@@ -1,7 +1,23 @@
 {
-  "name": "my-v0-project",
+  "name": "EloMath",
   "version": "0.1.0",
   "private": true,
+  "description": "",
+  "homepage": "https://github.com/monkegiuseppe/EloMath#readme",
+  "bugs": {
+    "url": "https://github.com/monkegiuseppe/EloMath/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/monkegiuseppe/EloMath.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
   "scripts": {
     "build": "next build",
     "dev": "next dev",
@@ -38,16 +54,22 @@
     "@radix-ui/react-toggle": "1.1.1",
     "@radix-ui/react-toggle-group": "1.1.1",
     "@radix-ui/react-tooltip": "1.1.6",
+    "@tiptap/pm": "^3.2.0",
+    "@tiptap/react": "^3.2.0",
+    "@tiptap/starter-kit": "^3.2.0",
     "autoprefixer": "^10.4.20",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "1.0.4",
     "date-fns": "4.1.0",
+    "dynamic": "^4.2.2",
     "embla-carousel-react": "8.5.1",
     "framer-motion": "latest",
     "geist": "latest",
     "input-otp": "1.4.1",
+    "katex": "^0.16.22",
     "lucide-react": "^0.454.0",
+    "mathjs": "^14.6.0",
     "next": "15.2.4",
     "next-themes": "^0.4.4",
     "react": "^19",
@@ -64,6 +86,7 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@types/katex": "^0.16.7",
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",

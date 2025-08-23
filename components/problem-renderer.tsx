@@ -1,24 +1,34 @@
+// components/problem-renderer.tsx
+
 "use client"
 
 import { useEffect, useRef } from "react"
+import katex from "katex"
 
-// Enhanced math renderer with better styling and MathJax support
-export default function ProblemRenderer({ text }) {
-  const containerRef = useRef(null)
+// Define the type for the component's props
+interface ProblemRendererProps {
+  text: string;
+}
+
+export default function ProblemRenderer({ text }: ProblemRendererProps) {
+  // Tell TypeScript this ref will hold an HTMLDivElement
+  const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    // Check if containerRef.current is not null
     if (containerRef.current && text) {
-      const rendered = text.replace(/\$([^$]+)\$/g, (match, math) => {
-        return `<span class="math-inline bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 px-2 py-1 rounded font-mono text-sm text-blue-900 dark:text-blue-100">${math}</span>`
-      })
-
-      containerRef.current.innerHTML = rendered
-
-      if (window.MathJax && window.MathJax.typesetPromise) {
-        window.MathJax.typesetPromise([containerRef.current]).catch((err) => {
-          console.log("MathJax rendering failed:", err)
-        })
-      }
+      const renderedHtml = text.replace(/\$(.*?)\$/g, (match: string, equation: string) => {
+        try {
+          return katex.renderToString(equation, {
+            throwOnError: false,
+            displayMode: false,
+          });
+        } catch (e) {
+          console.error("KaTeX rendering failed:", e);
+          return `<span class="text-red-500">Error rendering: ${equation}</span>`;
+        }
+      });
+      containerRef.current.innerHTML = renderedHtml;
     }
   }, [text])
 

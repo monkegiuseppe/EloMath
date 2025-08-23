@@ -1,0 +1,45 @@
+// lib/problems.ts
+
+import { mathProblems as allMathProblems } from './math-problems';
+import { physicsProblems as allPhysicsProblems } from './physics-problems';
+
+// The main interface for all problems in the application.
+
+export interface Problem {
+  id: string;
+  topic: string;
+  category: string;
+  difficulty: number;
+  problem: string;
+  answer: string; // Changed to just string for consistency
+  unit?: string; // Optional field for the answer's unit
+  format_hint?: string; // ADDED: Optional field for formatting instructions
+}
+
+// These imports now correctly match the extended Problem type.
+export const mathProblems: Problem[] = allMathProblems;
+export const physicsProblems: Problem[] = allPhysicsProblems;
+
+// This combined array now works seamlessly with both data types.
+export const allProblems: Problem[] = [...mathProblems, ...physicsProblems];
+
+// physics categories to the master list for filtering.
+export const allCategories: string[] = [
+  // Math
+  "Calculus I",
+  "Calculus II",
+  "Calculus III",
+  "Differential Equations",
+  "Linear Algebra1",
+  "Linear Algebra2",
+  "Complex Analysis",
+  // Physics
+  "Classical Mechanics",
+  "Electromagnetism",
+  "Thermodynamics",
+  "Statistical Mechanics",
+  "Optics and Waves",
+  "Modern Physics",
+  "Quantum Mechanics",
+  "Quantum Field Theory",
+];

@@ -4,11 +4,12 @@ import { GeistSans } from "geist/font/sans"
 import { GeistMono } from "geist/font/mono"
 import "./globals.css"
 import { ThemeToggle } from "@/components/theme-toggle"
+import "katex/dist/katex.min.css";
 
 export const metadata: Metadata = {
-  title: "v0 App",
-  description: "Created with v0",
-  generator: "v0.app",
+  title: "EloMath",
+  description: "",
+  generator: "",
 }
 
 export default function RootLayout({
