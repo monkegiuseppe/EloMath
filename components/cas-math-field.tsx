@@ -8,9 +8,9 @@ import { evaluateMath } from '../lib/cas-math';
 
 interface CasMathFieldProps {
   latex: string;
-  onChange: (latex: string) => void;
+  onChange: (newLatex: string) => void;
   onDelete: () => void;
-  onFocus: (field: MathField) => void;
+  onFocus?: (field: MathField) => void; 
 }
 
 const CasMathField: FC<CasMathFieldProps> = ({ latex, onChange, onFocus, onDelete }) => {
@@ -64,7 +64,8 @@ const CasMathField: FC<CasMathFieldProps> = ({ latex, onChange, onFocus, onDelet
           },
         }}
         onFocus={() => {
-          if (mathFieldRef.current) {
+          // FIXED: Check if onFocus was provided before calling it.
+          if (mathFieldRef.current && onFocus) {
             onFocus(mathFieldRef.current);
           }
         }}

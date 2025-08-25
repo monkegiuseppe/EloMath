@@ -9,6 +9,8 @@ import dynamic from 'next/dynamic'
 import { getPlayerElo, setPlayerElo } from "../lib/elo"
 import { MathPracticeCore } from "./math-practice-core"
 import { PhysicsPracticeCore } from "./physics-practice-core"
+import { Checkbox } from "./ui/checkbox";
+
 
 const FullscreenNotepad = dynamic(() => import('./fullscreen-notepad'), { ssr: false });
 
@@ -133,7 +135,7 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
           </button>
           
           {sessionType !== 'default' && (
-            <div className="flex items-center gap-4 glass px-4 py-2 rounded-lg">
+            <div className="relative flex items-center gap-4 glass px-4 py-2 rounded-lg">
               <div className="flex items-center gap-2 text-lg font-semibold text-primary">
                 <BrainCircuit size={24} />
                 <span>{sessionType === 'math' ? 'Math' : 'Physics'} ELO: {userElo}</span>
@@ -146,7 +148,7 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
                   <RefreshCw size={16} />
                 </button>
               </div>
-              <div className="relative">
+              <div>
                 <button onClick={() => setIsCategorySelectorOpen(p => !p)} className="flex items-center gap-2 text-sm px-3 py-1.5 rounded-md hover:bg-muted/50 transition-colors">
                   <SlidersHorizontal size={16} />
                   Categories
@@ -157,18 +159,20 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 10 }}
-                      // UPDATED: Used the .glass-strong utility class for a more intense blur and consistent styling
                       className="absolute top-full right-0 mt-2 w-72 glass-strong rounded-lg p-4 z-30"
                     >
                       <h3 className="text-sm font-semibold text-foreground mb-3">Filter Categories</h3>
                       <div className="max-h-60 overflow-y-auto space-y-1 pr-2 custom-scrollbar">
                         {currentCategoryList.map((cat) => (
-                          <label key={cat} className="flex items-center gap-3 p-2 rounded-md hover:bg-white/10 cursor-pointer">
-                            <input
-                              type="checkbox"
+                          <label
+                            htmlFor={cat}
+                            key={cat}
+                            className="flex items-center gap-3 p-2 rounded-md hover:bg-white/10 cursor-pointer"
+                          >
+                            <Checkbox
                               checked={selectedCategories.includes(cat)}
-                              onChange={() => handleCategoryToggle(cat)}
-                              className="h-4 w-4 rounded bg-transparent border-muted-foreground text-primary focus:ring-primary focus:ring-offset-0"
+                              onCheckedChange={() => handleCategoryToggle(cat)}
+                              id={cat}
                             />
                             <span className="text-sm text-foreground select-none">{cat}</span>
                           </label>

@@ -9,8 +9,7 @@ import { CheckCircle, XCircle, SkipForward, Info } from "lucide-react"
 import { mathProblems, type Problem } from "../lib/problems"
 import { isAnswerCorrect } from "../lib/utils"
 import ProblemRenderer from "./problem-renderer"
-
-// ... (interfaces remain the same)
+import FormattingGuideModal from "./formatting-guide-modal"
 
 interface MathPracticeCoreProps {
   userElo: number;
@@ -29,7 +28,11 @@ export const MathPracticeCore: FC<MathPracticeCoreProps> = ({ userElo, onEloUpda
   const [currentProblem, setCurrentProblem] = useState<Problem | null>(null);
   const [userAnswer, setUserAnswer] = useState<string>("");
   const [feedback, setFeedback] = useState<Feedback | null>(null);
+  const [isGuideOpen, setIsGuideOpen] = useState(false);
 
+  /**
+   * Fetches a new problem based on the user's ELO and selected categories.
+   */
   const getNewProblem = () => {
     setFeedback(null);
     setUserAnswer("");
@@ -63,12 +66,14 @@ export const MathPracticeCore: FC<MathPracticeCoreProps> = ({ userElo, onEloUpda
     setCurrentProblem(eligibleProblems[randomIndex]);
   };
 
-  // FIXED: Removed userElo from the dependency array. This is the crucial fix.
-  // A new problem will now only be fetched when categories change, not when ELO updates.
+  // A new problem will be fetched only when categories change.
   useEffect(() => {
     getNewProblem();
   }, [selectedCategories]);
 
+  /**
+   * Handles the submission of the user's answer, calculates ELO change, and provides feedback.
+   */
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!userAnswer.trim() || !currentProblem || currentProblem.id.startsWith("no-problems")) return;
@@ -90,91 +95,96 @@ export const MathPracticeCore: FC<MathPracticeCoreProps> = ({ userElo, onEloUpda
     });
   };
 
+  /**
+   * Skips the current problem and fetches a new one.
+   */
   const handleSkip = () => {
     onStatsUpdate('skipped');
     getNewProblem();
   };
   
-  // ... (JSX remains the same)
   return (
-    <div className="w-full h-full p-4 sm:p-6 lg:p-8 flex flex-col justify-center items-center">
-      <div className="w-full max-w-3xl">
-        <div className="bg-card/60 backdrop-blur-xl border border-border/30 rounded-2xl p-8 min-h-[24rem] mb-6">
-          <AnimatePresence mode="wait">
-            {currentProblem && (
-              <motion.div
-                key={currentProblem.id}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -30 }}
-                transition={{ duration: 0.4, ease: "easeInOut" }}
-                className="flex flex-col h-full"
-              >
-                <div className="flex justify-between items-center mb-4">
-                  <span className="text-sm font-medium text-primary bg-primary/10 px-3 py-1 rounded-full">
-                    {currentProblem.topic}
-                  </span>
-                  <span className="text-sm font-medium text-muted-foreground">
-                    Difficulty: {currentProblem.difficulty}
-                  </span>
-                </div>
-
-                <div className="flex-grow mb-6">
-                  <ProblemRenderer text={currentProblem.problem} />
-                </div>
-
-                <form onSubmit={handleSubmit} className="mt-auto">
-                  <div className="relative">
-                    <input
-                      type="text"
-                      value={userAnswer}
-                      onChange={(e) => setUserAnswer(e.target.value)}
-                      placeholder={currentProblem.id.startsWith("no-problems") ? "Please select categories..." : "Your Answer..."}
-                      disabled={!!feedback || currentProblem.id.startsWith("no-problems")}
-                      className="w-full bg-background/80 border-2 border-border rounded-lg py-3 pr-12 pl-4 text-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary transition-all disabled:opacity-50"
-                    />
-                    <button type="button" className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary p-1" title="Formatting Guide">
-                      <Info size={20} />
-                    </button>
+    <>
+      <FormattingGuideModal isOpen={isGuideOpen} onClose={() => setIsGuideOpen(false)} />
+      <div className="w-full h-full p-4 sm:p-6 lg:p-8 flex flex-col justify-center items-center">
+        <div className="w-full max-w-3xl">
+          <div className="bg-card/60 backdrop-blur-xl border border-border/30 rounded-2xl p-8 min-h-[24rem] mb-6">
+            <AnimatePresence mode="wait">
+              {currentProblem && (
+                <motion.div
+                  key={currentProblem.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -30 }}
+                  transition={{ duration: 0.4, ease: "easeInOut" }}
+                  className="flex flex-col h-full"
+                >
+                  <div className="flex justify-between items-center mb-4">
+                    <span className="text-sm font-medium text-primary bg-primary/10 px-3 py-1 rounded-full">
+                      {currentProblem.topic}
+                    </span>
+                    <span className="text-sm font-medium text-muted-foreground">
+                      Difficulty: {currentProblem.difficulty}
+                    </span>
                   </div>
-                  <div className="flex items-center justify-end gap-4 mt-4">
-                    {!feedback && !currentProblem.id.startsWith("no-problems") && (
-                      <motion.button type="button" onClick={handleSkip} className="flex items-center gap-2 px-4 py-2 text-sm text-yellow-500 hover:text-yellow-400">
-                        <SkipForward size={16} /> Skip
+
+                  <div className="flex-grow mb-6">
+                    <ProblemRenderer text={currentProblem.problem} />
+                  </div>
+
+                  <form onSubmit={handleSubmit} className="mt-auto">
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={userAnswer}
+                        onChange={(e) => setUserAnswer(e.target.value)}
+                        placeholder={currentProblem.id.startsWith("no-problems") ? "Please select categories..." : "Your Answer..."}
+                        disabled={!!feedback || currentProblem.id.startsWith("no-problems")}
+                        className="w-full bg-background/80 border-2 border-border rounded-lg py-3 pr-12 pl-4 text-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary transition-all disabled:opacity-50"
+                      />
+                      <button type="button" onClick={() => setIsGuideOpen(true)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary p-1" title="Formatting Guide">
+                        <Info size={20} />
+                      </button>
+                    </div>
+                    <div className="flex items-center justify-end gap-4 mt-4">
+                      {!feedback && !currentProblem.id.startsWith("no-problems") && (
+                        <motion.button type="button" onClick={handleSkip} className="flex items-center gap-2 px-4 py-2 text-sm text-yellow-500 hover:text-yellow-400">
+                          <SkipForward size={16} /> Skip
+                        </motion.button>
+                      )}
+                      <motion.button type="submit" disabled={!!feedback || !userAnswer.trim() || currentProblem.id.startsWith("no-problems")} className="px-8 py-3 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 disabled:bg-muted/50 disabled:cursor-not-allowed">
+                        {feedback ? "Answered" : "Submit"}
                       </motion.button>
-                    )}
-                    <motion.button type="submit" disabled={!!feedback || !userAnswer.trim() || currentProblem.id.startsWith("no-problems")} className="px-8 py-3 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 disabled:bg-muted/50 disabled:cursor-not-allowed">
-                      {feedback ? "Answered" : "Submit"}
-                    </motion.button>
+                    </div>
+                  </form>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          <AnimatePresence>
+            {feedback && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                className={`bg-card/60 backdrop-blur-xl border border-border/30 rounded-lg p-4 flex items-center justify-between ${feedback.type === "correct" ? "border-green-500/30" : "border-red-500/30"}`}
+              >
+                <div className="flex items-center gap-3">
+                  {feedback.type === "correct" ? <CheckCircle className="text-green-500" /> : <XCircle className="text-red-500" />}
+                  <div>
+                    <p className="font-bold text-foreground">{feedback.message}</p>
+                    <p className="text-sm text-muted-foreground">The correct answer is: <span className="font-mono">{feedback.correctAnswer}</span></p>
                   </div>
-                </form>
+                </div>
+                <motion.button onClick={getNewProblem} className="glass px-4 py-2 hover:bg-card/90 font-semibold rounded-lg">
+                  Next Question →
+                </motion.button>
               </motion.div>
             )}
           </AnimatePresence>
         </div>
-
-        <AnimatePresence>
-          {feedback && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              className={`bg-card/60 backdrop-blur-xl border border-border/30 rounded-lg p-4 flex items-center justify-between ${feedback.type === "correct" ? "border-green-500/30" : "border-red-500/30"}`}
-            >
-              <div className="flex items-center gap-3">
-                {feedback.type === "correct" ? <CheckCircle className="text-green-500" /> : <XCircle className="text-red-500" />}
-                <div>
-                  <p className="font-bold text-foreground">{feedback.message}</p>
-                  <p className="text-sm text-muted-foreground">The correct answer is: <span className="font-mono">{feedback.correctAnswer}</span></p>
-                </div>
-              </div>
-              <motion.button onClick={getNewProblem} className="glass px-4 py-2 hover:bg-card/90 font-semibold rounded-lg">
-                Next Question →
-              </motion.button>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
-    </div>
+    </>
   );
 };

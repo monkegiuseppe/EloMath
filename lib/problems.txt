@@ -3,9 +3,8 @@
 import { mathProblems as allMathProblems } from './math-problems';
 import { physicsProblems as allPhysicsProblems } from './physics-problems';
 
-// CHANGED: The main interface for all problems in the application.
-// We've added optional fields for units and formatting hints.
-// The 'answer' type is set to string for consistency across all data files.
+// The main interface for all problems in the application.
+
 export interface Problem {
   id: string;
   topic: string;
@@ -13,7 +12,7 @@ export interface Problem {
   difficulty: number;
   problem: string;
   answer: string; // Changed to just string for consistency
-  unit?: string; // ADDED: Optional field for the answer's unit
+  unit?: string; // Optional field for the answer's unit
   format_hint?: string; // ADDED: Optional field for formatting instructions
 }
 
@@ -24,7 +23,7 @@ export const physicsProblems: Problem[] = allPhysicsProblems;
 // This combined array now works seamlessly with both data types.
 export const allProblems: Problem[] = [...mathProblems, ...physicsProblems];
 
-// ADDED: New physics categories to the master list for filtering.
+// physics categories to the master list for filtering.
 export const allCategories: string[] = [
   // Math
   "Calculus I",
