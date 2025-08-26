@@ -49,3 +49,9 @@ yarn-error.log*
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Custom ignores for text file duplicates
+lib/cas-math.txt
+lib/elo.txt
+lib/problems.txt
+lib/utils.txt

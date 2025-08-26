@@ -9,8 +9,10 @@ import CasMathField from './cas-math-field';
 
 addStyles();
 
+// UPDATED: The state now includes the MathField instance
 interface EquationState {
   latex: string;
+  mqInstance: MathField | null;
 }
 
 interface FullscreenNotepadProps {
@@ -38,38 +40,84 @@ export default function FullscreenNotepad({ value, onChange }: FullscreenNotepad
 
     const equationId = `cas-eq-${equationCounter.current++}`;
     
-    const wrapper = document.createElement('div');
+    const wrapper = document.createElement('span');
     wrapper.className = 'inline-math-wrapper';
     wrapper.setAttribute('data-equation-id', equationId);
     wrapper.contentEditable = 'false';
 
-    const pBefore = document.createElement('p');
-    const pAfter = document.createElement('p');
-    pAfter.innerHTML = '&#8203;';
+    const cursorNode = document.createTextNode('\u200B');
 
-    range.insertNode(pAfter);
     range.insertNode(wrapper);
-    range.insertNode(pBefore);
+    range.insertNode(cursorNode);
+    
+    // Initialize the state for the new equation
+    setEquations(prev => ({ ...prev, [equationId]: { latex: '', mqInstance: null } }));
 
-    setEquations(prev => ({ ...prev, [equationId]: { latex: '' } }));
-
-    range.setStart(pAfter, 0);
+    range.setStart(cursorNode, 1);
     range.collapse(true);
     selection.removeAllRanges();
     selection.addRange(range);
   };
+  
+  // This function is called by the child to store its instance
+  const handleEquationMount = (id: string, field: MathField) => {
+    setEquations(prev => {
+      // Ensure the ID exists before trying to update
+      if (!prev[id]) return prev;
+      return {
+        ...prev,
+        [id]: { ...prev[id], mqInstance: field },
+      };
+    });
+  };
 
   useEffect(() => {
+    const contentEl = contentRef.current;
+    if (!contentEl) return;
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'm') {
         e.preventDefault();
         insertEquation();
+        return;
+      }
+      
+      const selection = window.getSelection();
+      if (!selection || !selection.isCollapsed || !selection.anchorNode) return;
+
+      const { anchorNode, anchorOffset } = selection;
+      let targetWrapper: Element | null = null;
+
+      if (e.key === 'ArrowRight') {
+        if (anchorNode.nodeType === Node.TEXT_NODE && anchorOffset === anchorNode.textContent?.length) {
+          targetWrapper = anchorNode.nextSibling as Element;
+        } else if (anchorNode.nodeType === Node.ELEMENT_NODE) {
+          targetWrapper = anchorNode.childNodes[anchorOffset] as Element;
+        }
+      } else if (e.key === 'ArrowLeft') {
+        if (anchorNode.nodeType === Node.TEXT_NODE && anchorOffset === 0) {
+          targetWrapper = anchorNode.previousSibling as Element;
+        } else if (anchorNode.nodeType === Node.ELEMENT_NODE) {
+          targetWrapper = anchorNode.childNodes[anchorOffset - 1] as Element;
+        }
+      }
+
+      // REWRITTEN: This logic now uses the stored instance from the state
+      if (targetWrapper && targetWrapper.classList?.contains('inline-math-wrapper')) {
+        e.preventDefault();
+        const equationId = targetWrapper.getAttribute('data-equation-id');
+        if (equationId && equations[equationId]?.mqInstance) {
+          const mqInstance = equations[equationId].mqInstance;
+          mqInstance.focus();
+          if (e.key === 'ArrowRight') mqInstance.moveToLeftEnd();
+          else mqInstance.moveToRightEnd();
+        }
       }
     };
-    const contentEl = contentRef.current;
-    contentEl?.addEventListener('keydown', handleKeyDown);
-    return () => contentEl?.removeEventListener('keydown', handleKeyDown);
-  }, []);
+
+    contentEl.addEventListener('keydown', handleKeyDown);
+    return () => contentEl.removeEventListener('keydown', handleKeyDown);
+  }, [equations]); // Dependency array now correctly includes `equations`
 
   return (
     <>
@@ -107,8 +155,10 @@ export default function FullscreenNotepad({ value, onChange }: FullscreenNotepad
                   return next;
                 });
               }}
+              // Pass the mounting function to the child
+              onMount={(field) => handleEquationMount(id, field)}
             />,
-            container
+            container as Element
           );
         })}
       </div>

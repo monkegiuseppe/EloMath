@@ -10,15 +10,14 @@ interface CasMathFieldProps {
   latex: string;
   onChange: (newLatex: string) => void;
   onDelete: () => void;
-  onFocus?: (field: MathField) => void; 
+  onMount: (field: MathField) => void;
 }
 
-const CasMathField: FC<CasMathFieldProps> = ({ latex, onChange, onFocus, onDelete }) => {
+const CasMathField: FC<CasMathFieldProps> = ({ latex, onChange, onMount, onDelete }) => {
   const [output, setOutput] = useState('');
   const mathFieldRef = useRef<MathField | null>(null);
 
   const handleEnter = (field: MathField) => {
-    // Good practice to have a check here as well.
     if (field) {
       const currentLatex = field.latex();
       if (currentLatex) {
@@ -34,13 +33,12 @@ const CasMathField: FC<CasMathFieldProps> = ({ latex, onChange, onFocus, onDelet
         latex={latex}
         mathquillDidMount={(field) => {
           mathFieldRef.current = field;
+          onMount(field);
           field.focus();
         }}
         config={{
           handlers: {
             edit: (mathField) => {
-              // FIXED: This guard clause is the definitive solution.
-              // It ensures we never try to access a property on an undefined object.
               if (mathField) {
                 onChange(mathField.latex());
               }
@@ -48,26 +46,58 @@ const CasMathField: FC<CasMathFieldProps> = ({ latex, onChange, onFocus, onDelet
             enter: handleEnter,
             deleteOutOf: () => onDelete(),
             moveOutOf: (dir) => {
-              const el = mathFieldRef.current?.el();
-              if (!el) return;
-              const wrapper = el.closest('.inline-math-wrapper');
-              if (!wrapper) return;
+              const wrapper = mathFieldRef.current?.el().closest('.inline-math-wrapper');
+              if (!wrapper || !wrapper.parentNode) return;
+              
+              // *** THIS IS THE FIX ***
+              // Store parentNode in a constant AFTER the null check.
+              // TypeScript now knows 'parent' is guaranteed to exist.
+              const parent = wrapper.parentNode;
+
+              const parentEditor = wrapper.closest('[contenteditable="true"]') as HTMLElement | null;
+              if (!parentEditor) return;
+              
+              parentEditor.focus();
               const selection = window.getSelection();
               if (!selection) return;
+              
               const range = document.createRange();
-              if (dir < 0) range.setStartBefore(wrapper);
-              else range.setStartAfter(wrapper);
+
+              const createCursorAnchor = (position: 'before' | 'after') => {
+                const zeroWidthNode = document.createTextNode('\u200B');
+                if (position === 'before') {
+                  // Use the safe 'parent' variable here
+                  parent.insertBefore(zeroWidthNode, wrapper);
+                } else {
+                  // And here
+                  parent.insertBefore(zeroWidthNode, wrapper.nextSibling);
+                }
+                range.setStart(zeroWidthNode, 1);
+              };
+
+              if (dir < 0) { // Moving LEFT
+                const prev = wrapper.previousSibling;
+                if (prev && prev.nodeType === Node.TEXT_NODE) {
+                  range.setStart(prev, prev.textContent?.length || 0);
+                } else {
+                  createCursorAnchor('before');
+                }
+              } 
+              else { // Moving RIGHT
+                const next = wrapper.nextSibling;
+                if (next && next.nodeType === Node.TEXT_NODE) {
+                  const offset = next.textContent === '\u200B' ? 1 : 0;
+                  range.setStart(next, offset);
+                } else {
+                  createCursorAnchor('after');
+                }
+              }
+              
               range.collapse(true);
               selection.removeAllRanges();
               selection.addRange(range);
             },
           },
-        }}
-        onFocus={() => {
-          // FIXED: Check if onFocus was provided before calling it.
-          if (mathFieldRef.current && onFocus) {
-            onFocus(mathFieldRef.current);
-          }
         }}
         className="w-full p-2 rounded-md bg-input border border-border"
       />
