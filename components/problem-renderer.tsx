@@ -2,35 +2,40 @@
 
 "use client"
 
-import { useEffect, useRef } from "react"
-import katex from "katex"
+import React from "react";
+import katex from "katex";
+import "katex/dist/katex.min.css"; // Ensures KaTeX styles are loaded
 
-// Define the type for the component's props
 interface ProblemRendererProps {
   text: string;
 }
 
 export default function ProblemRenderer({ text }: ProblemRendererProps) {
-  // Tell TypeScript this ref will hold an HTMLDivElement
-  const containerRef = useRef<HTMLDivElement>(null)
+  // Split the text by the KaTeX delimiter ($)
+  const parts = text.split('$');
 
-  useEffect(() => {
-    // Check if containerRef.current is not null
-    if (containerRef.current && text) {
-      const renderedHtml = text.replace(/\$(.*?)\$/g, (match: string, equation: string) => {
-        try {
-          return katex.renderToString(equation, {
-            throwOnError: false,
-            displayMode: false,
-          });
-        } catch (e) {
-          console.error("KaTeX rendering failed:", e);
-          return `<span class="text-red-500">Error rendering: ${equation}</span>`;
+  return (
+    <div className="text-lg leading-relaxed text-foreground prose prose-lg max-w-none">
+      {parts.map((part, index) => {
+        // Even-indexed parts are regular text.
+        if (index % 2 === 0) {
+          return <span key={index}>{part}</span>;
         }
-      });
-      containerRef.current.innerHTML = renderedHtml;
-    }
-  }, [text])
-
-  return <div ref={containerRef} className="text-lg leading-relaxed text-foreground prose prose-lg max-w-none" />
+        // Odd-indexed parts are math expressions to be rendered by KaTeX.
+        else {
+          try {
+            const html = katex.renderToString(part, {
+              throwOnError: false,
+              displayMode: false,
+            });
+            // Use dangerouslySetInnerHTML in a controlled way for KaTeX output.
+            return <span key={index} dangerouslySetInnerHTML={{ __html: html }} />;
+          } catch (e) {
+            console.error("KaTeX rendering failed:", e);
+            return <span key={index} className="text-red-500">{`Error: ${part}`}</span>;
+          }
+        }
+      })}
+    </div>
+  );
 }

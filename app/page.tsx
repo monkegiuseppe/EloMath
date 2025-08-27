@@ -97,9 +97,9 @@ export default function Home() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.1 * index }}
                 onClick={() => handleMenuClick(item.id)}
-                className="glass p-6 rounded-xl text-left hover:bg-card/90 transition-all duration-200 hover:scale-105 group"
+                className="glass p-6 rounded-xl text-left hover:bg-card/90 transition-colors duration-200 group"
               >
-                <div className="flex items-start gap-4">
+                <div className="flex items-center gap-4">
                   <div className="p-3 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
                     <item.icon className="w-6 h-6 text-primary" />
                   </div>
