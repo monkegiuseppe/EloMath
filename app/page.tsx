@@ -7,9 +7,7 @@ import type { FC } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Brain, Calculator, Atom, BarChart3, LogIn, LucideProps, BookOpen } from "lucide-react"
 import Workspace from "../components/workspace"
-import GraphingTool from "../components/graphing-tool" // Keep this for now
 
-// Define the shape of a menu item for better type safety
 interface MenuItem {
   id: 'practice-math' | 'practice-physics' | 'progress' | 'workspace';
   label: string;
@@ -20,10 +18,6 @@ interface MenuItem {
 export default function Home() {
   const [currentView, setCurrentView] = useState("home")
   const [sessionType, setSessionType] = useState<'math' | 'physics' | 'default'>('default');
-  
-  // REMOVED: isNotepadOpen state is no longer needed
-  // ADDED: State for the floating graphing tool, which we might still want
-  const [isGraphingOpen, setIsGraphingOpen] = useState(false)
 
   const menuItems: MenuItem[] = [
     { id: "practice-math", label: "Math Practice", icon: Calculator, description: "Calculus, Linear Algebra, etc." },
@@ -72,11 +66,6 @@ export default function Home() {
       <div className="absolute inset-0 bg-cover bg-center bg-no-repeat dynamic-background" />
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5" />
       <div className="absolute inset-0 backdrop-blur-[1px]" />
-
-      {/* REMOVED: The floating notepad is gone. We can decide later if a floating grapher is still needed. */}
-      <AnimatePresence>
-        {isGraphingOpen && <GraphingTool key="graphing-tool" onClose={() => setIsGraphingOpen(false)} />}
-      </AnimatePresence>
 
       <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="w-full max-w-5xl">

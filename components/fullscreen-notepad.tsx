@@ -5,11 +5,12 @@
 import { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import { addStyles, MathField } from 'react-mathquill';
+import { Info } from 'lucide-react';
 import CasMathField from './cas-math-field';
+import NotepadGuideModal from './notepad-guide-modal';
 
 addStyles();
 
-// UPDATED: The state now includes the MathField instance
 interface EquationState {
   latex: string;
   mqInstance: MathField | null;
@@ -18,10 +19,12 @@ interface EquationState {
 interface FullscreenNotepadProps {
   value: string;
   onChange: (newValue: string) => void;
+  sessionType?: 'math' | 'physics' | 'default';
 }
 
-export default function FullscreenNotepad({ value, onChange }: FullscreenNotepadProps) {
+export default function FullscreenNotepad({ value, onChange, sessionType = 'default' }: FullscreenNotepadProps) {
   const [equations, setEquations] = useState<Record<string, EquationState>>({});
+  const [isGuideOpen, setIsGuideOpen] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
   const equationCounter = useRef(0);
 
@@ -50,7 +53,6 @@ export default function FullscreenNotepad({ value, onChange }: FullscreenNotepad
     range.insertNode(wrapper);
     range.insertNode(cursorNode);
     
-    // Initialize the state for the new equation
     setEquations(prev => ({ ...prev, [equationId]: { latex: '', mqInstance: null } }));
 
     range.setStart(cursorNode, 1);
@@ -59,10 +61,8 @@ export default function FullscreenNotepad({ value, onChange }: FullscreenNotepad
     selection.addRange(range);
   };
   
-  // This function is called by the child to store its instance
   const handleEquationMount = (id: string, field: MathField) => {
     setEquations(prev => {
-      // Ensure the ID exists before trying to update
       if (!prev[id]) return prev;
       return {
         ...prev,
@@ -102,7 +102,6 @@ export default function FullscreenNotepad({ value, onChange }: FullscreenNotepad
         }
       }
 
-      // REWRITTEN: This logic now uses the stored instance from the state
       if (targetWrapper && targetWrapper.classList?.contains('inline-math-wrapper')) {
         e.preventDefault();
         const equationId = targetWrapper.getAttribute('data-equation-id');
@@ -117,10 +116,11 @@ export default function FullscreenNotepad({ value, onChange }: FullscreenNotepad
 
     contentEl.addEventListener('keydown', handleKeyDown);
     return () => contentEl.removeEventListener('keydown', handleKeyDown);
-  }, [equations]); // Dependency array now correctly includes `equations`
+  }, [equations]);
 
   return (
     <>
+      <NotepadGuideModal isOpen={isGuideOpen} onClose={() => setIsGuideOpen(false)} />
       <div className="w-full h-full flex flex-col bg-card/50 rounded-b-lg overflow-hidden">
         <div
           ref={contentRef}
@@ -130,11 +130,16 @@ export default function FullscreenNotepad({ value, onChange }: FullscreenNotepad
           onInput={(e) => onChange(e.currentTarget.innerHTML)}
         />
         
-        <div className="px-8 pb-4 mt-auto border-t border-border/30 bg-card/50 flex-shrink-0 flex items-center justify-between">
-          <div className="text-sm text-muted-foreground pt-3">
+        {/* *** THIS IS THE FIX *** */}
+        {/* Changed the layout of the bottom bar */}
+        <div className="px-8 pb-4 pt-3 mt-auto border-t border-border/30 bg-card/50 flex-shrink-0 flex items-center">
+          <div className="text-sm text-muted-foreground">
             <kbd className="px-2 py-1 bg-muted border rounded text-xs">Ctrl</kbd> + 
             <kbd className="px-2 py-1 bg-muted border rounded text-xs">M</kbd> to insert equation.
           </div>
+          <button onClick={() => setIsGuideOpen(true)} className="ml-3 p-1 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/50" title="Notepad Guide">
+            <Info size={18} />
+          </button>
         </div>
 
       {Object.entries(equations).map(([id, state]) => {
@@ -155,8 +160,8 @@ export default function FullscreenNotepad({ value, onChange }: FullscreenNotepad
                   return next;
                 });
               }}
-              // Pass the mounting function to the child
               onMount={(field) => handleEquationMount(id, field)}
+              sessionType={sessionType}
             />,
             container as Element
           );

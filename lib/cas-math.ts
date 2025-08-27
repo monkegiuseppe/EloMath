@@ -12,14 +12,16 @@ math.import({
   e: math.unit('1.602176634e-19 C'),
 }, { override: true });
 
-// ADDED: A type definition to correctly handle the output of rationalize
 interface RationalizeResult {
   coefficients: number[];
   variables: string[];
   expression: MathNode;
 }
 
-export const evaluateMath = (expression: string): string => {
+export const evaluateMath = (
+  expression: string,
+  sessionType: 'math' | 'physics' | 'default' = 'default'
+): string => {
   try {
     let sanitizedExpr = expression
       .replace(/\\sqrt/g, 'sqrt')
@@ -31,9 +33,14 @@ export const evaluateMath = (expression: string): string => {
       .replace(/\{/g, '(')
       .replace(/\}/g, ')');
 
-    // REWRITTEN: This logic now correctly solves linear and quadratic equations.
     const solveMatch = sanitizedExpr.match(/^solve\(([^,]+),([^)]+)\)/);
     if (solveMatch) {
+      // *** THIS IS THE FIX ***
+      // The check is now specific to 'math' practice only.
+      if (sessionType === 'math') {
+        return "Error: solve() is disabled during math practice.";
+      }
+      
       let equation = solveMatch[1].trim();
       const variable = solveMatch[2].trim();
 
@@ -45,13 +52,12 @@ export const evaluateMath = (expression: string): string => {
       const simplified = math.simplify(equation);
       const poly = math.rationalize(simplified, {}, true) as RationalizeResult;
 
-      if (poly.variables.length > 1 || poly.variables[0] !== variable) {
-        return "Error: Can only solve for one variable.";
+      if (poly.variables.length > 1 || (poly.variables.length > 0 && poly.variables[0] !== variable)) {
+        return "Error: Can only solve for the specified variable.";
       }
 
-      const coeffs = poly.coefficients.reverse(); // From [c, b, a] to [a, b, c]
+      const coeffs = poly.coefficients.reverse();
       
-      // Solve Quadratic: ax^2 + bx + c = 0
       if (coeffs.length === 3) {
         const [a, b, c] = coeffs;
         const discriminant = b * b - 4 * a * c;
@@ -59,11 +65,12 @@ export const evaluateMath = (expression: string): string => {
         
         const root1 = math.simplify(`(-${b} + sqrt(${discriminant})) / (2 * ${a})`);
         const root2 = math.simplify(`(-${b} - sqrt(${discriminant})) / (2 * ${a})`);
+        if (root1.equals(root2)) return root1.toTex();
         return `${root1.toTex()}, ${root2.toTex()}`;
       }
-      // Solve Linear: ax + b = 0
       else if (coeffs.length === 2) {
         const [a, b] = coeffs;
+        if (a === 0) return "Invalid linear equation";
         const root = math.simplify(`${-b} / ${a}`);
         return root.toTex();
       }

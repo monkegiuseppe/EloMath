@@ -11,9 +11,10 @@ interface CasMathFieldProps {
   onChange: (newLatex: string) => void;
   onDelete: () => void;
   onMount: (field: MathField) => void;
+  sessionType?: 'math' | 'physics' | 'default';
 }
 
-const CasMathField: FC<CasMathFieldProps> = ({ latex, onChange, onMount, onDelete }) => {
+const CasMathField: FC<CasMathFieldProps> = ({ latex, onChange, onMount, onDelete, sessionType }) => {
   const [output, setOutput] = useState('');
   const mathFieldRef = useRef<MathField | null>(null);
 
@@ -21,7 +22,7 @@ const CasMathField: FC<CasMathFieldProps> = ({ latex, onChange, onMount, onDelet
     if (field) {
       const currentLatex = field.latex();
       if (currentLatex) {
-        const result = evaluateMath(currentLatex);
+        const result = evaluateMath(currentLatex, sessionType);
         setOutput(result);
       }
     }
@@ -37,10 +38,16 @@ const CasMathField: FC<CasMathFieldProps> = ({ latex, onChange, onMount, onDelet
           field.focus();
         }}
         config={{
+          // *** THIS IS THE FIX ***
+          // Automatically convert 'sqrt' to the square root symbol.
+          autoCommands: 'pi theta sqrt',
           handlers: {
             edit: (mathField) => {
               if (mathField) {
                 onChange(mathField.latex());
+                if (output) {
+                  setOutput('');
+                }
               }
             },
             enter: handleEnter,
@@ -49,9 +56,6 @@ const CasMathField: FC<CasMathFieldProps> = ({ latex, onChange, onMount, onDelet
               const wrapper = mathFieldRef.current?.el().closest('.inline-math-wrapper');
               if (!wrapper || !wrapper.parentNode) return;
               
-              // *** THIS IS THE FIX ***
-              // Store parentNode in a constant AFTER the null check.
-              // TypeScript now knows 'parent' is guaranteed to exist.
               const parent = wrapper.parentNode;
 
               const parentEditor = wrapper.closest('[contenteditable="true"]') as HTMLElement | null;
@@ -66,10 +70,8 @@ const CasMathField: FC<CasMathFieldProps> = ({ latex, onChange, onMount, onDelet
               const createCursorAnchor = (position: 'before' | 'after') => {
                 const zeroWidthNode = document.createTextNode('\u200B');
                 if (position === 'before') {
-                  // Use the safe 'parent' variable here
                   parent.insertBefore(zeroWidthNode, wrapper);
                 } else {
-                  // And here
                   parent.insertBefore(zeroWidthNode, wrapper.nextSibling);
                 }
                 range.setStart(zeroWidthNode, 1);
