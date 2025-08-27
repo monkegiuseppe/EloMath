@@ -130,7 +130,6 @@ export default function FullscreenNotepad({ value, onChange, sessionType = 'defa
           onInput={(e) => onChange(e.currentTarget.innerHTML)}
         />
         
-        {/* *** THIS IS THE FIX *** */}
         {/* Changed the layout of the bottom bar */}
         <div className="px-8 pb-4 pt-3 mt-auto border-t border-border/30 bg-card/50 flex-shrink-0 flex items-center">
           <div className="text-sm text-muted-foreground">
