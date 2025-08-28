@@ -8,6 +8,8 @@
   }
 }
 
+/* *** THIS IS THE FIX *** */
+/* I have consolidated the two @layer base blocks into one and made the default text color more explicit. */
 @layer base {
   :root {
     --background: 15 23 42;
@@ -47,14 +49,13 @@
     --gradient-via: 51 65 85;
     --gradient-to: 71 85 105;
   }
-}
 
-@layer base {
   * {
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background; /* Removed text-foreground from @apply */
+    color: rgb(var(--foreground)); /* Added explicit color rule */
     background: linear-gradient(
       135deg,
       rgb(var(--gradient-from)) 0%,
@@ -182,4 +183,17 @@
 /* When dark mode is active */
 .dark .dynamic-background {
   background-image: url(/images/gd.png);
+}
+
+
+.answer-math-field .mq-editable-field {
+  min-height: 4rem; /* Larger height */
+  font-size: 1.25rem; /* Larger font size */
+}
+
+.answer-math-field .mq-editable-field:focus,
+.answer-math-field .mq-editable-field.mq-focused {
+  outline: none;
+  box-shadow: none;
+  border-color: hsl(var(--border)); 
 }
