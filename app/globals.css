@@ -61,13 +61,10 @@
     );
     min-height: 100vh;
   }
+  
 
-  /* *** THIS IS THE FIX *** */
-  /* This rule forces button elements to inherit text color from their parents,
-     overriding stubborn browser-default styles. This ensures your utility
-     classes like `text-foreground` will work correctly inside buttons. */
-  button {
-    @apply text-inherit;
+  h1, h2, h3, h4, h5, h6, button {
+    color: inherit;
   }
 }
 
@@ -190,7 +187,7 @@
   background-image: url(/images/gd.png);
 }
 
-/* ADDED: Styles for the new answer box */
+/* Styles for the new answer box */
 .answer-math-field .mq-editable-field {
   min-height: 4rem; /* Larger height */
   font-size: 1.25rem; /* Larger font size */
