@@ -183,16 +183,3 @@
 .dark .dynamic-background {
   background-image: url(/images/gd.png);
 }
-
-/* ADDED: Styles for the new answer box */
-.answer-math-field .mq-editable-field {
-  min-height: 4rem; /* Larger height */
-  font-size: 1.25rem; /* Larger font size */
-}
-
-.answer-math-field .mq-editable-field:focus,
-.answer-math-field .mq-editable-field.mq-focused {
-  outline: none;
-  box-shadow: none;
-  border-color: hsl(var(--border)); /* Keep a consistent border color */
-}

@@ -38,7 +38,6 @@ const CasMathField: FC<CasMathFieldProps> = ({ latex, onChange, onMount, onDelet
           field.focus();
         }}
         config={{
-          // *** THIS IS THE FIX ***
           // Automatically convert 'sqrt' to the square root symbol.
           autoCommands: 'pi theta sqrt',
           handlers: {

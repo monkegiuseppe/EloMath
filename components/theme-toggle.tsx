@@ -1,3 +1,5 @@
+// components/theme-toggle.tsx
+
 "use client"
 
 import { useState, useEffect } from "react"
@@ -8,8 +10,6 @@ export function ThemeToggle() {
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme")
-
-    // Default to light unless 'dark' is explicitly saved in localStorage
     if (savedTheme === "dark") {
       setIsDark(true)
       document.documentElement.classList.add("dark")
@@ -35,7 +35,8 @@ export function ThemeToggle() {
   return (
     <button
       onClick={toggleTheme}
-      className="fixed top-4 right-4 z-50 glass p-3 rounded-full hover:glass-strong transition-all duration-300 group"
+      // *** FIX: Removed fixed positioning classes ***
+      className="glass p-3 rounded-full hover:glass-strong transition-all duration-300 group"
       aria-label="Toggle theme"
     >
       <div className="relative w-6 h-6">

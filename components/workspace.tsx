@@ -109,9 +109,10 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
     setTabs(newTabs);
   };
   
-  const handleContentChange = (newContent: string) => { setTabs(tabs.map(tab => tab.id === activeTabId ? { ...tab, content: newContent } : tab)); };
+  const handleContentChange = (tabId: number, newContent: string) => {
+    setTabs(tabs.map(tab => tab.id === tabId ? { ...tab, content: newContent } : tab));
+  };
 
-  const activeTab = tabs.find(tab => tab.id === activeTabId);
   const currentCategoryList = sessionType === 'math' ? mathCategories : physicsCategories;
 
   return (
@@ -172,16 +173,41 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
           </div>
 
           <div className="flex-grow relative">
-            {activeTab?.type === 'notepad' && (
-              <FullscreenNotepad
-                value={activeTab.content || ''}
-                onChange={handleContentChange}
-                sessionType={sessionType}
-              />
-            )}
-            {activeTab?.type === 'graphing' && <FullscreenGraphingTool />}
-            {activeTab?.type === 'math-practice' && <MathPracticeCore userElo={userElo} onEloUpdate={handleEloUpdate} onStatsUpdate={handleStatsUpdate} selectedCategories={selectedCategories} />}
-            {activeTab?.type === 'physics-practice' && <PhysicsPracticeCore userElo={userElo} onEloUpdate={handleEloUpdate} onStatsUpdate={handleStatsUpdate} selectedCategories={selectedCategories} />}
+            {tabs.map(tab => (
+              <div
+                key={tab.id}
+                // *** THIS IS THE FIX ***
+                // Replaced inline style with a smooth and safe opacity transition
+                className={`w-full h-full absolute top-0 left-0 transition-opacity duration-150 ease-in-out ${
+                  activeTabId === tab.id ? 'opacity-100 z-10' : 'opacity-0 z-0 invisible'
+                }`}
+              >
+                {tab.type === 'notepad' && (
+                  <FullscreenNotepad
+                    value={tab.content || ''}
+                    onChange={(newContent) => handleContentChange(tab.id, newContent)}
+                    sessionType={sessionType}
+                  />
+                )}
+                {tab.type === 'graphing' && <FullscreenGraphingTool />}
+                {tab.type === 'math-practice' && (
+                  <MathPracticeCore
+                    userElo={userElo}
+                    onEloUpdate={handleEloUpdate}
+                    onStatsUpdate={handleStatsUpdate}
+                    selectedCategories={selectedCategories}
+                  />
+                )}
+                {tab.type === 'physics-practice' && (
+                  <PhysicsPracticeCore
+                    userElo={userElo}
+                    onEloUpdate={handleEloUpdate}
+                    onStatsUpdate={handleStatsUpdate}
+                    selectedCategories={selectedCategories}
+                  />
+                )}
+              </div>
+            ))}
           </div>
         </motion.div>
       </div>
