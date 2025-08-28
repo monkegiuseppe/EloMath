@@ -1,6 +1,6 @@
 // lib/cas-math.ts
 
-import { create, all, MathNode } from 'mathjs'
+import { create, all, MathNode, OperatorNode } from 'mathjs' // Import OperatorNode
 
 const math = create(all);
 
@@ -35,8 +35,6 @@ export const evaluateMath = (
 
     const solveMatch = sanitizedExpr.match(/^solve\(([^,]+),([^)]+)\)/);
     if (solveMatch) {
-      // *** THIS IS THE FIX ***
-      // The check is now specific to 'math' practice only.
       if (sessionType === 'math') {
         return "Error: solve() is disabled during math practice.";
       }
@@ -50,15 +48,26 @@ export const evaluateMath = (
       }
       
       const simplified = math.simplify(equation);
-      const poly = math.rationalize(simplified, {}, true) as RationalizeResult;
+      
+      let expressionToSolve: MathNode | string = simplified;
+
+      // *** THIS IS THE FIX ***
+      // Use a type guard to check if the simplified node is an OperatorNode.
+      if ('isOperatorNode' in simplified && (simplified as OperatorNode).op === '/') {
+        expressionToSolve = (simplified as OperatorNode).args[0];
+      }
+
+      const poly = math.rationalize(expressionToSolve, {}, true) as RationalizeResult;
 
       if (poly.variables.length > 1 || (poly.variables.length > 0 && poly.variables[0] !== variable)) {
         return "Error: Can only solve for the specified variable.";
       }
-
+      
+      if (poly.coefficients.length === 0) return "Error: Could not find coefficients.";
+      
       const coeffs = poly.coefficients.reverse();
       
-      if (coeffs.length === 3) {
+      if (coeffs.length === 3) { // Quadratic
         const [a, b, c] = coeffs;
         const discriminant = b * b - 4 * a * c;
         if (discriminant < 0) return "No real roots";
@@ -68,11 +77,14 @@ export const evaluateMath = (
         if (root1.equals(root2)) return root1.toTex();
         return `${root1.toTex()}, ${root2.toTex()}`;
       }
-      else if (coeffs.length === 2) {
+      else if (coeffs.length === 2) { // Linear
         const [a, b] = coeffs;
         if (a === 0) return "Invalid linear equation";
         const root = math.simplify(`${-b} / ${a}`);
         return root.toTex();
+      }
+       else if (coeffs.length === 1) {
+        return coeffs[0] === 0 ? "All real numbers" : "No solution";
       }
       
       return "Solver only supports linear and quadratic equations.";
