@@ -69,13 +69,12 @@ export default function Home() {
 
       <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
         {/* *** THIS IS THE FIX *** */}
-        {/* Added prose and prose-invert to enforce the dark theme's text colors consistently. */}
-        {/* Added prose-h1:text-transparent to preserve the gradient on the title. */}
+        {/* Removed all `prose` related classes to prevent style conflicts. */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="w-full max-w-5xl prose prose-invert prose-h1:text-transparent"
+          className="w-full max-w-5xl"
         >
           <div className="text-center mb-12">
             <motion.div initial={{ scale: 0.9 }} animate={{ scale: 1 }} transition={{ duration: 0.5, delay: 0.2 }} className="glass rounded-2xl p-8 mb-8">
