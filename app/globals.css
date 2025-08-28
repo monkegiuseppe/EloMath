@@ -61,16 +61,13 @@
     );
     min-height: 100vh;
   }
-  
+
   /* *** THIS IS THE FIX *** */
-  /* This block explicitly resets the color of common text elements,
-     ensuring your theme's foreground color overrides browser defaults.
-     Utility classes like `text-muted-foreground` will still work correctly. */
-  h1, h2, h3, h4, h5, h6 {
-    @apply text-foreground;
-  }
-  p {
-    @apply text-muted-foreground;
+  /* This rule forces button elements to inherit text color from their parents,
+     overriding stubborn browser-default styles. This ensures your utility
+     classes like `text-foreground` will work correctly inside buttons. */
+  button {
+    @apply text-inherit;
   }
 }
 
