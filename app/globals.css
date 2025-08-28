@@ -8,8 +8,6 @@
   }
 }
 
-/* *** THIS IS THE FIX *** */
-/* I have consolidated the two @layer base blocks into one and made the default text color more explicit. */
 @layer base {
   :root {
     --background: 15 23 42;
@@ -54,8 +52,7 @@
     @apply border-border;
   }
   body {
-    @apply bg-background; /* Removed text-foreground from @apply */
-    color: rgb(var(--foreground)); /* Added explicit color rule */
+    @apply bg-background text-foreground;
     background: linear-gradient(
       135deg,
       rgb(var(--gradient-from)) 0%,
@@ -63,6 +60,17 @@
       rgb(var(--gradient-to)) 100%
     );
     min-height: 100vh;
+  }
+  
+  /* *** THIS IS THE FIX *** */
+  /* This block explicitly resets the color of common text elements,
+     ensuring your theme's foreground color overrides browser defaults.
+     Utility classes like `text-muted-foreground` will still work correctly. */
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-foreground;
+  }
+  p {
+    @apply text-muted-foreground;
   }
 }
 
@@ -185,7 +193,7 @@
   background-image: url(/images/gd.png);
 }
 
-
+/* ADDED: Styles for the new answer box */
 .answer-math-field .mq-editable-field {
   min-height: 4rem; /* Larger height */
   font-size: 1.25rem; /* Larger font size */
@@ -195,5 +203,5 @@
 .answer-math-field .mq-editable-field.mq-focused {
   outline: none;
   box-shadow: none;
-  border-color: hsl(var(--border)); 
+  border-color: hsl(var(--border)); /* Keep a consistent border color */
 }
