@@ -6,38 +6,29 @@ import { useState, useEffect } from "react"
 import { Moon, Sun } from "lucide-react"
 
 export function ThemeToggle() {
-  const [isDark, setIsDark] = useState(false)
+  // State lives directly inside the component
+  const [imageTheme, setImageTheme] = useState<'light' | 'dark'>('dark');
 
+  // On initial load, set the body class
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme")
-    if (savedTheme === "dark") {
-      setIsDark(true)
-      document.documentElement.classList.add("dark")
-    } else {
-      setIsDark(false)
-      document.documentElement.classList.remove("dark")
-    }
-  }, [])
+    document.body.classList.add('dark-bg'); // Default to the dark background
+  }, []);
 
   const toggleTheme = () => {
-    const newTheme = !isDark
-    setIsDark(newTheme)
+    const newTheme = imageTheme === 'dark' ? 'light' : 'dark';
+    setImageTheme(newTheme);
+    // Directly manipulate the body's class list
+    document.body.classList.toggle('dark-bg', newTheme === 'dark');
+    document.body.classList.toggle('light-bg', newTheme === 'light');
+  };
 
-    if (newTheme) {
-      document.documentElement.classList.add("dark")
-      localStorage.setItem("theme", "dark")
-    } else {
-      document.documentElement.classList.remove("dark")
-      localStorage.setItem("theme", "light")
-    }
-  }
+  const isDark = imageTheme === 'dark';
 
   return (
     <button
       onClick={toggleTheme}
-      // *** FIX: Removed fixed positioning classes ***
       className="glass p-3 rounded-full hover:glass-strong transition-all duration-300 group"
-      aria-label="Toggle theme"
+      aria-label="Toggle background image"
     >
       <div className="relative w-6 h-6">
         <Sun

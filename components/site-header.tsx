@@ -5,6 +5,7 @@
 import { ThemeToggle } from "./theme-toggle";
 import { Bug, Github } from "lucide-react";
 
+// No more props needed here
 export function SiteHeader() {
   return (
     <div className="fixed top-4 right-4 z-50 flex items-center gap-2">
@@ -28,6 +29,7 @@ export function SiteHeader() {
       >
         <Bug className="w-6 h-6 text-foreground/80 group-hover:text-foreground transition-colors" />
       </a>
+      {/* Renders the self-contained toggle */}
       <ThemeToggle />
     </div>
   );

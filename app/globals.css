@@ -47,7 +47,9 @@
     --gradient-via: 51 65 85;
     --gradient-to: 71 85 105;
   }
+}
 
+@layer base {
   * {
     @apply border-border;
   }
@@ -60,11 +62,6 @@
       rgb(var(--gradient-to)) 100%
     );
     min-height: 100vh;
-  }
-  
-
-  h1, h2, h3, h4, h5, h6, button {
-    color: inherit;
   }
 }
 
@@ -177,17 +174,21 @@
 }
 
 /* Styles for dynamic background image */
-/* Default state (light mode) */
-.dynamic-background {
+/* *** THIS IS THE FIX *** */
+/* The CSS selectors now correctly target the classes set by the ThemeToggle component. */
+
+/* Default state (light image) */
+.dynamic-background, .light-bg .dynamic-background {
   background-image: url(/images/g2.jpg);
 }
 
-/* When dark mode is active */
-.dark .dynamic-background {
+/* When dark image theme is active */
+.dark-bg .dynamic-background {
   background-image: url(/images/gd.png);
 }
 
-/* Styles for the new answer box */
+
+/* ADDED: Styles for the new answer box */
 .answer-math-field .mq-editable-field {
   min-height: 4rem; /* Larger height */
   font-size: 1.25rem; /* Larger font size */
