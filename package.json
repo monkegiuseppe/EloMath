@@ -25,6 +25,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@auth/prisma-adapter": "^2.10.0",
     "@emotion/is-prop-valid": "latest",
     "@hookform/resolvers": "^3.9.1",
     "@radix-ui/react-accordion": "1.2.2",
@@ -72,8 +73,10 @@
     "katex": "^0.16.22",
     "lucide-react": "^0.454.0",
     "mathjs": "^14.6.0",
-    "next": "15.2.4",
+    "next": "^15.5.2",
+    "next-auth": "^4.24.11",
     "next-themes": "^0.4.4",
+    "prisma": "^6.15.0",
     "react": "^19",
     "react-day-picker": "9.8.0",
     "react-dom": "^19",
@@ -88,8 +91,9 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@prisma/client": "^6.15.0",
     "@types/katex": "^0.16.7",
-    "@types/node": "^22",
+    "@types/node": "^22.18.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "postcss": "^8.5",

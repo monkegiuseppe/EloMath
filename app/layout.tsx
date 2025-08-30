@@ -6,7 +6,8 @@ import "./globals.css";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { SiteHeader } from "@/components/site-header";
-import { ThemeProvider } from "@/components/theme-provider"; // Import the provider
+import { ThemeProvider } from "@/components/theme-provider"; 
+import AuthProvider from "@/components/auth-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,18 +24,18 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        {/* *** THIS IS THE FIX *** */}
-        {/* Wrap everything with the ThemeProvider */}
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
           enableSystem={false}
           disableTransitionOnChange
         >
-          <SiteHeader />
-          {children}
-          <Analytics />
-          <SpeedInsights />
+          <AuthProvider>
+              <SiteHeader />
+              {children}
+              <Analytics />
+              <SpeedInsights />
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

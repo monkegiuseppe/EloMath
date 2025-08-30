@@ -27,6 +27,7 @@ yarn-error.log*
 # Local environment variables
 # Never commit secrets!
 .env*.local
+.env
 
 # Editor directories and files
 .vscode/*
@@ -55,3 +56,4 @@ lib/cas-math.txt
 lib/elo.txt
 lib/problems.txt
 lib/utils.txt
+/lib/generated/prisma

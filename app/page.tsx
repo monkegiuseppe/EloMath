@@ -5,8 +5,10 @@
 import { useState } from "react"
 import type { FC } from "react"
 import { motion } from "framer-motion"
-import { Brain, Calculator, Atom, BarChart3, LogIn, LucideProps, BookOpen } from "lucide-react"
+import { Brain, Calculator, Atom, BarChart3, LogIn, LogOut, LucideProps, BookOpen } from "lucide-react"
 import Workspace from "../components/workspace"
+import { useSession, signIn, signOut } from "next-auth/react" // NextAuth hooks for session management
+import Image from "next/image" // Next.js component for optimized images
 
 interface MenuItem {
   id: 'practice-math' | 'practice-physics' | 'progress' | 'workspace';
@@ -18,11 +20,12 @@ interface MenuItem {
 export default function Home() {
   const [currentView, setCurrentView] = useState("home")
   const [sessionType, setSessionType] = useState<'math' | 'physics' | 'default'>('default');
+  const { data: session, status } = useSession(); // Get the current user session and authentication status
 
   const menuItems: MenuItem[] = [
     { id: "practice-math", label: "Math Practice", icon: Calculator, description: "Calculus, Linear Algebra, etc." },
-    { id: "practice-physics", label: "Physics Practice", icon: Atom, description: "Quantum Mechanics, Thermodynamics, etc." },
-    { id: "workspace", label: "Workspace", icon: BookOpen, description: "A notepad with CAS and graphing capabilities" },
+    { id: "practice-physics", label: "Physics Practice", icon: Atom, description: "Quantum Mechanics, QFT, etc." },
+    { id: "workspace", label: "Workspace", icon: BookOpen, description: "A notepad with CAS/graphing capabilities" },
     { id: "progress", label: "Progress", icon: BarChart3, description: "Track your learning journey." },
   ]
 
@@ -86,11 +89,25 @@ export default function Home() {
               </p>
             </motion.div>
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }} className="flex justify-center mb-8">
-              <button className="glass px-6 py-3 rounded-xl flex items-center gap-2 text-foreground hover:bg-card/90">
-                <LogIn size={20} />
-                <span>Sign in with Google</span>
-                <span className="text-xs text-muted-foreground ml-2">(Coming Soon)</span>
-              </button>
+              {/* --- DYNAMIC AUTHENTICATION SECTION --- */}
+              {status === 'authenticated' ? (
+                // If the user is logged in, show their info and a sign-out button
+                <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 glass px-4 py-2 rounded-xl">
+                      {session.user?.image && <Image src={session.user.image} alt="User avatar" width={24} height={24} className="rounded-full" />}
+                      <span className="text-sm font-medium text-foreground">{session.user?.name}</span>
+                    </div>
+                    <button onClick={() => signOut()} className="glass px-4 py-3 rounded-xl flex items-center gap-2 text-foreground hover:bg-card/90" title="Sign Out">
+                      <LogOut size={20} />
+                    </button>
+                </div>
+              ) : (
+                // If the user is not logged in, show the sign-in button
+                <button onClick={() => signIn('google')} disabled={status === 'loading'} className="glass px-6 py-3 rounded-xl flex items-center gap-2 text-foreground hover:bg-card/90">
+                  <LogIn size={20} />
+                  <span>{status === 'loading' ? 'Authenticating...' : 'Sign in with Google'}</span>
+                </button>
+              )}
             </motion.div>
           </div>
 
