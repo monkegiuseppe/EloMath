@@ -10,39 +10,43 @@
 
 @layer base {
   :root {
+    /* Core Colors */
     --background: 15 23 42;
     --foreground: 248 250 252;
+
+    /* Components */
     --card: 30 41 59 / 0.8;
     --card-foreground: 248 250 252;
     --popover: 30 41 59 / 0.9;
     --popover-foreground: 248 250 252;
-    --primary: 56 189 248;
-    --primary-foreground: 15 23 42;
-    --secondary: 129 140 248;
-    --secondary-foreground: 15 23 42;
     --muted: 30 41 59;
-    --muted-foreground: 148 163 184;
-    --accent: 129 140 248;
-    --accent-foreground: 15 23 42;
+    --muted-foreground: 248 250 252;
+    --border: 248 250 252;
+    --input: 30 41 59;
     --destructive: 239 68 68;
     --destructive-foreground: 248 250 252;
-    --border: 51 65 85;
-    --input: 30 41 59;
-    --ring: 56 189 248 / 0.5;
-    --chart-1: 129 140 248;
-    --chart-2: 56 189 248;
-    --chart-3: 148 163 184;
-    --chart-4: 239 68 68;
-    --chart-5: 244 114 182;
+    
+
+    /* Primary, Secondary, and Accent are now the same as Foreground (White) */
+    --primary: 248 250 252;
+    --primary-foreground: 248 250 252; /* Dark text for on-white backgrounds */
+    --secondary: 248 250 252;
+    --secondary-foreground: 248 250 252;
+    --accent: 248 250 252;
+    --accent-foreground: 248 250 252;
+    
+    /* Ring color is now based on Foreground (White) */
+    --ring: 248 250 252 / 0.5;
+
+    /* Chart colors updated to a neutral, white, and red palette */
+    --chart-1: 148 163 184; /* Muted Grey */
+    --chart-2: 248 250 252; /* White */
+    --chart-3: 148 163 184; /* Muted Grey */
+    --chart-4: 239 68 68;   /* Destructive Red */
+    --chart-5: 244 114 182; /* Pink */
+
+
     --radius: 0.5rem;
-    --sidebar-background: 30 41 59 / 0.85;
-    --sidebar-foreground: 248 250 252;
-    --sidebar-primary: 56 189 248;
-    --sidebar-primary-foreground: 15 23 42;
-    --sidebar-accent: 129 140 248;
-    --sidebar-accent-foreground: 15 23 42;
-    --sidebar-border: 51 65 85;
-    --sidebar-ring: 56 189 248 / 0.5;
     --gradient-from: 30 41 59;
     --gradient-via: 51 65 85;
     --gradient-to: 71 85 105;
@@ -77,48 +81,44 @@
   }
 }
 
-/* MathQuill and mathematical notation styles */
+/* MathQuill and mathematical notation styles (All white/neutral) */
 .mq-editable-field {
   @apply bg-input border border-border rounded-md px-2 py-1;
 }
 
-.mq-editable-field:focus {
-  @apply ring-2 ring-ring border-primary;
-}
-
-.inline-math-wrapper {
-  @apply inline-block mx-1 align-middle;
+.mq-editable-field:focus,
+.mq-editable-field.mq-focused {
+  @apply ring-2 ring-ring border-border;
 }
 
 .inline-math-wrapper .mq-editable-field {
-  @apply bg-accent/10 border-accent/20 rounded-md px-2 py-1;
+  @apply bg-transparent border-border/50 rounded-md px-2 py-1;
   min-width: 30px;
   transition: all 0.2s ease;
 }
 
 .inline-math-wrapper .mq-editable-field:focus,
 .inline-math-wrapper .mq-editable-field.mq-focused {
-  @apply bg-accent/20 border-accent/40 ring-2 ring-accent/20;
+  @apply bg-foreground/5 border-border/80 ring-2 ring-ring/50;
 }
 
 .mq-cursor {
-  border-color: hsl(var(--primary)) !important;
+  border-color: rgb(var(--foreground)) !important;
 }
 
 .mq-editable-field .mq-root-block,
 .mq-editable-field var,
 .mq-editable-field span {
-  color: hsl(var(--foreground)) !important;
+  color: rgb(var(--foreground)) !important;
 }
 
 .mq-editable-field .mq-selection,
 .mq-editable-field .mq-selection .mq-non-leaf,
 .mq-editable-field .mq-selection .mq-scaled {
-  background: hsl(var(--primary) / 0.3) !important;
-  color: hsl(var(--foreground)) !important;
+  background: rgb(var(--foreground) / 0.2) !important;
 }
 
-/* Adding custom scrollbar styles for category selector */
+/* Custom scrollbar styles */
 .custom-scrollbar {
   scrollbar-width: thin;
   scrollbar-color: hsl(var(--border)) transparent;
@@ -136,7 +136,6 @@
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background: hsl(var(--border));
   border-radius: 3px;
-  transition: background 0.2s ease;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
@@ -150,53 +149,23 @@
   position: absolute;
 }
 
-.inline-math-wrapper {
-  display: inline-block;
-  margin: 0 3px;
-  vertical-align: middle;
-}
-
-.inline-math-wrapper .mq-editable-field {
-  padding: 2px 6px;
-  background: hsl(var(--primary) / 0.1);
-  border: 1px solid hsl(var(--primary) / 0.2);
-  border-radius: 6px;
-}
-
-.inline-math-wrapper .mq-editable-field.mq-focused {
-  background: hsl(var(--primary) / 0.15);
-  border-color: hsl(var(--primary) / 0.4);
-  box-shadow: 0 0 0 3px hsl(var(--primary) / 0.1);
-}
-
-.mq-cursor {
-  border-left-color: hsl(var(--primary)) !important;
-}
-
 /* Styles for dynamic background image */
-/* *** THIS IS THE FIX *** */
-/* The CSS selectors now correctly target the classes set by the ThemeToggle component. */
-
-/* Default state (light image) */
-.dynamic-background, .light-bg .dynamic-background {
+.light .dynamic-background {
   background-image: url(/images/g2.jpg);
 }
 
-/* When dark image theme is active */
-.dark-bg .dynamic-background {
+.dark .dynamic-background {
   background-image: url(/images/gd.png);
 }
 
-
-/* ADDED: Styles for the new answer box */
 .answer-math-field .mq-editable-field {
-  min-height: 4rem; /* Larger height */
-  font-size: 1.25rem; /* Larger font size */
+  min-height: 4rem;
+  font-size: 1.25rem;
 }
 
 .answer-math-field .mq-editable-field:focus,
 .answer-math-field .mq-editable-field.mq-focused {
   outline: none;
   box-shadow: none;
-  border-color: hsl(var(--border)); /* Keep a consistent border color */
+  border-color: hsl(var(--border));
 }

@@ -4,7 +4,7 @@
 
 import { useState } from "react"
 import type { FC } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion } from "framer-motion"
 import { Brain, Calculator, Atom, BarChart3, LogIn, LucideProps, BookOpen } from "lucide-react"
 import Workspace from "../components/workspace"
 
@@ -50,9 +50,9 @@ export default function Home() {
       <div className="min-h-screen relative flex items-center justify-center">
         <div className="absolute inset-0 bg-cover bg-center bg-no-repeat dynamic-background" />
         <div className="relative z-10 glass rounded-2xl p-8 text-center">
-          <BarChart3 className="w-16 h-16 text-primary mx-auto mb-4" />
+          <BarChart3 className="w-16 h-16 text-foreground mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-foreground mb-4">Progress Tracking</h2>
-          <p className="text-muted-foreground mb-6">Coming soon! Track your ELO progress.</p>
+          <p className="text-foreground mb-6">Coming soon! Track your ELO progress.</p>
           <button onClick={() => setCurrentView("home")} className="glass px-6 py-3 rounded-lg">
             Back to Home
           </button>
@@ -68,8 +68,6 @@ export default function Home() {
       <div className="absolute inset-0 backdrop-blur-[1px]" />
 
       <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
-        {/* *** THIS IS THE FIX *** */}
-        {/* Removed all `prose` related classes to prevent style conflicts. */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -79,11 +77,11 @@ export default function Home() {
           <div className="text-center mb-12">
             <motion.div initial={{ scale: 0.9 }} animate={{ scale: 1 }} transition={{ duration: 0.5, delay: 0.2 }} className="glass rounded-2xl p-8 mb-8">
               <div className="flex items-center justify-center gap-3 mb-4">
-                <Calculator className="w-8 h-8 text-primary" />
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">EloMath</h1>
-                <Brain className="w-8 h-8 text-secondary" />
+                <Calculator className="w-8 h-8 text-foreground" />
+                <h1 className="text-4xl font-bold text-foreground">EloMath</h1>
+                <Brain className="w-8 h-8 text-foreground" />
               </div>
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              <p className="text-lg text-foreground max-w-2xl mx-auto">
                 Master advanced mathematics and physics through adaptive learning.
               </p>
             </motion.div>
@@ -107,12 +105,12 @@ export default function Home() {
                 className="glass p-6 rounded-xl text-left hover:bg-card/90 transition-colors duration-200 group"
               >
                 <div className="flex items-center gap-4">
-                  <div className="p-3 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                    <item.icon className="w-6 h-6 text-primary" />
+                  <div className="p-3 rounded-lg bg-foreground/10 group-hover:bg-foreground/20 transition-colors">
+                    <item.icon className="w-6 h-6 text-foreground" />
                   </div>
                   <div className="flex-1">
                     <h3 className="text-lg font-semibold text-foreground mb-1">{item.label}</h3>
-                    <p className="text-sm text-muted-foreground">{item.description}</p>
+                    <p className="text-sm text-foreground/80">{item.description}</p>
                   </div>
                 </div>
               </motion.button>

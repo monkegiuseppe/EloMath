@@ -2,27 +2,32 @@
 
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect } from "react" // Import hooks
+import { useTheme } from "next-themes"
 import { Moon, Sun } from "lucide-react"
 
 export function ThemeToggle() {
-  // State lives directly inside the component
-  const [imageTheme, setImageTheme] = useState<'light' | 'dark'>('dark');
+  // 1. Create a state to track if the component is mounted
+  const [mounted, setMounted] = useState(false)
+  const { theme, setTheme } = useTheme()
 
-  // On initial load, set the body class
+  // 2. Use useEffect to set the mounted state to true after the initial render
+  // This hook only runs on the client, so we can be sure the theme is available.
   useEffect(() => {
-    document.body.classList.add('dark-bg'); // Default to the dark background
-  }, []);
+    setMounted(true)
+  }, [])
+
+  // 3. If the component is not yet mounted, render a placeholder or null
+  // to avoid the hydration mismatch.
+  if (!mounted) {
+    return null
+  }
 
   const toggleTheme = () => {
-    const newTheme = imageTheme === 'dark' ? 'light' : 'dark';
-    setImageTheme(newTheme);
-    // Directly manipulate the body's class list
-    document.body.classList.toggle('dark-bg', newTheme === 'dark');
-    document.body.classList.toggle('light-bg', newTheme === 'light');
+    setTheme(theme === 'dark' ? 'light' : 'dark')
   };
 
-  const isDark = imageTheme === 'dark';
+  const isDark = theme === 'dark';
 
   return (
     <button

@@ -120,13 +120,13 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
       <div className="absolute inset-0 bg-cover bg-center bg-no-repeat dynamic-background" />
       <div className="relative z-10 w-full max-w-7xl mx-auto p-4 flex flex-col flex-grow">
         <motion.header initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between mb-4 flex-shrink-0 relative z-20">
-          <button onClick={onBack} className="group flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors glass px-3 py-2 rounded-lg">
+          <button onClick={onBack} className="group flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors glass px-3 py-2 rounded-lg">
             <ArrowLeft size={20} className="transition-transform group-hover:-translate-x-1" /> Back to Home
           </button>
           
           {sessionType !== 'default' && (
             <div className="relative flex items-center gap-4 glass px-4 py-2 rounded-lg">
-              <div className="flex items-center gap-2 text-lg font-semibold text-primary"><BrainCircuit size={24} /><span>{sessionType === 'math' ? 'Math' : 'Physics'} ELO: {userElo}</span></div>
+              <div className="flex items-center gap-2 text-lg font-semibold text-foreground"><BrainCircuit size={24} /><span>{sessionType === 'math' ? 'Math' : 'Physics'} ELO: {userElo}</span></div>
               <div className="text-sm text-muted-foreground flex items-center gap-4">
                 <span><span className="text-green-500">✓ {sessionStats.correct}</span> | <span className="text-red-500">✗ {sessionStats.incorrect}</span> | <span className="text-yellow-500">» {sessionStats.skipped}</span></span>
                 <button onClick={handleReset} title="Reset ELO & Stats" className="text-muted-foreground hover:text-destructive"><RefreshCw size={16} /></button>
@@ -151,7 +151,7 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="glass-strong rounded-lg flex flex-col flex-grow relative z-10">
           <div className="flex items-center border-b border-border/50 p-2 flex-shrink-0">
             {tabs.map(tab => (
-              <div key={tab.id} onClick={() => setActiveTabId(tab.id)} className={`flex items-center gap-2 px-4 py-2 rounded-md cursor-pointer text-sm font-medium ${activeTabId === tab.id ? 'bg-primary/20 text-foreground' : 'text-muted-foreground hover:bg-muted/50'}`}>
+              <div key={tab.id} onClick={() => setActiveTabId(tab.id)} className={`flex items-center gap-2 px-4 py-2 rounded-md cursor-pointer text-sm font-medium ${activeTabId === tab.id ? 'bg-foreground/10 text-foreground' : 'text-muted-foreground hover:bg-muted/50'}`}>
                 {tab.type === 'notepad' && <Notebook size={14} />}
                 {tab.type === 'graphing' && <TrendingUp size={14} />}
                 {tab.type.includes('practice') && <BrainCircuit size={14} />}
@@ -176,8 +176,6 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
             {tabs.map(tab => (
               <div
                 key={tab.id}
-                // *** THIS IS THE FIX ***
-                // Replaced inline style with a smooth and safe opacity transition
                 className={`w-full h-full absolute top-0 left-0 transition-opacity duration-150 ease-in-out ${
                   activeTabId === tab.id ? 'opacity-100 z-10' : 'opacity-0 z-0 invisible'
                 }`}

@@ -6,10 +6,10 @@ import "./globals.css";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { SiteHeader } from "@/components/site-header";
+import { ThemeProvider } from "@/components/theme-provider"; // Import the provider
 
 const inter = Inter({ subsets: ["latin"] });
 
-// Metadata export is now valid again.
 export const metadata: Metadata = {
   title: "EloMath",
   description: "Master advanced mathematics and physics through adaptive learning.",
@@ -21,13 +21,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    // The `<html>` tag is clean. The toggle will add a class to the body.
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <SiteHeader />
-        {children}
-        <Analytics />
-        <SpeedInsights />
+        {/* *** THIS IS THE FIX *** */}
+        {/* Wrap everything with the ThemeProvider */}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem={false}
+          disableTransitionOnChange
+        >
+          <SiteHeader />
+          {children}
+          <Analytics />
+          <SpeedInsights />
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -30,9 +30,6 @@ export const MathPracticeCore: FC<MathPracticeCoreProps> = ({ userElo, onEloUpda
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [isGuideOpen, setIsGuideOpen] = useState(false);
 
-  /**
-   * Fetches a new problem based on the user's ELO and selected categories.
-   */
   const getNewProblem = () => {
     setFeedback(null);
     setUserAnswer("");
@@ -66,14 +63,10 @@ export const MathPracticeCore: FC<MathPracticeCoreProps> = ({ userElo, onEloUpda
     setCurrentProblem(eligibleProblems[randomIndex]);
   };
 
-  // A new problem will be fetched only when categories change.
   useEffect(() => {
     getNewProblem();
   }, [selectedCategories]);
 
-  /**
-   * Handles the submission of the user's answer, calculates ELO change, and provides feedback.
-   */
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!userAnswer.trim() || !currentProblem || currentProblem.id.startsWith("no-problems")) return;
@@ -95,9 +88,6 @@ export const MathPracticeCore: FC<MathPracticeCoreProps> = ({ userElo, onEloUpda
     });
   };
 
-  /**
-   * Skips the current problem and fetches a new one.
-   */
   const handleSkip = () => {
     onStatsUpdate('skipped');
     getNewProblem();
@@ -120,7 +110,7 @@ export const MathPracticeCore: FC<MathPracticeCoreProps> = ({ userElo, onEloUpda
                   className="flex flex-col h-full"
                 >
                   <div className="flex justify-between items-center mb-4">
-                    <span className="text-sm font-medium text-primary bg-primary/10 px-3 py-1 rounded-full">
+                    <span className="text-sm font-medium text-foreground bg-foreground/10 px-3 py-1 rounded-full">
                       {currentProblem.topic}
                     </span>
                     <span className="text-sm font-medium text-muted-foreground">
@@ -128,7 +118,7 @@ export const MathPracticeCore: FC<MathPracticeCoreProps> = ({ userElo, onEloUpda
                     </span>
                   </div>
 
-                  <div className="flex-grow mb-6">
+                  <div className="flex-grow mb-6 text-foreground">
                     <ProblemRenderer text={currentProblem.problem} />
                   </div>
 
@@ -140,19 +130,19 @@ export const MathPracticeCore: FC<MathPracticeCoreProps> = ({ userElo, onEloUpda
                         onChange={(e) => setUserAnswer(e.target.value)}
                         placeholder={currentProblem.id.startsWith("no-problems") ? "Please select categories..." : "Your Answer..."}
                         disabled={!!feedback || currentProblem.id.startsWith("no-problems")}
-                        className="w-full bg-background/80 border-2 border-border rounded-lg py-3 pr-12 pl-4 text-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary transition-all disabled:opacity-50"
+                        className="w-full bg-background/80 border-2 border-border rounded-lg py-3 pr-12 pl-4 text-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-foreground/50 focus:border-foreground/80 transition-all disabled:opacity-50"
                       />
-                      <button type="button" onClick={() => setIsGuideOpen(true)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary p-1" title="Formatting Guide">
+                      <button type="button" onClick={() => setIsGuideOpen(true)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-1" title="Formatting Guide">
                         <Info size={20} />
                       </button>
                     </div>
                     <div className="flex items-center justify-end gap-4 mt-4">
                       {!feedback && !currentProblem.id.startsWith("no-problems") && (
-                        <motion.button type="button" onClick={handleSkip} className="flex items-center gap-2 px-4 py-2 text-sm text-yellow-500 hover:text-yellow-400">
+                        <motion.button type="button" onClick={handleSkip} className="flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground hover:text-foreground">
                           <SkipForward size={16} /> Skip
                         </motion.button>
                       )}
-                      <motion.button type="submit" disabled={!!feedback || !userAnswer.trim() || currentProblem.id.startsWith("no-problems")} className="px-8 py-3 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 disabled:bg-muted/50 disabled:cursor-not-allowed">
+                      <motion.button type="submit" disabled={!!feedback || !userAnswer.trim() || currentProblem.id.startsWith("no-problems")} className="px-8 py-3 bg-foreground text-background font-bold rounded-lg hover:bg-foreground/90 disabled:bg-muted/50 disabled:text-muted-foreground disabled:cursor-not-allowed">
                         {feedback ? "Answered" : "Submit"}
                       </motion.button>
                     </div>
@@ -177,7 +167,7 @@ export const MathPracticeCore: FC<MathPracticeCoreProps> = ({ userElo, onEloUpda
                     <p className="text-sm text-muted-foreground">The correct answer is: <span className="font-mono">{feedback.correctAnswer}</span></p>
                   </div>
                 </div>
-                <motion.button onClick={getNewProblem} className="glass px-4 py-2 hover:bg-card/90 font-semibold rounded-lg">
+                <motion.button onClick={getNewProblem} className="glass px-4 py-2 hover:bg-card/90 font-semibold rounded-lg text-foreground">
                   Next Question →
                 </motion.button>
               </motion.div>
