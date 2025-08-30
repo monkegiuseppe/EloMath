@@ -1,11 +1,14 @@
-import NextAuth from "next-auth"
+// app/api/auth/[...nextauth]/route.ts
+
+import NextAuth, { type DefaultSession, type NextAuthOptions } from "next-auth" 
 import GoogleProvider from "next-auth/providers/google"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { PrismaClient } from "@prisma/client"
 
 const prisma = new PrismaClient()
 
-const handler = NextAuth({
+// ---  Define and EXPORT the auth options separately ---
+export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
     GoogleProvider({
@@ -14,7 +17,6 @@ const handler = NextAuth({
     }),
   ],
   callbacks: {
-    // This callback makes the user's ID available in the session object
     async session({ session, user }) {
       if (session.user) {
         session.user.id = user.id;
@@ -22,11 +24,15 @@ const handler = NextAuth({
       return session;
     }
   }
-});
+};
 
+// Use the options to create the handler
+const handler = NextAuth(authOptions);
+
+// Export the handlers as before
 export { handler as GET, handler as POST }
 
-// This is needed to extend the default session type
+// This part extends the default session type to include the user ID
 declare module "next-auth" {
   interface Session {
     user: {

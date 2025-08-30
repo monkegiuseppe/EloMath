@@ -3,10 +3,10 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
+import { useSession } from "next-auth/react"; // To check if the user is logged in
 import { motion, AnimatePresence } from "framer-motion"
-import { ArrowLeft, Plus, X, Notebook, TrendingUp, BrainCircuit, RefreshCw, SlidersHorizontal, Check } from "lucide-react"
+import { ArrowLeft, Plus, X, Notebook, TrendingUp, BrainCircuit, RefreshCw, SlidersHorizontal } from "lucide-react"
 import dynamic from 'next/dynamic'
-import { getPlayerElo, setPlayerElo } from "../lib/elo"
 import { MathPracticeCore } from "./math-practice-core"
 import { PhysicsPracticeCore } from "./physics-practice-core"
 import { Checkbox } from "./ui/checkbox";
@@ -30,22 +30,13 @@ interface WorkspaceProps {
 
 const mathCategories = ["Calculus I", "Calculus II", "Linear Algebra", "Complex Analysis"];
 const physicsCategories = [
-    "Kinematic Equations",
-    "Forces & Newton's Laws",
-    "Work & Energy",
-    "Momentum & Collisions",
-    "Circular Motion & Gravitation",
-    "Rotational Motion",
-    "Simple Harmonic Motion",
-    "Electric Fields & Potential",
-    "Circuits & Capacitance",
-    "Magnetic Fields & Forces",
-    "Electromagnetic Induction",
-    "Thermodynamics",
-    "Quantum Mechanics"
+    "Kinematic Equations", "Forces & Newton's Laws", "Work & Energy", "Momentum & Collisions",
+    "Circular Motion & Gravitation", "Rotational Motion", "Simple Harmonic Motion", "Electric Fields & Potential",
+    "Circuits & Capacitance", "Magnetic Fields & Forces", "Electromagnetic Induction", "Thermodynamics", "Quantum Mechanics"
 ];
 
 export default function Workspace({ onBack, sessionType = 'default' }: WorkspaceProps) {
+  const { status } = useSession(); // Get user session status
   const STARTING_ELO = 1200;
 
   const getInitialTabs = (): Tab[] => {
@@ -59,36 +50,84 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
   const nextTabId = useRef(2);
   const [isAddTabMenuOpen, setIsAddTabMenuOpen] = useState(false);
   
+  // State is initialized with default values
   const [userElo, setUserElo] = useState(STARTING_ELO);
   const [sessionStats, setSessionStats] = useState({ correct: 0, incorrect: 0, skipped: 0 });
   const [isCategorySelectorOpen, setIsCategorySelectorOpen] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
+  // --- NEW AND IMPROVED DATA FETCHING ---
+  // This hook runs in the background without blocking the UI
+  useEffect(() => {
+    // Only fetch if the user is logged in and it's a practice session
+    if (status === 'authenticated' && sessionType !== 'default') {
+      fetch('/api/progress')
+        .then(res => res.json())
+        .then(data => {
+          if (data && !data.error) {
+            // When data arrives, update the state. React will then
+            // seamlessly update the ELO and stats in the header.
+            setUserElo(sessionType === 'math' ? data.mathElo : data.physicsElo);
+            setSessionStats({
+              correct: sessionType === 'math' ? data.mathCorrect : data.physicsCorrect,
+              incorrect: sessionType === 'math' ? data.mathIncorrect : data.physicsIncorrect,
+              skipped: sessionType === 'math' ? data.mathSkipped : data.physicsSkipped,
+            });
+          }
+        })
+        .catch(console.error); // Log errors but don't crash the page
+    }
+  }, [status, sessionType]);
+
   useEffect(() => {
     if (sessionType !== 'default') {
-      const initialElo = getPlayerElo(sessionType);
-      setUserElo(initialElo);
       setSelectedCategories(sessionType === 'math' ? mathCategories : physicsCategories);
     }
   }, [sessionType]);
 
-  const handleEloUpdate = (newElo: number) => { if (sessionType !== 'default') { setUserElo(newElo); setPlayerElo(newElo, sessionType); } };
-  const handleStatsUpdate = (type: 'correct' | 'incorrect' | 'skipped') => { setSessionStats(prev => ({ ...prev, [type]: prev[type] + 1 })); };
-  const handleCategoryToggle = (category: string) => { const newSelection = selectedCategories.includes(category) ? selectedCategories.filter(c => c !== category) : [...selectedCategories, category]; if (newSelection.length > 0) setSelectedCategories(newSelection); };
+  // Handler to optimistically update the UI, then send changes to the server
+  const handleEloUpdate = (newElo: number) => {
+    setUserElo(newElo);
+  };
+
+  // Handler to optimistically update stats and send changes to the server
+  const handleStatsUpdate = (type: 'correct' | 'incorrect' | 'skipped') => {
+    // Update the UI state immediately for a responsive feel
+    setSessionStats(prev => ({ ...prev, [type]: prev[type] + 1 }));
+
+    // Only send the update to the server if the user is logged in
+    if (status === 'authenticated' && sessionType !== 'default') {
+      // The new ELO is passed from the MathPracticeCore component via onEloUpdate
+      fetch('/api/progress', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionType,
+          newElo: userElo,
+          statUpdate: { type }
+        }),
+      });
+    }
+  };
+  
+  const handleCategoryToggle = (category: string) => {
+    const newSelection = selectedCategories.includes(category)
+      ? selectedCategories.filter(c => c !== category)
+      : [...selectedCategories, category];
+    if (newSelection.length > 0) {
+      setSelectedCategories(newSelection);
+    }
+  };
   
   const handleReset = () => {
-    if (sessionType === 'default' || !confirm(`Are you sure you want to reset your ${sessionType} ELO and session stats?`)) return;
-    setPlayerElo(STARTING_ELO, sessionType);
+    if (sessionType === 'default' || !confirm(`Are you sure you want to reset your ${sessionType} ELO and session stats for this session? This action is not yet saved to the database.`)) return;
     setUserElo(STARTING_ELO);
     setSessionStats({ correct: 0, incorrect: 0, skipped: 0 });
   };
 
   const addTab = (type: 'notepad' | 'graphing') => {
     const newId = nextTabId.current++;
-    const newTab: Tab = {
-      id: newId, type,
-      title: `${type === 'notepad' ? 'Notepad' : 'Graph'} ${tabs.filter(t => t.type === type).length + 1}`,
-    };
+    const newTab: Tab = { id: newId, type, title: `${type === 'notepad' ? 'Notepad' : 'Graph'} ${tabs.filter(t => t.type === type).length + 1}` };
     setTabs([...tabs, newTab]);
     setActiveTabId(newTab.id);
     setIsAddTabMenuOpen(false);
@@ -96,15 +135,11 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
 
   const closeTab = (tabId: number) => {
     if (tabs.find(t => t.id === tabId)?.type.includes('practice') || tabs.length <= 1) return;
-    
     const tabIndex = tabs.findIndex(tab => tab.id === tabId);
     const newTabs = tabs.filter(tab => tab.id !== tabId);
-
     if (activeTabId === tabId) {
       const newActiveTab = newTabs[tabIndex] || newTabs[tabIndex - 1] || newTabs[0];
-      if (newActiveTab) {
-        setActiveTabId(newActiveTab.id);
-      }
+      if (newActiveTab) setActiveTabId(newActiveTab.id);
     }
     setTabs(newTabs);
   };
@@ -114,7 +149,9 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
   };
 
   const currentCategoryList = sessionType === 'math' ? mathCategories : physicsCategories;
+  const activeTab = tabs.find(t => t.id === activeTabId);
 
+  // --- The component now returns the full UI structure immediately ---
   return (
     <div className="min-h-screen relative flex flex-col">
       <div className="absolute inset-0 bg-cover bg-center bg-no-repeat dynamic-background" />
@@ -173,39 +210,12 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
           </div>
 
           <div className="flex-grow relative">
-            {tabs.map(tab => (
-              <div
-                key={tab.id}
-                className={`w-full h-full absolute top-0 left-0 transition-opacity duration-150 ease-in-out ${
-                  activeTabId === tab.id ? 'opacity-100 z-10' : 'opacity-0 z-0 invisible'
-                }`}
-              >
-                {tab.type === 'notepad' && (
-                  <FullscreenNotepad
-                    value={tab.content || ''}
-                    onChange={(newContent) => handleContentChange(tab.id, newContent)}
-                    sessionType={sessionType}
-                  />
-                )}
-                {tab.type === 'graphing' && <FullscreenGraphingTool />}
-                {tab.type === 'math-practice' && (
-                  <MathPracticeCore
-                    userElo={userElo}
-                    onEloUpdate={handleEloUpdate}
-                    onStatsUpdate={handleStatsUpdate}
-                    selectedCategories={selectedCategories}
-                  />
-                )}
-                {tab.type === 'physics-practice' && (
-                  <PhysicsPracticeCore
-                    userElo={userElo}
-                    onEloUpdate={handleEloUpdate}
-                    onStatsUpdate={handleStatsUpdate}
-                    selectedCategories={selectedCategories}
-                  />
-                )}
+              <div className={`w-full h-full transition-opacity duration-150 ease-in-out ${activeTab ? 'opacity-100 z-10' : 'opacity-0 z-0 invisible'}`}>
+                {activeTab?.type === 'notepad' && ( <FullscreenNotepad value={activeTab.content || ''} onChange={(newContent) => handleContentChange(activeTab.id, newContent)} sessionType={sessionType} /> )}
+                {activeTab?.type === 'graphing' && <FullscreenGraphingTool />}
+                {activeTab?.type === 'math-practice' && ( <MathPracticeCore userElo={userElo} onEloUpdate={handleEloUpdate} onStatsUpdate={handleStatsUpdate} selectedCategories={selectedCategories} /> )}
+                {activeTab?.type === 'physics-practice' && ( <PhysicsPracticeCore userElo={userElo} onEloUpdate={handleEloUpdate} onStatsUpdate={handleStatsUpdate} selectedCategories={selectedCategories} /> )}
               </div>
-            ))}
           </div>
         </motion.div>
       </div>
