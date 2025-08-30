@@ -29,7 +29,7 @@ const CasMathField: FC<CasMathFieldProps> = ({ latex, onChange, onMount, onDelet
   };
 
   return (
-    <div className="inline-block align-middle mx-1 my-2 p-2 bg-muted/30 rounded-lg w-full">
+    <div className="inline-block align-middle mx-1 my-2 p-2 bg-muted/30 rounded-lg w-auto">
       <EditableMathField
         latex={latex}
         mathquillDidMount={(field) => {
@@ -38,7 +38,6 @@ const CasMathField: FC<CasMathFieldProps> = ({ latex, onChange, onMount, onDelet
           field.focus();
         }}
         config={{
-          // Automatically convert 'sqrt' to the square root symbol.
           autoCommands: 'pi theta sqrt',
           handlers: {
             edit: (mathField) => {
@@ -100,7 +99,7 @@ const CasMathField: FC<CasMathFieldProps> = ({ latex, onChange, onMount, onDelet
             },
           },
         }}
-        className="w-full p-2 rounded-md bg-input border border-border"
+        className="p-2 rounded-md bg-input border border-border min-w-12"
       />
       {output && (
         <div className="mt-2 pl-2 flex items-center gap-2 text-lg text-primary">
