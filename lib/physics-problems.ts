@@ -80,8 +80,117 @@ export const physicsProblems: Problem[] = [
     unit: "m/s",
     format_hint: "Round to two decimal places."
   },
+  {
+    category: "Kinematic Equations",
+    id: "KE201",
+    topic: "Interpreting Motion",
+    difficulty: 1450,
+    problem: "The position of a particle is given by the function $x(t) = t^3 - 6t^2 + 9t + 1$. At what time(s) is the particle momentarily at rest?",
+    answer: "1 and 3",
+    unit: "s",
+  },
+  {
+    category: "Kinematic Equations",
+    id: "KE202",
+    topic: "Relative Motion",
+    difficulty: 1500,
+    problem: "Car A starts at $x=0$ and moves with velocity $v_A(t) = 2t$. Car B starts at $x=10$ and moves with a constant velocity of $v_B = 1$ m/s. When does Car A overtake Car B?",
+    answer: "3.7",
+    unit: "s",
+    format_hint: "Round to one decimal place."
+  },
+  {
+    category: "Kinematic Equations",
+    id: "KE203",
+    topic: "Maximum Height",
+    difficulty: 1400,
+    problem: "An object is thrown upwards with an initial velocity of 40 m/s. Its height is described by $y(t) = 40t - 4.9t^2$. What is the maximum height it reaches?",
+    answer: "81.6",
+    unit: "m",
+    format_hint: "Round to one decimal place."
+  },
+  {
+    category: "Kinematic Equations",
+    id: "KE204",
+    topic: "Jerk",
+    difficulty: 1550,
+    problem: "The acceleration of a high-tech elevator is given by $a(t) = 6t - 2$. What is the total change in velocity from $t=1$ to $t=3$?",
+    answer: "20",
+    unit: "m/s"
+  },
+  {
+    category: "Kinematic Equations",
+    id: "KE205",
+    topic: "Constant Acceleration",
+    difficulty: 1350,
+    problem: "A car accelerates uniformly from 10 m/s to 30 m/s over a distance of 100 m. What is its acceleration?",
+    answer: "4",
+    unit: "m/s²"
+  },
+  {
+    category: "Kinematic Equations",
+    id: "KE206",
+    topic: "Free Fall",
+    difficulty: 1300,
+    problem: "A stone is dropped from a tall building. How long does it take to travel the first 50 meters of its fall? (Use g = 9.8 m/s²)",
+    answer: "3.19",
+    unit: "s"
+  },
+  {
+    category: "Kinematic Equations",
+    id: "KE207",
+    topic: "Projectile Angle",
+    difficulty: 1600,
+    problem: "A projectile is fired with an initial speed of 100 m/s. Its range is given by $R(\\theta) = \\frac{v_0^2 \\sin(2\\theta)}{g}$. At what angle $\\theta$ is the range 500 m? (Use g=9.8 m/s²)",
+    answer: "14.7",
+    unit: "degrees",
+    format_hint: "Provide the smaller angle, rounded to one decimal place."
+  },
+  {
+    category: "Kinematic Equations",
+    id: "KE208",
+    topic: "Average vs Instantaneous",
+    difficulty: 1450,
+    problem: "A particle's position is $x(t) = 4t^2 - 1$. Find the time at which its instantaneous velocity is equal to its average velocity over the interval from t=0 to t=5.",
+    answer: "2.5",
+    unit: "s"
+  },
+    {
+    category: "Kinematic Equations",
+    id: "KE209",
+    topic: "Stopping Distance",
+    difficulty: 1400,
+    problem: "A car is traveling at 25 m/s and applies the brakes, causing a constant deceleration of 5 m/s². How far does it travel before coming to a complete stop?",
+    answer: "62.5",
+    unit: "m"
+  },
+  {
+    category: "Kinematic Equations",
+    id: "KE210",
+    topic: "Multi-stage motion",
+    difficulty: 1650,
+    problem: "A rocket accelerates upwards at 20 m/s² for 10 seconds, then its engine cuts out and it enters free fall. What is the maximum altitude it reaches? (Use g=9.8 m/s²)",
+    answer: "3040.8",
+    unit: "m",
+    format_hint: "Round to one decimal place."
+  },
+  {
+    category: "Kinematic Equations",
+    id: "KE211",
+    topic: "Vector Kinematics",
+    difficulty: 1550,
+    problem: "A particle's position vector is $\\vec{r}(t) = \\langle 2t^2, 3t-1 \\rangle$. What is the magnitude of its velocity vector at $t=2$?",
+    answer: "8.54",
+    unit: "m/s",
+    format_hint: "Round to two decimal places."
+  },
+
+
 
   // --- Forces & Newton's Laws (8 Problems) ---
+
+
+
   {
     category: "Forces & Newton's Laws",
     id: "FNL101",
@@ -154,8 +263,111 @@ export const physicsProblems: Problem[] = [
     answer: "2.45",
     unit: "m/s²",
   },
+ {
+    category: "Forces & Newton's Laws",
+    id: "FNL201",
+    topic: "Force with Friction",
+    difficulty: 1500,
+    problem: "A 10 kg box is pushed on a horizontal floor with a force of 50 N. The coefficient of kinetic friction is 0.3. What is the acceleration of the box? (Use g=9.8 m/s²)",
+    answer: "2.06",
+    unit: "m/s²"
+  },
+  {
+    category: "Forces & Newton's Laws",
+    id: "FNL202",
+    topic: "Angled Force",
+    difficulty: 1600,
+    problem: "A 20 kg crate is pulled by a rope with a tension of 100 N at an angle of 30° above the horizontal. If the floor is frictionless, what is the crate's acceleration?",
+    answer: "4.33",
+    unit: "m/s²"
+  },
+  {
+    category: "Forces & Newton's Laws",
+    id: "FNL203",
+    topic: "Equilibrium",
+    difficulty: 1450,
+    problem: "A traffic light weighing 150 N hangs from a cable tied to two other cables at 120° to each other. By symmetry, the vertical components of tension in the upper cables must balance the weight. What is the tension in each of the upper cables?",
+    answer: "150",
+    unit: "N"
+  },
+  {
+    category: "Forces & Newton's Laws",
+    id: "FNL204",
+    topic: "Connected Objects",
+    difficulty: 1700,
+    problem: "A 5 kg block and a 10 kg block are connected by a string. The 10 kg block is pulled to the right with a force of 60 N on a frictionless surface. What is the tension in the string between them?",
+    answer: "20",
+    unit: "N"
+  },
+  {
+    category: "Forces & Newton's Laws",
+    id: "FNL205",
+    topic: "Elevator Physics",
+    difficulty: 1550,
+    problem: "A person with a mass of 70 kg stands on a scale in an elevator. The elevator is accelerating downwards at 2 m/s². What does the scale read in Newtons? (Use g=9.8 m/s²)",
+    answer: "546",
+    unit: "N"
+  },
+  {
+    category: "Forces & Newton's Laws",
+    id: "FNL206",
+    topic: "Variable Force",
+    difficulty: 1650,
+    problem: "A 2 kg object is subjected to a time-varying force $F(t) = 12t^2$. If it starts from rest, what is its velocity at $t=2$ s?",
+    answer: "16",
+    unit: "m/s"
+  },
+    {
+    category: "Forces & Newton's Laws",
+    id: "FNL207",
+    topic: "Angled Friction",
+    difficulty: 1750,
+    problem: "A 10 kg block is pulled by a 100 N force at 30° above horizontal. The coefficient of kinetic friction is 0.4. What is the acceleration? (Use g=9.8 m/s²)",
+    answer: "6.74",
+    unit: "m/s²"
+  },
+  {
+    category: "Forces & Newton's Laws",
+    id: "FNL208",
+    topic: "System of Pulleys",
+    difficulty: 1800,
+    problem: "A 4 kg mass and a 6 kg mass are connected by a rope over a frictionless pulley. What is the magnitude of the acceleration of the system? (Use g=9.8 m/s²)",
+    answer: "1.96",
+    unit: "m/s²"
+  },
+  {
+    category: "Forces & Newton's Laws",
+    id: "FNL209",
+    topic: "Terminal Velocity",
+    difficulty: 1600,
+    problem: "An object reaches terminal velocity when the force of gravity equals the drag force, $F_d = kv^2$. A 80 kg skydiver has a drag constant $k=0.25$ kg/m. What is their terminal velocity? (Use g=9.8 m/s²)",
+    answer: "56",
+    unit: "m/s"
+  },
+  {
+    category: "Forces & Newton's Laws",
+    id: "FNL210",
+    topic: "Vector Sum of Forces",
+    difficulty: 1500,
+    problem: "A particle experiences two forces: $\\vec{F}_1 = \\langle 10, -5 \\rangle$ N and $\\vec{F}_2 = \\langle -3, 15 \\rangle$ N. What is the magnitude of the net force?",
+    answer: "12.2",
+    unit: "N",
+    format_hint: "Round to one decimal place."
+  },
+  {
+    category: "Forces & Newton's Laws",
+    id: "FNL211",
+    topic: "Conical Pendulum",
+    difficulty: 1850,
+    problem: "A 1 kg mass is swung in a horizontal circle at the end of a 2 m long string. The string makes an angle of 30° with the vertical. What is the speed of the mass? (Use g=9.8 m/s²)",
+    answer: "2.38",
+    unit: "m/s"
+  },
+
 
   // --- Work & Energy (8 Problems) ---
+
+
   {
     category: "Work & Energy",
     id: "WE101",
@@ -228,8 +440,108 @@ export const physicsProblems: Problem[] = [
     answer: "14",
     unit: "J"
   },
+  {
+    category: "Work & Energy",
+    id: "WE201",
+    topic: "Energy Conservation",
+    difficulty: 1450,
+    problem: "A 2 kg rollercoaster car starts from rest at the top of a 20 m high hill. Assuming no friction, what is its speed at the bottom of the hill? (g=9.8 m/s²)",
+    answer: "19.8",
+    unit: "m/s",
+  },
+  {
+    category: "Work & Energy",
+    id: "WE202",
+    topic: "Work by Friction",
+    difficulty: 1500,
+    problem: "A 5 kg block sliding at 10 m/s on a rough surface comes to a stop after traveling 15 m. What was the magnitude of the force of friction acting on it?",
+    answer: "16.67",
+    unit: "N"
+  },
+  {
+    category: "Work & Energy",
+    id: "WE203",
+    topic: "Spring Launch",
+    difficulty: 1600,
+    problem: "A 0.5 kg block is launched by a spring with spring constant $k=500$ N/m, which was compressed by 0.2 m. What is the block's speed as it leaves the spring?",
+    answer: "6.32",
+    unit: "m/s"
+  },
+  {
+    category: "Work & Energy",
+    id: "WE204",
+    topic: "Potential Energy Function",
+    difficulty: 1750,
+    problem: "A particle's potential energy is described by $U(x) = 2x^4 - 8x^2$. Find the position(s) of stable equilibrium.",
+    answer: "sqrt(2) and -sqrt(2)",
+  },
+  {
+    category: "Work & Energy",
+    id: "WE205",
+    topic: "Power",
+    difficulty: 1400,
+    problem: "A motor lifts a 100 kg elevator at a constant speed of 3 m/s. What is the power output of the motor? (g=9.8 m/s²)",
+    answer: "2940",
+    unit: "W"
+  },
+  {
+    category: "Work & Energy",
+    id: "WE206",
+    topic: "Loop-the-Loop",
+    difficulty: 1800,
+    problem: "A cart must maintain contact with the track at the top of a loop-the-loop of radius 10 m. What is the minimum height it must be released from (from rest) to complete the loop?",
+    answer: "25",
+    unit: "m"
+  },
+    {
+    category: "Work & Energy",
+    id: "WE207",
+    topic: "Work-Energy with Angled Force",
+    difficulty: 1650,
+    problem: "A 10 kg box is pulled 5 meters across a frictionless floor by a 40 N force angled at 60° above the horizontal. If it started from rest, what is its final speed?",
+    answer: "4.47",
+    unit: "m/s"
+  },
+  {
+    category: "Work & Energy",
+    id: "WE208",
+    topic: "Escape Energy",
+    difficulty: 1700,
+    problem: "The gravitational potential energy of a satellite of mass $m$ in orbit around Earth (mass M) is $U = -GmM/r$. How much additional work must be done to allow the satellite to escape Earth's gravity (i.e., reach a total energy of 0)?",
+    answer: "GmM/r",
+  },
+  {
+    category: "Work & Energy",
+    id: "WE209",
+    topic: "Variable Power",
+    difficulty: 1550,
+    problem: "An engine provides power to a car according to $P(t) = 300t^2$. How much work is done by the engine from t=0 to t=5 seconds?",
+    answer: "12500",
+    unit: "J"
+  },
+  {
+    category: "Work & Energy",
+    id: "WE210",
+    topic: "Spring and Gravity",
+    difficulty: 1750,
+    problem: "A 2 kg mass is dropped from 0.5 m above a vertical spring with k=800 N/m. What is the maximum distance the spring is compressed? (Use g=9.8 m/s²)",
+    answer: "0.21",
+    unit: "m"
+  },
+  {
+    category: "Work & Energy",
+    id: "WE211",
+    topic: "Force from Potential",
+    difficulty: 1600,
+    problem: "The potential energy of a diatomic molecule can be approximated by the Lennard-Jones potential $U(r) = A/r^{12} - B/r^6$. What is the force $F(r)$ between the atoms?",
+    answer: "12A/r^13 - 6B/r^7",
+  },
+
+
 
   // --- Momentum & Collisions (8 Problems) ---
+
+
   {
     category: "Momentum & Collisions",
     id: "MC101",
@@ -303,8 +615,110 @@ export const physicsProblems: Problem[] = [
     answer: "4",
     unit: "kg*m/s"
   },
+  {
+    category: "Momentum & Collisions",
+    id: "MC201",
+    topic: "Ballistic Pendulum",
+    difficulty: 1800,
+    problem: "A 0.01 kg bullet is fired into a 2 kg block of wood, which then swings up to a maximum height of 0.1 m. What was the initial speed of the bullet? (g=9.8 m/s²)",
+    answer: "281.4",
+    unit: "m/s"
+  },
+  {
+    category: "Momentum & Collisions",
+    id: "MC202",
+    topic: "Impulse from Graph",
+    difficulty: 1500,
+    problem: "The force on an object over time is a triangle starting at (0,0), rising to (2s, 100N), and returning to (4s, 0). What is the total impulse delivered?",
+    answer: "200",
+    unit: "N*s"
+  },
+  {
+    category: "Momentum & Collisions",
+    id: "MC203",
+    topic: "Elastic Collision 2D",
+    difficulty: 1850,
+    problem: "A pool ball moving at 5 m/s hits an identical stationary ball. After the collision, the first ball moves off at a 30° angle to its original path. Assuming a perfectly elastic collision, at what angle does the second ball move off?",
+    answer: "-60",
+    unit: "degrees"
+  },
+  {
+    category: "Momentum & Collisions",
+    id: "MC204",
+    topic: "Rocket Propulsion",
+    difficulty: 1700,
+    problem: "A rocket expels fuel at a rate of 50 kg/s with an exhaust velocity of 2000 m/s relative to the rocket. What is the magnitude of the thrust produced?",
+    answer: "100000",
+    unit: "N"
+  },
+  {
+    category: "Momentum & Collisions",
+    id: "MC205",
+    topic: "Center of Mass Motion",
+    difficulty: 1450,
+    problem: "A 2 kg mass at the origin and a 3 kg mass at $x=5$ are both initially at rest. No external forces act on the system. If the masses are pulled toward each other by an internal spring, what is the final position of their center of mass when they collide?",
+    answer: "3",
+    unit: "m"
+  },
+  {
+    category: "Momentum & Collisions",
+    id: "MC206",
+    topic: "Kinetic Energy in Collisions",
+    difficulty: 1600,
+    problem: "A 4 kg cart at 5 m/s collides with and sticks to a 6 kg cart at rest. How much kinetic energy was lost in the collision?",
+    answer: "30",
+    unit: "J"
+  },
+    {
+    category: "Momentum & Collisions",
+    id: "MC207",
+    topic: "Bouncing Ball",
+    difficulty: 1400,
+    problem: "A 0.5 kg ball is dropped from a height of 2 m. It hits the ground and rebounds to a height of 1.5 m. What is the magnitude of the impulse delivered by the floor to the ball? (g=9.8 m/s²)",
+    answer: "5.86",
+    unit: "N*s"
+  },
+  {
+    category: "Momentum & Collisions",
+    id: "MC208",
+    topic: "Force from Momentum",
+    difficulty: 1550,
+    problem: "A fire hose shoots water at a rate of 20 kg/s and a speed of 30 m/s against a wall. The water stops when it hits the wall. What is the force exerted by the water on the wall?",
+    answer: "600",
+    unit: "N"
+  },
+  {
+    category: "Momentum & Collisions",
+    id: "MC209",
+    topic: "Vector Momentum",
+    difficulty: 1650,
+    problem: "A 3 kg object has velocity $\\vec{v} = \\langle 4, -2 \\rangle$ m/s. A 5 kg object has velocity $\\vec{v} = \\langle -1, 5 \\rangle$ m/s. What is the magnitude of the total momentum of the system?",
+    answer: "20.1",
+    unit: "kg*m/s",
+    format_hint: "Round to one decimal place."
+  },
+  {
+    category: "Momentum & Collisions",
+    id: "MC210",
+    topic: "Coefficient of Restitution",
+    difficulty: 1750,
+    problem: "A ball is dropped from 10 m and bounces to 6.4 m. The coefficient of restitution $e$ is given by $e=\\sqrt{h_f/h_i}$. What is $e$?",
+    answer: "0.8",
+  },
+  {
+    category: "Momentum & Collisions",
+    id: "MC211",
+    topic: "Variable Mass System",
+    difficulty: 1900,
+    problem: "A cart of mass 100 kg is moving at 10 m/s. Rain begins to fall, adding mass to the cart at a rate of 2 kg/s. Assuming no friction, what is the cart's speed after 10 seconds?",
+    answer: "8.33",
+    unit: "m/s"
+  },
+
 
   // --- Circular Motion & Gravitation (8 Problems) ---
+
+
   {
     category: "Circular Motion & Gravitation",
     id: "CG101",
@@ -375,8 +789,98 @@ export const physicsProblems: Problem[] = [
     unit: "km/s",
     format_hint: "Round to one decimal place."
   },
+  {
+    category: "Circular Motion & Gravitation",
+    id: "CG201",
+    topic: "Banked Curve",
+    difficulty: 1750,
+    problem: "A car is driving on a frictionless banked curve of radius 150 m. The ideal speed for the curve is 25 m/s. What is the banking angle $\\theta$ in degrees? (g=9.8 m/s²)",
+    answer: "22.8",
+    unit: "degrees",
+  },
+  {
+    category: "Circular Motion & Gravitation",
+    id: "CG202",
+    topic: "Vertical Circle",
+    difficulty: 1650,
+    problem: "A 1 kg bucket of water is swung in a vertical circle of radius 1.2 m. What is the minimum speed it must have at the top of the circle to not spill the water? (g=9.8 m/s²)",
+    answer: "3.43",
+    unit: "m/s"
+  },
+  {
+    category: "Circular Motion & Gravitation",
+    id: "CG203",
+    topic: "Geosynchronous Orbit",
+    difficulty: 1700,
+    problem: "A geosynchronous satellite orbits Earth in exactly 24 hours. Using Kepler's Third Law in the form $r = (GMT^2 / (4\\pi^2))^{1/3}$, find the orbital radius. ($G=6.67e-11$, $M_{Earth}=5.97e24$ kg, $T=86400$ s)",
+    answer: "4.22e7",
+    unit: "m"
+  },
+  {
+    category: "Circular Motion & Gravitation",
+    id: "CG204",
+    topic: "Comparing g",
+    difficulty: 1500,
+    problem: "Planet X has twice the mass of Earth and three times the radius. What is the acceleration due to gravity on Planet X, as a multiple of Earth's g?",
+    answer: "2/9",
+  },
+    {
+    category: "Circular Motion & Gravitation",
+    id: "CG205",
+    topic: "Artificial Gravity",
+    difficulty: 1600,
+    problem: "A space station is designed as a large rotating ring to simulate Earth's gravity (9.8 m/s²). If the station has a radius of 200 m, what must its angular velocity be?",
+    answer: "0.22",
+    unit: "rad/s"
+  },
+  {
+    category: "Circular Motion & Gravitation",
+    id: "CG206",
+    topic: "Orbital Energy",
+    difficulty: 1800,
+    problem: "The total energy of a satellite in a circular orbit is $E = -GmM/(2r)$. If a 1000 kg satellite is in an orbit with radius $r=7e6$ m around Earth ($M=5.97e24$ kg), what is its total energy? ($G=6.67e-11$)",
+    answer: "-2.84e10",
+    unit: "J"
+  },
+  {
+    category: "Circular Motion & Gravitation",
+    id: "CG207",
+    topic: "Frequency to Acceleration",
+    difficulty: 1450,
+    problem: "A centrifuge spins a sample at 3000 rpm (revolutions per minute) at a radius of 0.15 m. What is the centripetal acceleration experienced by the sample?",
+    answer: "14804",
+    unit: "m/s²",
+    format_hint: "Round to the nearest integer."
+  },
+  {
+    category: "Circular Motion & Gravitation",
+    id: "CG208",
+    topic: "Lagrange Points",
+    difficulty: 1950,
+    problem: "The L1 Lagrange point is where the gravity from the Sun and Earth on a satellite cancel out the centripetal force required to orbit with the Earth. If a satellite is at this point, does it orbit faster, slower, or at the same angular velocity as Earth?",
+    answer: "same",
+  },
+  {
+    category: "Circular Motion & Gravitation",
+    id: "CG209",
+    topic: "Dark Matter",
+    difficulty: 1600,
+    problem: "Stars in a galaxy orbit much faster than predicted by visible matter alone. If a star's speed remains constant far from the galactic center, how must the enclosed mass M(r) scale with radius r, based on the orbital speed formula?",
+    answer: "proportional to r",
+  },
+  {
+    category: "Circular Motion & Gravitation",
+    id: "CG210",
+    topic: "Weightlessness",
+    difficulty: 1350,
+    problem: "Astronauts in orbit feel 'weightless' not because there is no gravity, but because they are in a constant state of what?",
+    answer: "free fall",
+  },
+
 
   // --- Rotational Motion (7 Problems) ---
+
+
   {
     category: "Rotational Motion",
     id: "RM101",
@@ -440,8 +944,97 @@ export const physicsProblems: Problem[] = [
     answer: "8",
     unit: "rad/s"
   },
+    {
+    category: "Rotational Motion",
+    id: "RM201",
+    topic: "Rolling without Slipping",
+    difficulty: 1750,
+    problem: "A solid sphere ($I=2/5 mr^2$) rolls without slipping down a ramp. What fraction of its total kinetic energy is rotational?",
+    answer: "2/7",
+  },
+  {
+    category: "Rotational Motion",
+    id: "RM202",
+    topic: "Torque and Equilibrium",
+    difficulty: 1600,
+    problem: "A 10 m long uniform beam weighing 200 N is supported at both ends. A 500 N person stands 2 m from the left end. What is the upward support force from the right end?",
+    answer: "200",
+    unit: "N"
+  },
+  {
+    category: "Rotational Motion",
+    id: "RM203",
+    topic: "Angular Impulse",
+    difficulty: 1550,
+    problem: "A constant torque of 10 N·m is applied to a flywheel for 4 seconds. What is the change in the flywheel's angular momentum?",
+    answer: "40",
+    unit: "kg*m²/s"
+  },
+  {
+    category: "Rotational Motion",
+    id: "RM204",
+    topic: "Parallel Axis Theorem",
+    difficulty: 1800,
+    problem: "A thin rod of mass M and length L has inertia $I_{cm}=ML^2/12$ about its center. What is its moment of inertia about one end?",
+    answer: "ML^2/3",
+  },
+    {
+    category: "Rotational Motion",
+    id: "RM205",
+    topic: "Conservation of Angular Momentum",
+    difficulty: 1850,
+    problem: "A 2 m radius merry-go-round with a moment of inertia of 500 kg·m² is rotating at 10 rad/s. A 60 kg person stands at the center and then walks to the outer edge. What is the new angular velocity?",
+    answer: "6.76",
+    unit: "rad/s"
+  },
+  {
+    category: "Rotational Motion",
+    id: "RM206",
+    topic: "Work in Rotation",
+    difficulty: 1650,
+    problem: "A torque of $\\tau(\\theta) = 5\\theta$ is applied to a wheel as it rotates from $\\theta=0$ to $\\theta=2\\pi$. How much work was done?",
+    answer: "98.7",
+    unit: "J",
+    format_hint: "Round to one decimal place."
+  },
+  {
+    category: "Rotational Motion",
+    id: "RM207",
+    topic: "Cross Product Torque",
+    difficulty: 1700,
+    problem: "A force $\\vec{F} = \\langle 1, 5, 0 \\rangle$ N is applied at a position $\\vec{r} = \\langle 2, 1, 0 \\rangle$ m relative to a pivot. What is the torque vector $\\vec{\\tau} = \\vec{r} \\times \\vec{F}$?",
+    answer: "<0,0,-9>",
+    unit: "N*m"
+  },
+  {
+    category: "Rotational Motion",
+    id: "RM208",
+    topic: "Gyroscopic Precession",
+    difficulty: 1900,
+    problem: "If a spinning gyroscope is tilted by gravity (a torque is applied), in which direction does it precess relative to the angular momentum and torque vectors?",
+    answer: "perpendicular",
+  },
+  {
+    category: "Rotational Motion",
+    id: "RM209",
+    topic: "Yo-yo Dynamics",
+    difficulty: 1800,
+    problem: "A yo-yo (solid disk, I=1/2 mr²) of mass $m$ unrolls down its string. What is its linear acceleration as a multiple of $g$?",
+    answer: "2/3",
+  },
+  {
+    category: "Rotational Motion",
+    id: "RM210",
+    topic: "Comparing Rolling Objects",
+    difficulty: 1600,
+    problem: "A solid sphere, a disk, and a hoop all roll without slipping down an incline. Which one reaches the bottom first?",
+    answer: "sphere",
+  },
 
   // --- Electric Fields & Potential (8 Problems) ---
+
+
+
   {
     category: "Electric Fields & Potential",
     id: "EFP101",
@@ -516,8 +1109,96 @@ export const physicsProblems: Problem[] = [
     unit: "C*m",
     format_hint: "Use scientific notation."
   },
+    {
+    category: "Electric Fields & Potential",
+    id: "EFP201",
+    topic: "Zero Field Point",
+    difficulty: 1600,
+    problem: "A charge of +4Q is at x=0 and a charge of +1Q is at x=3. At what x-coordinate between them is the net electric field zero?",
+    answer: "2",
+  },
+  {
+    category: "Electric Fields & Potential",
+    id: "EFP202",
+    topic: "Electric Flux",
+    difficulty: 1550,
+    problem: "A uniform electric field of 50 N/C passes through a flat square surface of area 4 m². The field is perpendicular to the surface. What is the electric flux?",
+    answer: "200",
+    unit: "N*m²/C"
+  },
+  {
+    category: "Electric Fields & Potential",
+    id: "EFP203",
+    topic: "Potential of a Quadrupole",
+    difficulty: 1700,
+    problem: "Two positive charges (+q) are at (0,a) and (0,-a). Two negative charges (-q) are at (a,0) and (-a,0). What is the electric potential at the origin (0,0)?",
+    answer: "0",
+  },
+  {
+    category: "Electric Fields & Potential",
+    id: "EFP204",
+    topic: "Field from Potential",
+    difficulty: 1650,
+    problem: "The electric potential in a region is $V(x,y) = 3x^2y - y^3$. What is the x-component of the electric field at the point (1,2)?",
+    answer: "-12",
+    unit: "V/m"
+  },
+    {
+    category: "Electric Fields & Potential",
+    id: "EFP205",
+    topic: "Electron Volt",
+    difficulty: 1400,
+    problem: "An electron is accelerated from rest through a potential difference of 5000 V. What is its final kinetic energy in electron-volts (eV)?",
+    answer: "5000",
+    unit: "eV"
+  },
+  {
+    category: "Electric Fields & Potential",
+    id: "EFP206",
+    topic: "Energy of Assembly",
+    difficulty: 1800,
+    problem: "How much work is required to assemble three +1 C charges into an equilateral triangle with side length 1 m? (Use k=9e9)",
+    answer: "2.7e10",
+    unit: "J"
+  },
+  {
+    category: "Electric Fields & Potential",
+    id: "EFP207",
+    topic: "Conducting Sphere",
+    difficulty: 1500,
+    problem: "A solid conducting sphere of radius R is given a net charge of +Q. What is the electric field at a point inside the sphere (r < R)?",
+    answer: "0",
+  },
+  {
+    category: "Electric Fields & Potential",
+    id: "EFP208",
+    topic: "Potential from Field",
+    difficulty: 1750,
+    problem: "The electric field between two parallel plates is a uniform 2000 V/m. The plates are separated by 0.05 m. What is the potential difference between them?",
+    answer: "100",
+    unit: "V"
+  },
+  {
+    category: "Electric Fields & Potential",
+    id: "EFP209",
+    topic: "Field Lines",
+    difficulty: 1300,
+    problem: "If the density of electric field lines in a region doubles, what has happened to the magnitude of the electric field?",
+    answer: "doubled",
+  },
+  {
+    category: "Electric Fields & Potential",
+    id: "EFP210",
+    topic: "Gauss's Law - Cylinder",
+    difficulty: 1850,
+    problem: "A very long insulating cylinder has charge distributed uniformly with charge per unit length $\\lambda$. Using a cylindrical Gaussian surface of radius r and length L, what is the magnitude of the electric field at distance r?",
+    answer: "λ/(2πε₀r)",
+  },
+
 
   // --- Circuits & Capacitance (8 Problems) ---
+
+
   {
     category: "Circuits & Capacitance",
     id: "CC101",
@@ -591,8 +1272,101 @@ export const physicsProblems: Problem[] = [
     answer: "0.1",
     unit: "J"
   },
+  {
+    category: "Circuits & Capacitance",
+    id: "CC201",
+    topic: "Complex Resistor Network",
+    difficulty: 1650,
+    problem: "A 10Ω resistor is in series with a parallel combination of a 20Ω and a 30Ω resistor. What is the total equivalent resistance of this circuit?",
+    answer: "22",
+    unit: "Ω"
+  },
+  {
+    category: "Circuits & Capacitance",
+    id: "CC202",
+    topic: "Kirchhoff's Junction Rule",
+    difficulty: 1400,
+    problem: "A junction in a circuit has two incoming currents, 3 A and 5 A. There is one outgoing wire. What must be the current in the outgoing wire?",
+    answer: "8",
+    unit: "A"
+  },
+  {
+    category: "Circuits & Capacitance",
+    id: "CC203",
+    topic: "Power Dissipation",
+    difficulty: 1350,
+    problem: "A 100 Ω resistor has a current of 0.5 A flowing through it. How much power is it dissipating as heat?",
+    answer: "25",
+    unit: "W"
+  },
+  {
+    category: "Circuits & Capacitance",
+    id: "CC204",
+    topic: "Dielectrics",
+    difficulty: 1550,
+    problem: "A parallel plate capacitor has a capacitance of 10 μF. A dielectric material with a dielectric constant of κ=4 is inserted between the plates. What is the new capacitance?",
+    answer: "40",
+    unit: "μF"
+  },
+  {
+    category: "Circuits & Capacitance",
+    id: "CC205",
+    topic: "RC Circuit Charging",
+    difficulty: 1750,
+    problem: "An RC circuit with a time constant of 5 seconds is connected to a 12V battery. How long does it take for the capacitor to charge to 63.2% of its maximum voltage?",
+    answer: "5",
+    unit: "s"
+  },
+    {
+    category: "Circuits & Capacitance",
+    id: "CC206",
+    topic: "Kirchhoff's Loop Rule",
+    difficulty: 1700,
+    problem: "A simple circuit contains a 9V battery and two resistors in series, R1=2Ω and R2=4Ω. What is the voltage drop across the 4Ω resistor?",
+    answer: "6",
+    unit: "V"
+  },
+  {
+    category: "Circuits & Capacitance",
+    id: "CC207",
+    topic: "Resistivity",
+    difficulty: 1600,
+    problem: "Wire A and Wire B are made of the same material. Wire B is twice as long and has half the radius of Wire A. What is the ratio of the resistance of Wire B to Wire A?",
+    answer: "8",
+  },
+  {
+    category: "Circuits & Capacitance",
+    id: "CC208",
+    topic: "Internal Resistance",
+    difficulty: 1650,
+    problem: "A 1.5V battery has an internal resistance of 0.2Ω. When connected to a 2.8Ω resistor, what is the actual voltage (terminal voltage) across the external resistor?",
+    answer: "1.4",
+    unit: "V"
+  },
+  {
+    category: "Circuits & Capacitance",
+    id: "CC209",
+    topic: "Complex Capacitor Network",
+    difficulty: 1700,
+    problem: "A 12μF capacitor and a 6μF capacitor are in series. This combination is in parallel with a 4μF capacitor. What is the total equivalent capacitance?",
+    answer: "8",
+    unit: "μF"
+  },
+  {
+    category: "Circuits & Capacitance",
+    id: "CC210",
+    topic: "Discharging Capacitor",
+    difficulty: 1800,
+    problem: "A 10μF capacitor is charged to 100V and then connected to a 2 MΩ resistor. How much charge remains on the capacitor after 20 seconds?",
+    answer: "3.68",
+    unit: "μC",
+    format_hint: "Round to two decimal places."
+  },
+
 
   // --- Magnetic Fields & Forces (8 Problems) ---
+
+
   {
     category: "Magnetic Fields & Forces",
     id: "MF101",
@@ -666,8 +1440,99 @@ export const physicsProblems: Problem[] = [
     problem: "The magnetic force is $\\vec{F} = q(\\vec{v} \\times \\vec{B})$. Given $q=1$, $\\vec{v} = \\langle 2,0,0 \\rangle$, and $\\vec{B} = \\langle 0,3,0 \\rangle$, what is the force vector $\\vec{F}$?",
     answer: "<0,0,6>",
   },
+  {
+    category: "Magnetic Fields & Forces",
+    id: "MF201",
+    topic: "Velocity Selector",
+    difficulty: 1750,
+    problem: "A region has a uniform magnetic field of 0.5 T pointing north and a uniform electric field. To allow a proton moving east at 2e5 m/s to pass undeflected, what must be the magnitude of the electric field?",
+    answer: "100000",
+    unit: "V/m"
+  },
+  {
+    category: "Magnetic Fields & Forces",
+    id: "MF202",
+    topic: "Circular Motion in B-Field",
+    difficulty: 1650,
+    problem: "An electron ($m=9.11e-31$ kg, $q=1.6e-19$ C) enters a uniform 0.01 T magnetic field at a speed of 3e7 m/s, perpendicular to the field. What is the radius of its circular path?",
+    answer: "0.017",
+    unit: "m",
+    format_hint: "Round to three decimal places."
+  },
+  {
+    category: "Magnetic Fields & Forces",
+    id: "MF203",
+    topic: "Force Between Wires",
+    difficulty: 1800,
+    problem: "Two parallel wires are 0.1 m apart. One carries a current of 10 A and the other carries 20 A in the same direction. What is the magnitude of the force per unit length between them? ($\\mu_0 = 4\\pi e-7$ T·m/A)",
+    answer: "0.0004",
+    unit: "N/m"
+  },
+  {
+    category: "Magnetic Fields & Forces",
+    id: "MF204",
+    topic: "Magnetic Flux",
+    difficulty: 1600,
+    problem: "A circular loop of wire with radius 0.1 m is in a uniform 1.5 T magnetic field. The loop is oriented parallel to the field. What is the magnetic flux through the loop?",
+    answer: "0",
+  },
+    {
+    category: "Magnetic Fields & Forces",
+    id: "MF205",
+    topic: "Faraday's Law",
+    difficulty: 1700,
+    problem: "The magnetic flux through a coil of 100 turns changes from 2 Wb to 5 Wb in 0.5 seconds. What is the magnitude of the induced EMF (voltage) in the coil?",
+    answer: "600",
+    unit: "V"
+  },
+  {
+    category: "Magnetic Fields & Forces",
+    id: "MF206",
+    topic: "Lenz's Law",
+    difficulty: 1500,
+    problem: "A bar magnet is moved towards a closed loop of wire with its North pole facing the loop. The induced current in the loop will create a magnetic pole on that face to oppose the change. What pole will it be?",
+    answer: "north",
+  },
+  {
+    category: "Magnetic Fields & Forces",
+    id: "MF207",
+    topic: "Motional EMF",
+    difficulty: 1650,
+    problem: "A 0.5 m long conducting rod moves at 4 m/s perpendicular to a 0.2 T magnetic field. What is the magnitude of the EMF induced across the ends of the rod?",
+    answer: "0.4",
+    unit: "V"
+  },
+  {
+    category: "Magnetic Fields & Forces",
+    id: "MF208",
+    topic: "Mass Spectrometer",
+    difficulty: 1850,
+    problem: "In a mass spectrometer, an ion's path radius is $r = mv/(qB)$. If a Carbon-12 ion ($m=12$ u) has a radius of 20 cm, what would be the radius for a Carbon-14 ion ($m=14$ u) with the same charge and speed?",
+    answer: "23.3",
+    unit: "cm"
+  },
+  {
+    category: "Magnetic Fields & Forces",
+    id: "MF209",
+    topic: "Field from a Loop",
+    difficulty: 1700,
+    problem: "The magnetic field at the center of a circular loop of radius $r$ carrying current $I$ is $B=\\mu_0 I/(2r)$. How much current is needed in a 5 cm radius loop to create a 0.001 T field? ($\\mu_0 = 4\\pi e-7$ T·m/A)",
+    answer: "79.6",
+    unit: "A"
+  },
+  {
+    category: "Magnetic Fields & Forces",
+    id: "MF210",
+    topic: "Gauss's Law for Magnetism",
+    difficulty: 1400,
+    problem: "Gauss's Law for Magnetism, $\\oint \\vec{B} \\cdot d\\vec{A} = 0$, implies the non-existence of what fundamental particle?",
+    answer: "magnetic monopoles",
+  },
+
 
   // --- Quantum Mechanics (8 Problems) ---
+
+
   {
     category: "Quantum Mechanics",
     id: "QM101",
@@ -740,5 +1605,96 @@ export const physicsProblems: Problem[] = [
     problem: "The commutator of two operators is $[A,B]=AB-BA$. For the position operator $\\hat{x}=x$ and momentum operator $\\hat{p}=-i\\hbar\\frac{d}{dx}$, what is the commutator $[\\hat{x}, \\hat{p}]$ applied to a function $f(x)$?",
     answer: "i*hbar*f(x)",
     format_hint: "Use i, hbar, and f(x)."
+  },
+  {
+    category: "Quantum Mechanics",
+    id: "QM201",
+    topic: "Photoelectric Effect",
+    difficulty: 1650,
+    problem: "A metal has a work function of 2.5 eV. What is the maximum kinetic energy of an electron ejected by a photon with an energy of 4.0 eV?",
+    answer: "1.5",
+    unit: "eV"
+  },
+  {
+    category: "Quantum Mechanics",
+    id: "QM202",
+    topic: "Atomic Spectra",
+    difficulty: 1550,
+    problem: "An electron in a hydrogen atom transitions from the n=3 energy level to the n=1 level. The energy of the emitted photon is the difference between the levels, $E_n = -13.6/n^2$ eV. What is the photon's energy?",
+    answer: "12.09",
+    unit: "eV"
+  },
+  {
+    category: "Quantum Mechanics",
+    id: "QM203",
+    topic: "Wavefunction Probability",
+    difficulty: 1850,
+    problem: "A particle in a 1D box of length L is in its ground state, $\\psi(x) = \\sqrt{2/L}\\sin(\\pi x/L)$. What is the probability of finding the particle in the left-most quarter of the box ($0 \\le x \\le L/4$)?",
+    answer: "0.091",
+    format_hint: "Round to three decimal places."
+  },
+  {
+    category: "Quantum Mechanics",
+    id: "QM204",
+    topic: "Quantum Tunneling",
+    difficulty: 1700,
+    problem: "An electron with energy 5 eV encounters a potential barrier of height 10 eV. According to classical physics, what is the probability that the electron will pass through the barrier?",
+    answer: "0",
+  },
+  {
+    category: "Quantum Mechanics",
+    id: "QM205",
+    topic: "Spin",
+    difficulty: 1400,
+    problem: "An electron is a spin-1/2 particle. In a Stern-Gerlach experiment with the magnetic field aligned in the z-direction, how many distinct paths will a beam of electrons split into?",
+    answer: "2",
+  },
+  {
+    category: "Quantum Mechanics",
+    id: "QM206",
+    topic: "Compton Scattering",
+    difficulty: 1900,
+    problem: "A photon scatters off a stationary electron. If the photon is deflected by 180 degrees, its wavelength will increase by the Compton wavelength, $h/(m_e c)$. Will the scattered photon's energy be higher, lower, or the same?",
+    answer: "lower",
+  },
+    {
+    category: "Quantum Mechanics",
+    id: "QM207",
+    topic: "Harmonic Oscillator",
+    difficulty: 1800,
+    problem: "The energy levels of a quantum harmonic oscillator are $E_n = \\hbar\\omega(n+1/2)$. What is the energy of the ground state (n=0)?",
+    answer: "hbar*omega/2",
+  },
+  {
+    category: "Quantum Mechanics",
+    id: "QM208",
+    topic: "Expectation Value of Position",
+    difficulty: 1950,
+    problem: "A particle in a 1D box of length L is in its ground state, $\\psi(x) = \\sqrt{2/L}\\sin(\\pi x/L)$. Based on the symmetry of the wavefunction, what is the expectation value of its position, $\\langle x \\rangle$?",
+    answer: "L/2",
+  },
+  {
+    category: "Quantum Mechanics",
+    id: "QM209",
+    topic: "Pauli Exclusion Principle",
+    difficulty: 1500,
+    problem: "The Pauli Exclusion Principle states that no two identical fermions can occupy the same quantum state simultaneously. This principle is responsible for the structure of what common scientific chart?",
+    answer: "periodic table",
+  },
+  {
+    category: "Quantum Mechanics",
+    id: "QM210",
+    topic: "Wave-Particle Duality",
+    difficulty: 1450,
+    problem: "The double-slit experiment demonstrates that particles like electrons can exhibit properties of both particles and what else?",
+    answer: "waves",
+  },
+  {
+    category: "Quantum Mechanics",
+    id: "QM211",
+    topic: "Superposition",
+    difficulty: 1750,
+    problem: "A qubit can be in a superposition of states, written as $|\\psi\\rangle = \\alpha|0\\rangle + \\beta|1\\rangle$. The probabilities of measuring 0 or 1 are $|\alpha|^2$ and $|\beta|^2$. If a qubit is in the state $|\\psi\\rangle = \\frac{1}{\\sqrt{5}}|0\\rangle + \\frac{2}{\\sqrt{5}}|1\\rangle$, what is the probability of measuring it in the state $|1\\rangle$?",
+    answer: "4/5",
   },
 ];
