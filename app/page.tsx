@@ -7,8 +7,8 @@ import type { FC } from "react"
 import { motion } from "framer-motion"
 import { Brain, Calculator, Atom, BarChart3, LogIn, LogOut, LucideProps, BookOpen } from "lucide-react"
 import Workspace from "../components/workspace"
-import { useSession, signIn, signOut } from "next-auth/react" // NextAuth hooks for session management
-import Image from "next/image" // Next.js component for optimized images
+import { useSession, signIn, signOut } from "next-auth/react" 
+import Image from "next/image" 
 
 interface MenuItem {
   id: 'practice-math' | 'practice-physics' | 'progress' | 'workspace';
@@ -20,7 +20,7 @@ interface MenuItem {
 export default function Home() {
   const [currentView, setCurrentView] = useState("home")
   const [sessionType, setSessionType] = useState<'math' | 'physics' | 'default'>('default');
-  const { data: session, status } = useSession(); // Get the current user session and authentication status
+  const { data: session, status } = useSession(); 
 
   const menuItems: MenuItem[] = [
     { id: "practice-math", label: "Math Practice", icon: Calculator, description: "Calculus, Linear Algebra, etc." },
