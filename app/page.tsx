@@ -21,8 +21,8 @@ export default function Home() {
 
   const menuItems: MenuItem[] = [
     { id: "practice-math", label: "Math Practice", icon: Calculator, description: "Calculus, Linear Algebra, etc." },
-    { id: "practice-physics", label: "Physics Practice", icon: Atom, description: "Quantum Mechanics, QFT, etc." },
-    { id: "workspace", label: "Workspace", icon: BookOpen, description: "A blank canvas for your ideas." },
+    { id: "practice-physics", label: "Physics Practice", icon: Atom, description: "Quantum Mechanics, Thermodynamics, etc." },
+    { id: "workspace", label: "Workspace", icon: BookOpen, description: "A notepad with CAS and graphing capabilities" },
     { id: "progress", label: "Progress", icon: BarChart3, description: "Track your learning journey." },
   ]
 
