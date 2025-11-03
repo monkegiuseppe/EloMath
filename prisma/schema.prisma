@@ -18,6 +18,7 @@ model User {
   sessions      Session[]
   
   progress      UserProgress? // One-to-one relation to UserProgress
+  attempts      QuestionAttempt[] // Track individual question attempts
 }
 
 // Our custom model to store ELO and stats
@@ -35,6 +36,23 @@ model UserProgress {
   physicsCorrect    Int @default(0)
   physicsIncorrect  Int @default(0)
   physicsSkipped    Int @default(0)
+}
+
+// New model to track individual question attempts for progress history
+model QuestionAttempt {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  subject       String   // "math" or "physics"
+  category      String   // e.g., "Calculus I", "Quantum Mechanics"
+  difficulty    Int      // Problem difficulty
+  result        String   // "correct", "incorrect", or "skipped"
+  eloChange     Int      // How much ELO changed
+  timestamp     DateTime @default(now())
+  
+  @@index([userId, timestamp]) // For efficient queries by user and date
+  @@index([userId, subject, timestamp]) // For subject-specific queries
 }
 
 // --- The rest of the models are required by the PrismaAdapter for NextAuth ---

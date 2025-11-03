@@ -13,7 +13,7 @@ import FormattingGuideModal from "./formatting-guide-modal"
 
 interface PhysicsPracticeCoreProps {
   userElo: number;
-  onEloUpdate: (newElo: number) => void;
+  onEloUpdate: (newElo: number, problemDetails?: { category: string; difficulty: number }) => void;
   onStatsUpdate: (type: 'correct' | 'incorrect' | 'skipped') => void;
   selectedCategories: string[];
 }
@@ -79,7 +79,11 @@ export const PhysicsPracticeCore: FC<PhysicsPracticeCoreProps> = ({ userElo, onE
     const newElo = Math.round(userElo + kFactor * (score - expectedScore));
     const eloChange = newElo - userElo;
 
-    onEloUpdate(newElo);
+    // Pass problem details along with the new ELO
+    onEloUpdate(newElo, {
+      category: currentProblem.category,
+      difficulty: currentProblem.difficulty
+    });
     onStatsUpdate(wasCorrect ? 'correct' : 'incorrect');
 
     setFeedback({

@@ -1,74 +1,133 @@
 // app/api/progress/route.ts
 
-import { getServerSession } from "next-auth/next"
-import { NextResponse } from "next/server"
-import { PrismaClient } from "@prisma/client"
-import { authOptions } from "../auth/[...nextauth]/route"
+import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '../auth/[...nextauth]/route';
+import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
-// GET handler: Fetches the current user's progress
-export async function GET() {
-  // Now this works perfectly because authOptions is the correct configuration object
-  const session = await getServerSession(authOptions);
-
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-  }
-
+export async function GET(req: NextRequest) {
   try {
-    let userProgress = await prisma.userProgress.findUnique({
-      where: { userId: session.user.id },
-    });
-
-    if (!userProgress) {
-      userProgress = await prisma.userProgress.create({
-        data: {
-          userId: session.user.id,
-          mathElo: 1200,
-          physicsElo: 1200,
-        },
-      });
+    const session = await getServerSession(authOptions);
+    
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
-    return NextResponse.json(userProgress);
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      include: { progress: true }
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    // If user doesn't have progress yet, create it
+    if (!user.progress) {
+      const newProgress = await prisma.userProgress.create({
+        data: {
+          userId: user.id,
+          mathElo: 1200,
+          mathCorrect: 0,
+          mathIncorrect: 0,
+          mathSkipped: 0,
+          physicsElo: 1200,
+          physicsCorrect: 0,
+          physicsIncorrect: 0,
+          physicsSkipped: 0
+        }
+      });
+      return NextResponse.json(newProgress);
+    }
+
+    return NextResponse.json(user.progress);
   } catch (error) {
-    console.error("Error fetching progress:", error);
-    return NextResponse.json({ error: "Failed to fetch progress" }, { status: 500 });
+    console.error('Progress fetch error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
-
-// POST handler: Updates the current user's progress
-export async function POST(request: Request) {
-  const session = await getServerSession(authOptions);
-
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-  }
-
+export async function POST(req: NextRequest) {
   try {
-    const { sessionType, newElo, statUpdate } = await request.json();
-
-    if (!['math', 'physics'].includes(sessionType) || typeof newElo !== 'number' || !statUpdate) {
-       return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+    const session = await getServerSession(authOptions);
+    
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
-    const updateData = {
-      [`${sessionType}Elo`]: newElo,
-      [`${sessionType}Correct`]: { increment: statUpdate.type === 'correct' ? 1 : 0 },
-      [`${sessionType}Incorrect`]: { increment: statUpdate.type === 'incorrect' ? 1 : 0 },
-      [`${sessionType}Skipped`]: { increment: statUpdate.type === 'skipped' ? 1 : 0 },
-    };
+    const body = await req.json();
+    const { sessionType, newElo, statUpdate, questionDetails } = body;
 
-    const updatedProgress = await prisma.userProgress.update({
-      where: { userId: session.user.id },
-      data: updateData,
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email }
     });
+
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    // Ensure progress exists
+    let progress = await prisma.userProgress.findUnique({
+      where: { userId: user.id }
+    });
+
+    if (!progress) {
+      progress = await prisma.userProgress.create({
+        data: {
+          userId: user.id,
+          mathElo: 1200,
+          mathCorrect: 0,
+          mathIncorrect: 0,
+          mathSkipped: 0,
+          physicsElo: 1200,
+          physicsCorrect: 0,
+          physicsIncorrect: 0,
+          physicsSkipped: 0
+        }
+      });
+    }
+
+    // Build update data based on session type
+    const updateData: any = {};
     
+    if (sessionType === 'math') {
+      if (newElo !== undefined) updateData.mathElo = newElo;
+      if (statUpdate?.type === 'correct') updateData.mathCorrect = progress.mathCorrect + 1;
+      if (statUpdate?.type === 'incorrect') updateData.mathIncorrect = progress.mathIncorrect + 1;
+      if (statUpdate?.type === 'skipped') updateData.mathSkipped = progress.mathSkipped + 1;
+    } else if (sessionType === 'physics') {
+      if (newElo !== undefined) updateData.physicsElo = newElo;
+      if (statUpdate?.type === 'correct') updateData.physicsCorrect = progress.physicsCorrect + 1;
+      if (statUpdate?.type === 'incorrect') updateData.physicsIncorrect = progress.physicsIncorrect + 1;
+      if (statUpdate?.type === 'skipped') updateData.physicsSkipped = progress.physicsSkipped + 1;
+    }
+
+    // Update progress
+    const updatedProgress = await prisma.userProgress.update({
+      where: { userId: user.id },
+      data: updateData
+    });
+
+    // Track individual attempt if details provided
+    if (questionDetails) {
+      await prisma.questionAttempt.create({
+        data: {
+          userId: user.id,
+          subject: sessionType,
+          category: questionDetails.category || 'Unknown',
+          difficulty: questionDetails.difficulty || 0,
+          result: statUpdate?.type || 'skipped',
+          eloChange: questionDetails.eloChange || 0,
+          timestamp: new Date()
+        }
+      });
+    }
+
     return NextResponse.json(updatedProgress);
   } catch (error) {
-    console.error("Error updating progress:", error);
-    return NextResponse.json({ error: "Failed to update progress" }, { status: 500 });
+    console.error('Progress update error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

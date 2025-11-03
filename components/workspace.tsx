@@ -55,6 +55,12 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
   const [sessionStats, setSessionStats] = useState({ correct: 0, incorrect: 0, skipped: 0 });
   const [isCategorySelectorOpen, setIsCategorySelectorOpen] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  
+  // Track current problem details for progress tracking
+  const [currentProblemDetails, setCurrentProblemDetails] = useState<{
+    category: string;
+    difficulty: number;
+  } | null>(null);
 
   // --- NEW AND IMPROVED DATA FETCHING ---
   // This hook runs in the background without blocking the UI
@@ -86,8 +92,14 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
   }, [sessionType]);
 
   // Handler to optimistically update the UI, then send changes to the server
-  const handleEloUpdate = (newElo: number) => {
+  const handleEloUpdate = (newElo: number, problemDetails?: { category: string; difficulty: number }) => {
+    const oldElo = userElo;
     setUserElo(newElo);
+    
+    // Store problem details for the next stats update
+    if (problemDetails) {
+      setCurrentProblemDetails(problemDetails);
+    }
   };
 
   // Handler to optimistically update stats and send changes to the server
@@ -97,17 +109,29 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
 
     // Only send the update to the server if the user is logged in
     if (status === 'authenticated' && sessionType !== 'default') {
-      // The new ELO is passed from the MathPracticeCore component via onEloUpdate
+      // Calculate ELO change
+      const eloChange = type === 'correct' || type === 'incorrect' 
+        ? userElo - (sessionStats.correct + sessionStats.incorrect + sessionStats.skipped === 0 ? STARTING_ELO : userElo)
+        : 0;
+
       fetch('/api/progress', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           sessionType,
           newElo: userElo,
-          statUpdate: { type }
+          statUpdate: { type },
+          questionDetails: currentProblemDetails ? {
+            category: currentProblemDetails.category,
+            difficulty: currentProblemDetails.difficulty,
+            eloChange: eloChange
+          } : null
         }),
       });
     }
+    
+    // Clear problem details after tracking
+    setCurrentProblemDetails(null);
   };
   
   const handleCategoryToggle = (category: string) => {

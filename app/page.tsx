@@ -7,6 +7,7 @@ import type { FC } from "react"
 import { motion } from "framer-motion"
 import { Brain, Calculator, Atom, BarChart3, LogIn, LogOut, LucideProps, BookOpen } from "lucide-react"
 import Workspace from "../components/workspace"
+import Progress from "../components/progress"
 import { useSession, signIn, signOut } from "next-auth/react" 
 import Image from "next/image" 
 
@@ -39,6 +40,8 @@ export default function Home() {
     } else if (id === "workspace") {
       setSessionType('default');
       setCurrentView('workspace');
+    } else if (id === "progress") {
+      setCurrentView('progress');
     } else {
       setCurrentView(id);
     }
@@ -49,19 +52,7 @@ export default function Home() {
   }
 
   if (currentView === "progress") {
-    return (
-      <div className="min-h-screen relative flex items-center justify-center">
-        <div className="absolute inset-0 bg-cover bg-center bg-no-repeat dynamic-background" />
-        <div className="relative z-10 glass rounded-2xl p-8 text-center">
-          <BarChart3 className="w-16 h-16 text-foreground mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-foreground mb-4">Progress Tracking</h2>
-          <p className="text-foreground mb-6">Coming soon! Track your ELO progress.</p>
-          <button onClick={() => setCurrentView("home")} className="glass px-6 py-3 rounded-lg">
-            Back to Home
-          </button>
-        </div>
-      </div>
-    )
+    return <Progress onBack={() => setCurrentView("home")} />
   }
 
   return (
