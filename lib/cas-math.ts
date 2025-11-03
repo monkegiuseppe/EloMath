@@ -51,8 +51,7 @@ export const evaluateMath = (
       
       let expressionToSolve: MathNode | string = simplified;
 
-      // *** THIS IS THE FIX ***
-      // Use a type guard to check if the simplified node is an OperatorNode.
+
       if ('isOperatorNode' in simplified && (simplified as OperatorNode).op === '/') {
         expressionToSolve = (simplified as OperatorNode).args[0];
       }
