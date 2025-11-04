@@ -6,8 +6,8 @@ import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { 
   ArrowLeft, TrendingUp, Target, Award, Calendar, 
-  BarChart3, Brain, Zap, BookOpen, Clock, CheckCircle, 
-  XCircle, SkipForward, Activity
+  BarChart3, Brain, Zap, BookOpen, Clock, Activity,
+  ChevronLeft, ChevronRight
 } from "lucide-react"
 import { useSession } from "next-auth/react"
 
@@ -239,19 +239,19 @@ export default function Progress({ onBack }: ProgressProps) {
             <div className="flex items-center gap-4">
               <button 
                 onClick={() => setSelectedMonth(new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() - 1))}
-                className="text-muted-foreground hover:text-foreground"
+                className="text-muted-foreground hover:text-foreground p-1 rounded hover:bg-muted/50 transition-colors"
               >
-                ←
+                <ChevronLeft size={20} />
               </button>
               <span className="text-foreground font-medium">
                 {monthNames[selectedMonth.getMonth()]} {selectedMonth.getFullYear()}
               </span>
               <button 
                 onClick={() => setSelectedMonth(new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() + 1))}
-                className="text-muted-foreground hover:text-foreground"
+                className="text-muted-foreground hover:text-foreground p-1 rounded hover:bg-muted/50 transition-colors"
                 disabled={selectedMonth.getMonth() === new Date().getMonth() && selectedMonth.getFullYear() === new Date().getFullYear()}
               >
-                →
+                <ChevronRight size={20} />
               </button>
             </div>
           </div>
@@ -274,9 +274,33 @@ export default function Progress({ onBack }: ProgressProps) {
               >
                 {day ? (
                   <div 
-                    className={`w-full h-full rounded-md flex items-center justify-center text-xs font-medium cursor-pointer transition-all hover:ring-2 hover:ring-foreground/50 ${getActivityColor(day.count)}`}
+                    className={`w-full h-full rounded-md flex flex-col items-center justify-center cursor-pointer transition-all hover:ring-2 hover:ring-foreground/50 ${getActivityColor(day.count)} p-1 relative group`}
                   >
-                    {parseInt(day.date.split('-')[2])}
+                    <span className="text-xs font-medium text-foreground/80">
+                      {parseInt(day.date.split('-')[2])}
+                    </span>
+                    {day.count > 0 && hoveredDay?.date === day.date && (
+                      <div className="flex items-center gap-1 mt-1">
+                        {day.correct > 0 && (
+                          <div className="flex items-center">
+                            <div className="w-2 h-2 bg-green-500 rounded-full" />
+                            <span className="text-xs text-green-500 ml-0.5 font-medium">{day.correct}</span>
+                          </div>
+                        )}
+                        {day.incorrect > 0 && (
+                          <div className="flex items-center ml-1">
+                            <div className="w-2 h-2 bg-red-500 rounded-full" />
+                            <span className="text-xs text-red-500 ml-0.5 font-medium">{day.incorrect}</span>
+                          </div>
+                        )}
+                        {day.skipped > 0 && (
+                          <div className="flex items-center ml-1">
+                            <div className="w-2 h-2 bg-yellow-500 rounded-full" />
+                            <span className="text-xs text-yellow-500 ml-0.5 font-medium">{day.skipped}</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div className="w-full h-full" />
@@ -284,30 +308,6 @@ export default function Progress({ onBack }: ProgressProps) {
               </div>
             ))}
           </div>
-
-          {hoveredDay && (
-            <div className="mt-4 p-3 bg-card/80 rounded-lg">
-              <p className="text-sm font-medium text-foreground mb-2">{formatDate(hoveredDay.date)}</p>
-              <div className="grid grid-cols-4 gap-4 text-sm">
-                <div>
-                  <span className="text-muted-foreground">Total:</span>
-                  <span className="ml-2 font-medium text-foreground">{hoveredDay.count}</span>
-                </div>
-                <div>
-                  <span className="text-green-500">Correct:</span>
-                  <span className="ml-2 font-medium text-foreground">{hoveredDay.correct}</span>
-                </div>
-                <div>
-                  <span className="text-red-500">Incorrect:</span>
-                  <span className="ml-2 font-medium text-foreground">{hoveredDay.incorrect}</span>
-                </div>
-                <div>
-                  <span className="text-yellow-500">Skipped:</span>
-                  <span className="ml-2 font-medium text-foreground">{hoveredDay.skipped}</span>
-                </div>
-              </div>
-            </div>
-          )}
 
           <div className="flex items-center gap-6 mt-6">
             <span className="text-sm text-muted-foreground">Less</span>

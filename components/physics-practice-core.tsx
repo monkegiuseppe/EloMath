@@ -13,8 +13,9 @@ import FormattingGuideModal from "./formatting-guide-modal"
 
 interface PhysicsPracticeCoreProps {
   userElo: number;
-  onEloUpdate: (newElo: number, problemDetails?: { category: string; difficulty: number }) => void;
-  onStatsUpdate: (type: 'correct' | 'incorrect' | 'skipped') => void;
+  onAnswerSubmit: (wasCorrect: boolean, newElo: number, problemDetails: { category: string; difficulty: number }) => void;
+  onSkip: () => void;
+  onProblemLoad: (problemDetails: { category: string; difficulty: number }) => void;
   selectedCategories: string[];
 }
 
@@ -24,8 +25,13 @@ interface Feedback {
   correctAnswer: string | number;
 }
 
-
-export const PhysicsPracticeCore: FC<PhysicsPracticeCoreProps> = ({ userElo, onEloUpdate, onStatsUpdate, selectedCategories }) => {
+export const PhysicsPracticeCore: FC<PhysicsPracticeCoreProps> = ({ 
+  userElo, 
+  onAnswerSubmit,
+  onSkip,
+  onProblemLoad,
+  selectedCategories 
+}) => {
   const [currentProblem, setCurrentProblem] = useState<Problem | null>(null);
   const [userAnswer, setUserAnswer] = useState<string>("");
   const [feedback, setFeedback] = useState<Feedback | null>(null);
@@ -61,7 +67,14 @@ export const PhysicsPracticeCore: FC<PhysicsPracticeCoreProps> = ({ userElo, onE
     }
 
     const randomIndex = Math.floor(Math.random() * eligibleProblems.length);
-    setCurrentProblem(eligibleProblems[randomIndex]);
+    const newProblem = eligibleProblems[randomIndex];
+    setCurrentProblem(newProblem);
+    
+    // Notify parent about the new problem
+    onProblemLoad({
+      category: newProblem.category,
+      difficulty: newProblem.difficulty
+    });
   };
 
   useEffect(() => {
@@ -73,19 +86,21 @@ export const PhysicsPracticeCore: FC<PhysicsPracticeCoreProps> = ({ userElo, onE
     if (!userAnswer.trim() || !currentProblem || currentProblem.id.startsWith("no-problems")) return;
 
     const wasCorrect = isAnswerCorrect(userAnswer, currentProblem.answer);
+    
+    // Calculate new ELO
     const score = wasCorrect ? 1 : 0;
     const expectedScore = 1 / (1 + Math.pow(10, (currentProblem.difficulty - userElo) / 400));
     const kFactor = 32;
     const newElo = Math.round(userElo + kFactor * (score - expectedScore));
     const eloChange = newElo - userElo;
 
-    // Pass problem details along with the new ELO
-    onEloUpdate(newElo, {
+    // Call the combined handler with all the info
+    onAnswerSubmit(wasCorrect, newElo, {
       category: currentProblem.category,
       difficulty: currentProblem.difficulty
     });
-    onStatsUpdate(wasCorrect ? 'correct' : 'incorrect');
 
+    // Show feedback
     setFeedback({
       type: wasCorrect ? "correct" : "incorrect",
       message: `${wasCorrect ? "Correct" : "Incorrect"}. ELO ${eloChange >= 0 ? "+" : ""}${eloChange}`,
@@ -94,7 +109,7 @@ export const PhysicsPracticeCore: FC<PhysicsPracticeCoreProps> = ({ userElo, onE
   };
 
   const handleSkip = () => {
-    onStatsUpdate('skipped');
+    onSkip();
     getNewProblem();
   };
 
