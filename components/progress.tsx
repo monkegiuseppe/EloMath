@@ -7,7 +7,7 @@ import { motion } from "framer-motion"
 import { 
   ArrowLeft, TrendingUp, Target, Award, Calendar, 
   BarChart3, Brain, Zap, BookOpen, Clock, Activity,
-  ChevronLeft, ChevronRight
+  ChevronLeft, ChevronRight, RefreshCw
 } from "lucide-react"
 import { useSession } from "next-auth/react"
 
@@ -64,6 +64,29 @@ export default function Progress({ onBack }: ProgressProps) {
       }
     } catch (error) {
       console.error('Failed to fetch progress data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResetAll = async () => {
+    if (!confirm('Are you sure you want to PERMANENTLY reset ALL your stats (both Math and Physics)? This will delete ALL your history and cannot be undone.')) {
+      return;
+    }
+    
+    try {
+      setLoading(true);
+      await fetch('/api/progress/reset', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionType: 'all' })
+      });
+      
+      // Refresh the data
+      await fetchProgressData();
+    } catch (error) {
+      console.error('Failed to reset stats:', error);
+      alert('Failed to reset stats. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -163,11 +186,21 @@ export default function Progress({ onBack }: ProgressProps) {
             <ArrowLeft size={20} className="transition-transform group-hover:-translate-x-1" />
             Back to Home
           </button>
-          <div className="glass px-4 py-2 rounded-lg">
-            <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
-              <BarChart3 size={24} />
-              Your Progress
-            </h1>
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={handleResetAll}
+              className="flex items-center gap-2 glass px-4 py-2 rounded-lg text-destructive hover:bg-destructive/10 transition-colors"
+              title="Reset all stats (Math & Physics)"
+            >
+              <RefreshCw size={18} />
+              <span className="text-sm font-medium">Reset All Stats</span>
+            </button>
+            <div className="glass px-4 py-2 rounded-lg">
+              <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
+                <BarChart3 size={24} />
+                Your Progress
+              </h1>
+            </div>
           </div>
         </motion.header>
 

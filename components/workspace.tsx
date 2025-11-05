@@ -166,10 +166,32 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
     }
   };
   
-  const handleReset = () => {
-    if (sessionType === 'default' || !confirm(`Are you sure you want to reset your ${sessionType} ELO and session stats for this session? This action is not yet saved to the database.`)) return;
+  const handleReset = async () => {
+    if (sessionType === 'default') return;
+    
+    const confirmMessage = status === 'authenticated' 
+      ? `Are you sure you want to PERMANENTLY reset your ${sessionType} ELO and ALL stats? This will delete all your ${sessionType} history and cannot be undone.`
+      : `Are you sure you want to reset your ${sessionType} ELO and session stats? (This session only - not saved to database)`;
+    
+    if (!confirm(confirmMessage)) return;
+    
+    // Reset local state immediately
     setUserElo(STARTING_ELO);
     setSessionStats({ correct: 0, incorrect: 0, skipped: 0 });
+    
+    // If authenticated, also reset in database
+    if (status === 'authenticated') {
+      try {
+        await fetch('/api/progress/reset', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionType })
+        });
+      } catch (error) {
+        console.error('Failed to reset stats in database:', error);
+        alert('Failed to reset stats. Please try again.');
+      }
+    }
   };
 
   const addTab = (type: 'notepad' | 'graphing') => {
@@ -208,37 +230,60 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
           </button>
           
           {sessionType !== 'default' && (
-            <div className="relative flex items-center gap-4 glass px-4 py-2 rounded-lg">
-              <div className="flex items-center gap-2 text-lg font-semibold text-foreground">
-                <BrainCircuit size={24} />
-                <span>{sessionType === 'math' ? 'Math' : 'Physics'} ELO: {userElo}</span>
+            <div className="relative">
+              <div className="flex items-center gap-4 glass px-4 py-2 rounded-lg">
+                {/* Border line with gap for popup */}
+                {!isCategorySelectorOpen ? (
+                  // Normal full border when closed
+                  <div className="absolute -bottom-[17px] left-0 right-0 h-px bg-border/50" />
+                ) : (
+                  // Split border with gap when open (popup is 288px wide + positioned on right)
+                  <div className="absolute -bottom-[17px] left-0 right-[296px] h-px bg-border/50" />
+                )}
+                
+                <div className="flex items-center gap-2 text-lg font-semibold text-foreground">
+                  <BrainCircuit size={24} />
+                  <span>{sessionType === 'math' ? 'Math' : 'Physics'} ELO: {userElo}</span>
+                </div>
+                <div className="text-sm text-muted-foreground flex items-center gap-4">
+                  <span className="flex items-center gap-3">
+                    <span className="text-green-500 flex items-center gap-1">
+                      <CheckCircle size={14} /> {sessionStats.correct}
+                    </span>
+                    <span>|</span>
+                    <span className="text-red-500 flex items-center gap-1">
+                      <XCircle size={14} /> {sessionStats.incorrect}
+                    </span>
+                    <span>|</span>
+                    <span className="text-yellow-500 flex items-center gap-1">
+                      <SkipForward size={14} /> {sessionStats.skipped}
+                    </span>
+                  </span>
+                  <button onClick={handleReset} title="Reset ELO & Stats" className="text-muted-foreground hover:text-destructive">
+                    <RefreshCw size={16} />
+                  </button>
+                </div>
+                <div>
+                  <button onClick={() => setIsCategorySelectorOpen(p => !p)} className="flex items-center gap-2 text-sm px-3 py-1.5 rounded-md hover:bg-muted/50 transition-colors">
+                    <SlidersHorizontal size={16} />
+                    Categories
+                  </button>
+                </div>
               </div>
-              <div className="text-sm text-muted-foreground flex items-center gap-4">
-                <span className="flex items-center gap-3">
-                  <span className="text-green-500 flex items-center gap-1">
-                    <CheckCircle size={14} /> {sessionStats.correct}
-                  </span>
-                  <span>|</span>
-                  <span className="text-red-500 flex items-center gap-1">
-                    <XCircle size={14} /> {sessionStats.incorrect}
-                  </span>
-                  <span>|</span>
-                  <span className="text-yellow-500 flex items-center gap-1">
-                    <SkipForward size={14} /> {sessionStats.skipped}
-                  </span>
-                </span>
-                <button onClick={handleReset} title="Reset ELO & Stats" className="text-muted-foreground hover:text-destructive">
-                  <RefreshCw size={16} />
-                </button>
-              </div>
-              <div>
-                <button onClick={() => setIsCategorySelectorOpen(p => !p)} className="flex items-center gap-2 text-sm px-3 py-1.5 rounded-md hover:bg-muted/50 transition-colors">
-                  <SlidersHorizontal size={16} />
-                  Categories
-                </button>
-                <AnimatePresence>
-                  {isCategorySelectorOpen && (
-                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }} className="absolute top-full right-0 mt-2 w-72 glass-strong rounded-lg p-4 z-30">
+              
+              <AnimatePresence>
+                {isCategorySelectorOpen && (
+                  <>
+                    <div 
+                      className="fixed inset-0 z-40" 
+                      onClick={() => setIsCategorySelectorOpen(false)} 
+                    />
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10 }} 
+                      animate={{ opacity: 1, y: 0 }} 
+                      exit={{ opacity: 0, y: 10 }} 
+                      className="absolute top-full right-0 mt-2 w-72 bg-card/[0.98] backdrop-blur-xl border border-border/40 rounded-lg p-4 z-50 shadow-2xl"
+                    >
                       <h3 className="text-sm font-semibold text-foreground mb-3">Filter Categories</h3>
                       <div className="max-h-60 overflow-y-auto space-y-1 pr-2 custom-scrollbar">
                         {currentCategoryList.map((cat) => (
@@ -249,15 +294,23 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
                         ))}
                       </div>
                     </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
+                  </>
+                )}
+              </AnimatePresence>
             </div>
           )}
         </motion.header>
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="glass-strong rounded-lg flex flex-col flex-grow relative z-10">
-          <div className="flex items-center border-b border-border/50 p-2 flex-shrink-0">
+          <div className="flex items-center p-2 flex-shrink-0 relative">
+            {/* Border line with gap for add-tab popup */}
+            {!isAddTabMenuOpen ? (
+              // Normal full border when closed
+              <div className="absolute bottom-0 left-0 right-0 h-px bg-border/50" />
+            ) : (
+              // Split border with gap when open (popup is ~192px wide + positioned on left)
+              <div className="absolute bottom-0 left-[200px] right-0 h-px bg-border/50" />
+            )}
             {tabs.map(tab => (
               <div key={tab.id} onClick={() => setActiveTabId(tab.id)} className={`flex items-center gap-2 px-4 py-2 rounded-md cursor-pointer text-sm font-medium ${activeTabId === tab.id ? 'bg-foreground/10 text-foreground' : 'text-muted-foreground hover:bg-muted/50'}`}>
                 {tab.type === 'notepad' && <Notebook size={14} />}
@@ -277,16 +330,27 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
               </button>
               <AnimatePresence>
                 {isAddTabMenuOpen && (
-                  <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="absolute top-full left-0 mt-2 w-48 glass-strong rounded-lg p-2 z-30">
-                    <button onClick={() => addTab('notepad')} className="w-full flex items-center gap-3 p-2 rounded-md hover:bg-white/10 text-sm text-left">
-                      <Notebook size={16} />
-                      Notepad
-                    </button>
-                    <button onClick={() => addTab('graphing')} className="w-full flex items-center gap-3 p-2 rounded-md hover:bg-white/10 text-sm text-left">
-                      <TrendingUp size={16} />
-                      Graphing Tool
-                    </button>
-                  </motion.div>
+                  <>
+                    <div 
+                      className="fixed inset-0 z-40" 
+                      onClick={() => setIsAddTabMenuOpen(false)} 
+                    />
+                    <motion.div 
+                      initial={{ opacity: 0, y: -10 }} 
+                      animate={{ opacity: 1, y: 0 }} 
+                      exit={{ opacity: 0, y: -10 }} 
+                      className="absolute top-full left-0 mt-2 w-48 bg-card/[0.98] backdrop-blur-xl border border-border/40 rounded-lg p-2 z-50 shadow-2xl"
+                    >
+                      <button onClick={() => addTab('notepad')} className="w-full flex items-center gap-3 p-2 rounded-md hover:bg-white/10 text-sm text-left">
+                        <Notebook size={16} />
+                        Notepad
+                      </button>
+                      <button onClick={() => addTab('graphing')} className="w-full flex items-center gap-3 p-2 rounded-md hover:bg-white/10 text-sm text-left">
+                        <TrendingUp size={16} />
+                        Graphing Tool
+                      </button>
+                    </motion.div>
+                  </>
                 )}
               </AnimatePresence>
             </div>

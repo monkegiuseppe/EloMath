@@ -319,7 +319,8 @@ export default function FullscreenGraphingTool() {
   return (
     <div className="w-full h-full flex flex-col bg-card/50 rounded-b-lg overflow-hidden">
       <div className="flex-shrink-0">
-        <div className="relative border-b border-border">
+        <div className={`relative transition-all ${isGraphSelectorOpen ? 'border-transparent' : 'border-b border-border'}`}>
+          {/* Note: Graph selector is full-width, so we hide the entire border when open */}
           <div className="flex items-center justify-between p-3">
             <div className="flex items-center gap-2 flex-1">
               <div className="w-1.5 h-6 rounded-full" style={{ backgroundColor: selectedEquation.color }} />
@@ -331,8 +332,8 @@ export default function FullscreenGraphingTool() {
           <AnimatePresence>
             {isGraphSelectorOpen && (
               <>
-                <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40" onClick={() => setIsGraphSelectorOpen(false)} />
-                <motion.div className="absolute top-full left-0 right-0 bg-background/95 backdrop-blur-2xl border-t border-border/40 rounded-b-xl shadow-2xl z-50" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+                <div className="fixed inset-0 z-40" onClick={() => setIsGraphSelectorOpen(false)} />
+                <motion.div className="absolute top-full left-0 right-0 bg-card/[0.98] backdrop-blur-xl border-t border-border/40 rounded-b-xl shadow-2xl z-50" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
                   <div className="p-3 space-y-2 max-h-60 overflow-y-auto">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-medium text-foreground">All Graphs ({equations.length})</span>
@@ -351,7 +352,7 @@ export default function FullscreenGraphingTool() {
             )}
           </AnimatePresence>
         </div>
-        <div className="flex items-center gap-2 p-3 border-b border-border min-h-[52px]">
+        <div className={`flex items-center gap-2 p-3 min-h-[52px] transition-all ${isGraphSelectorOpen ? 'border-transparent' : 'border-b border-border'}`}>
           <button onClick={() => setShowRoots(!showRoots)} className={`flex items-center gap-1.5 glass px-2 py-1 rounded text-xs transition-colors ${showRoots ? "bg-cyan-500/20 text-cyan-400 border-cyan-500/30" : "text-muted-foreground hover:bg-card/90"}`}><Target size={12} />Roots</button>
           <button onClick={() => setShowExtrema(!showExtrema)} className={`flex items-center gap-1.5 glass px-2 py-1 rounded text-xs transition-colors ${showExtrema ? "bg-purple-500/20 text-purple-400 border-purple-500/30" : "text-muted-foreground hover:bg-card/90"}`}><TrendingDown size={12} />Extrema</button>
           <button onClick={() => setShowIntersections(!showIntersections)} className={`flex items-center gap-1.5 glass px-2 py-1 rounded text-xs transition-colors ${showIntersections ? "bg-green-500/20 text-green-400 border-green-500/30" : "text-muted-foreground hover:bg-card/90"}`}><Move size={12} />Intersections</button>
