@@ -5,11 +5,14 @@
 import { useState, useEffect } from "react"
 import type { FC } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { CheckCircle, XCircle, SkipForward, Info } from "lucide-react"
+import { CheckCircle, XCircle, SkipForward } from "lucide-react"
 import { mathProblems, type Problem } from "../lib/problems"
 import { isAnswerCorrect } from "../lib/utils"
 import ProblemRenderer from "./problem-renderer"
 import FormattingGuideModal from "./formatting-guide-modal"
+import dynamic from 'next/dynamic'
+
+const MathAnswerInput = dynamic(() => import('./math-answer-input'), { ssr: false });
 
 interface MathPracticeCoreProps {
   userElo: number;
@@ -81,8 +84,8 @@ export const MathPracticeCore: FC<MathPracticeCoreProps> = ({
     getNewProblem();
   }, [selectedCategories]);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = (e?: React.FormEvent<HTMLFormElement>) => {
+    if (e) e.preventDefault();
     if (!userAnswer.trim() || !currentProblem || currentProblem.id.startsWith("no-problems")) return;
 
     const wasCorrect = isAnswerCorrect(userAnswer, currentProblem.answer);
@@ -143,19 +146,14 @@ export const MathPracticeCore: FC<MathPracticeCoreProps> = ({
                   </div>
 
                   <form onSubmit={handleSubmit} className="mt-auto">
-                    <div className="relative">
-                      <input
-                        type="text"
-                        value={userAnswer}
-                        onChange={(e) => setUserAnswer(e.target.value)}
-                        placeholder={currentProblem.id.startsWith("no-problems") ? "Please select categories..." : "Your Answer..."}
-                        disabled={!!feedback || currentProblem.id.startsWith("no-problems")}
-                        className="w-full bg-background/80 border-2 border-border rounded-lg py-3 pr-12 pl-4 text-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-foreground/50 focus:border-foreground/80 transition-all disabled:opacity-50"
-                      />
-                      <button type="button" onClick={() => setIsGuideOpen(true)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-1" title="Formatting Guide">
-                        <Info size={20} />
-                      </button>
-                    </div>
+                    <MathAnswerInput
+                      value={userAnswer}
+                      onChange={setUserAnswer}
+                      onSubmit={handleSubmit}
+                      disabled={!!feedback || currentProblem.id.startsWith("no-problems")}
+                      placeholder={currentProblem.id.startsWith("no-problems") ? "Please select categories..." : "Your Answer..."}
+                      onOpenGuide={() => setIsGuideOpen(true)}
+                    />
                     <div className="flex items-center justify-end gap-4 mt-4">
                       {!feedback && !currentProblem.id.startsWith("no-problems") && (
                         <motion.button type="button" onClick={handleSkip} className="flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground hover:text-foreground">
