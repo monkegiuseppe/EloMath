@@ -65,6 +65,10 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
   
   // Track current problem details for skip tracking
   const currentProblemRef = useRef<{ category: string; difficulty: number } | null>(null);
+  
+  // Track add tab button position for border gap
+  const addTabButtonRef = useRef<HTMLDivElement>(null);
+  const [addTabButtonLeft, setAddTabButtonLeft] = useState<number>(0);
 
   // --- NEW AND IMPROVED DATA FETCHING ---
   // This hook runs in the background without blocking the UI
@@ -94,6 +98,17 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
       setSelectedCategories(sessionType === 'math' ? mathCategories : physicsCategories);
     }
   }, [sessionType]);
+
+  // Measure add tab button position when popup opens
+  useEffect(() => {
+    if (isAddTabMenuOpen && addTabButtonRef.current) {
+      const rect = addTabButtonRef.current.getBoundingClientRect();
+      const parentRect = addTabButtonRef.current.closest('.flex.items-center.p-2')?.getBoundingClientRect();
+      if (parentRect) {
+        setAddTabButtonLeft(rect.left - parentRect.left);
+      }
+    }
+  }, [isAddTabMenuOpen]);
 
   // Combined handler that updates both ELO and stats together
   const handleAnswerSubmit = (
@@ -308,8 +323,19 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
               // Normal full border when closed
               <div className="absolute bottom-0 left-0 right-0 h-px bg-border/50" />
             ) : (
-              // Split border with gap when open (popup is ~192px wide + positioned on left)
-              <div className="absolute bottom-0 left-[200px] right-0 h-px bg-border/50" />
+              // Two segments with gap where popup appears
+              <>
+                {/* Left segment: from start to button */}
+                <div 
+                  className="absolute bottom-0 left-0 h-px bg-border/50" 
+                  style={{ width: `${addTabButtonLeft}px` }}
+                />
+                {/* Right segment: from end of popup (button + 192px) to end */}
+                <div 
+                  className="absolute bottom-0 right-0 h-px bg-border/50" 
+                  style={{ left: `${addTabButtonLeft + 192}px` }}
+                />
+              </>
             )}
             {tabs.map(tab => (
               <div key={tab.id} onClick={() => setActiveTabId(tab.id)} className={`flex items-center gap-2 px-4 py-2 rounded-md cursor-pointer text-sm font-medium ${activeTabId === tab.id ? 'bg-foreground/10 text-foreground' : 'text-muted-foreground hover:bg-muted/50'}`}>
@@ -324,7 +350,7 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
                 )}
               </div>
             ))}
-            <div className="relative ml-2">
+            <div ref={addTabButtonRef} className="relative ml-2">
               <button onClick={() => setIsAddTabMenuOpen(p => !p)} className="p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50" title="Add Tab">
                 <Plus size={16} />
               </button>
