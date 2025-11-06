@@ -119,7 +119,7 @@ export const PhysicsPracticeCore: FC<PhysicsPracticeCoreProps> = ({
   return (
     <>
       <FormattingGuideModal isOpen={isGuideOpen} onClose={() => setIsGuideOpen(false)} />
-      <div className="w-full h-full p-4 sm:p-6 lg:p-8 flex flex-col justify-center items-center">
+      <div className="w-full h-full min-h-[600px] p-4 sm:p-6 lg:p-8 flex flex-col justify-center items-center overflow-y-auto">
         <div className="w-full max-w-3xl">
           <div className="bg-card/60 backdrop-blur-xl border border-border/30 rounded-2xl p-8 min-h-[24rem] mb-6">
             <AnimatePresence mode="wait">

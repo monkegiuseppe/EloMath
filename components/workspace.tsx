@@ -238,30 +238,25 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
   return (
     <div className="min-h-screen relative flex flex-col">
       <div className="absolute inset-0 bg-cover bg-center bg-no-repeat dynamic-background" />
-      <div className="relative z-10 w-full max-w-7xl mx-auto p-4 flex flex-col flex-grow">
-        <motion.header initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between mb-4 flex-shrink-0 relative z-20">
+      <div className="relative z-10 w-full max-w-7xl mx-auto p-4 flex flex-col flex-grow overflow-y-auto">
+        <motion.header 
+          initial={{ opacity: 0, y: -20 }} 
+          animate={{ opacity: 1, y: 0 }} 
+          className="flex items-center justify-between mb-6 sm:mb-8 flex-shrink-0 relative z-20 pr-0 sm:pr-40 lg:pr-44"
+        >
           <button onClick={onBack} className="group flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors glass px-3 py-2 rounded-lg">
             <ArrowLeft size={20} className="transition-transform group-hover:-translate-x-1" /> Back to Home
           </button>
           
           {sessionType !== 'default' && (
             <div className="relative">
-              <div className="flex items-center gap-4 glass px-4 py-2 rounded-lg">
-                {/* Border line with gap for popup */}
-                {!isCategorySelectorOpen ? (
-                  // Normal full border when closed
-                  <div className="absolute -bottom-[17px] left-0 right-0 h-px bg-border/50" />
-                ) : (
-                  // Split border with gap when open (popup is 288px wide + positioned on right)
-                  <div className="absolute -bottom-[17px] left-0 right-[296px] h-px bg-border/50" />
-                )}
-                
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 glass px-3 sm:px-4 py-2 rounded-lg text-sm sm:text-base">
                 <div className="flex items-center gap-2 text-lg font-semibold text-foreground">
                   <BrainCircuit size={24} />
                   <span>{sessionType === 'math' ? 'Math' : 'Physics'} ELO: {userElo}</span>
                 </div>
-                <div className="text-sm text-muted-foreground flex items-center gap-4">
-                  <span className="flex items-center gap-3">
+                <div className="text-xs sm:text-sm text-muted-foreground flex items-center gap-2 sm:gap-4">
+                  <span className="flex items-center gap-1 sm:gap-3">
                     <span className="text-green-500 flex items-center gap-1">
                       <CheckCircle size={14} /> {sessionStats.correct}
                     </span>
@@ -316,7 +311,12 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
           )}
         </motion.header>
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="glass-strong rounded-lg flex flex-col flex-grow relative z-10">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }} 
+          animate={{ opacity: 1, y: 0 }} 
+          transition={{ delay: 0.1 }} 
+          className="glass rounded-lg flex flex-col flex-grow relative z-10 border-0"
+        >
           <div className="flex items-center p-2 flex-shrink-0 relative">
             {/* Border line with gap for add-tab popup */}
             {!isAddTabMenuOpen ? (
@@ -382,11 +382,11 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
             </div>
           </div>
 
-          <div className="flex-grow relative">
+          <div className="flex-grow relative min-h-[450px]">
             {tabs.map((tab) => (
               <div
                 key={tab.id}
-                className={`absolute inset-0 w-full h-full transition-opacity duration-150 ease-in-out ${
+                className={`absolute inset-0 w-full h-full overflow-y-auto transition-opacity duration-150 ease-in-out ${
                   activeTabId === tab.id 
                     ? 'opacity-100 z-10 pointer-events-auto' 
                     : 'opacity-0 z-0 pointer-events-none'

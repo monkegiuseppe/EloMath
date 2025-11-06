@@ -71,13 +71,77 @@
 
 @layer utilities {
   .glass {
-    @apply bg-card/60 backdrop-blur-xl border border-border/30;
+    /* More opaque on small screens for better readability */
+    @apply bg-card/90 backdrop-blur-md border border-border/40;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Medium screens: start showing more transparency */
+  @media (min-width: 768px) {
+    .glass {
+      @apply bg-card/75 backdrop-blur-lg border-border/35;
+    }
+  }
+  
+  /* Large screens: full glass effect */
+  @media (min-width: 1024px) {
+    .glass {
+      @apply bg-card/60 backdrop-blur-xl border-border/30;
+    }
   }
 
   .glass-strong {
-    @apply bg-card/80 backdrop-blur-2xl border border-border/40;
+    /* More opaque on small screens */
+    @apply bg-card/95 backdrop-blur-lg border border-border/50;
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  }
+  
+  @media (min-width: 768px) {
+    .glass-strong {
+      @apply bg-card/90 backdrop-blur-xl border-border/45;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .glass-strong {
+      @apply bg-card/80 backdrop-blur-2xl border-border/40;
+    }
+  }
+}
+
+
+@layer utilities {
+
+  .responsive-container {
+    @apply p-2;
+  }
+  
+  @media (min-width: 768px) {
+    .responsive-container {
+      @apply p-4;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .responsive-container {
+      @apply p-6;
+    }
+  }
+}
+
+.dynamic-background {
+  opacity: 0.7;
+}
+
+@media (min-width: 768px) {
+  .dynamic-background {
+    opacity: 0.85;
+  }
+}
+
+@media (min-width: 1024px) {
+  .dynamic-background {
+    opacity: 1;
   }
 }
 
@@ -121,25 +185,74 @@
 /* Custom scrollbar styles */
 .custom-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: hsl(var(--border)) transparent;
+  scrollbar-color: rgba(248, 250, 252, 0.3) transparent;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
+  width: 10px;
+  height: 10px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-  border-radius: 3px;
+  background: rgba(30, 41, 59, 0.3);
+  border-radius: 10px;
+  margin: 4px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: hsl(var(--border));
-  border-radius: 3px;
+  background: linear-gradient(
+    180deg,
+    rgba(248, 250, 252, 0.4) 0%,
+    rgba(248, 250, 252, 0.2) 100%
+  );
+  border-radius: 10px;
+  border: 2px solid rgba(30, 41, 59, 0.3);
+  backdrop-filter: blur(10px);
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--muted-foreground));
+  background: linear-gradient(
+    180deg,
+    rgba(248, 250, 252, 0.6) 0%,
+    rgba(248, 250, 252, 0.4) 100%
+  );
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:active {
+  background: rgba(248, 250, 252, 0.7);
+}
+
+/* Apply to body for main scrollbar */
+body {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(248, 250, 252, 0.3) transparent;
+}
+
+body::-webkit-scrollbar {
+  width: 10px;
+}
+
+body::-webkit-scrollbar-track {
+  background: rgba(30, 41, 59, 0.3);
+  border-radius: 10px;
+}
+
+body::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    180deg,
+    rgba(248, 250, 252, 0.4) 0%,
+    rgba(248, 250, 252, 0.2) 100%
+  );
+  border-radius: 10px;
+  border: 2px solid rgba(30, 41, 59, 0.3);
+}
+
+body::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    180deg,
+    rgba(248, 250, 252, 0.6) 0%,
+    rgba(248, 250, 252, 0.4) 100%
+  );
 }
 
 .notepad-content:empty:before {
