@@ -3,7 +3,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { useSession } from "next-auth/react"; // To check if the user is logged in
+import { useSession } from "next-auth/react"; 
 import { motion, AnimatePresence } from "framer-motion"
 import { ArrowLeft, Plus, X, Notebook, TrendingUp, BrainCircuit, RefreshCw, SlidersHorizontal, CheckCircle, XCircle, SkipForward } from "lucide-react"
 import dynamic from 'next/dynamic'
