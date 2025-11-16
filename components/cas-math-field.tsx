@@ -38,7 +38,10 @@ const CasMathField: FC<CasMathFieldProps> = ({ latex, onChange, onMount, onDelet
           field.focus();
         }}
         config={{
-          autoCommands: 'pi theta sqrt',
+          // Enhanced autoCommands for easier symbol input
+          // Only include items that are NOT built-in MathQuill operators
+          autoCommands: 'pi theta alpha beta gamma delta epsilon zeta eta lambda mu nu xi rho sigma tau phi chi psi omega sqrt cbrt',
+          autoOperatorNames: 'sin cos tan sec csc cot sinh cosh tanh arcsin arccos arctan log ln exp abs derivative solve simplify expand factor limit',
           handlers: {
             edit: (mathField) => {
               if (mathField) {
@@ -55,47 +58,51 @@ const CasMathField: FC<CasMathFieldProps> = ({ latex, onChange, onMount, onDelet
               if (!wrapper || !wrapper.parentNode) return;
               
               const parent = wrapper.parentNode;
-
               const parentEditor = wrapper.closest('[contenteditable="true"]') as HTMLElement | null;
               if (!parentEditor) return;
               
-              parentEditor.focus();
-              const selection = window.getSelection();
-              if (!selection) return;
+              // Blur the math field first to release focus
+              mathFieldRef.current?.blur();
               
-              const range = document.createRange();
+              // Small delay to ensure blur completes and selection is ready
+              setTimeout(() => {
+                const selection = window.getSelection();
+                if (!selection) return;
+                
+                const range = document.createRange();
 
-              const createCursorAnchor = (position: 'before' | 'after') => {
-                const zeroWidthNode = document.createTextNode('\u200B');
-                if (position === 'before') {
-                  parent.insertBefore(zeroWidthNode, wrapper);
-                } else {
-                  parent.insertBefore(zeroWidthNode, wrapper.nextSibling);
+                if (dir === 1) { // Moving RIGHT (MathQuill uses 1 for right)
+                  const next = wrapper.nextSibling;
+                  if (next && next.nodeType === Node.TEXT_NODE && next.textContent) {
+                    // Move to the start of the next text node
+                    range.setStart(next, 0);
+                    range.collapse(true);
+                  } else {
+                    // Create a new text node after the wrapper
+                    const newTextNode = document.createTextNode('\u200B');
+                    parent.insertBefore(newTextNode, wrapper.nextSibling);
+                    range.setStart(newTextNode, 1);
+                    range.collapse(true);
+                  }
+                } else if (dir === -1) { // Moving LEFT
+                  const prev = wrapper.previousSibling;
+                  if (prev && prev.nodeType === Node.TEXT_NODE && prev.textContent) {
+                    // Move to the end of the previous text node
+                    range.setStart(prev, prev.textContent.length);
+                    range.collapse(true);
+                  } else {
+                    // Create a new text node before the wrapper
+                    const newTextNode = document.createTextNode('\u200B');
+                    parent.insertBefore(newTextNode, wrapper);
+                    range.setStart(newTextNode, 1);
+                    range.collapse(true);
+                  }
                 }
-                range.setStart(zeroWidthNode, 1);
-              };
-
-              if (dir < 0) { // Moving LEFT
-                const prev = wrapper.previousSibling;
-                if (prev && prev.nodeType === Node.TEXT_NODE) {
-                  range.setStart(prev, prev.textContent?.length || 0);
-                } else {
-                  createCursorAnchor('before');
-                }
-              } 
-              else { // Moving RIGHT
-                const next = wrapper.nextSibling;
-                if (next && next.nodeType === Node.TEXT_NODE) {
-                  const offset = next.textContent === '\u200B' ? 1 : 0;
-                  range.setStart(next, offset);
-                } else {
-                  createCursorAnchor('after');
-                }
-              }
-              
-              range.collapse(true);
-              selection.removeAllRanges();
-              selection.addRange(range);
+                
+                selection.removeAllRanges();
+                selection.addRange(range);
+                parentEditor.focus();
+              }, 10);
             },
           },
         }}
