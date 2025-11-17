@@ -38,10 +38,12 @@ const CasMathField: FC<CasMathFieldProps> = ({ latex, onChange, onMount, onDelet
           field.focus();
         }}
         config={{
-          // Enhanced autoCommands for easier symbol input
-          // Only include items that are NOT built-in MathQuill operators
-          autoCommands: 'pi theta alpha beta gamma delta epsilon zeta eta lambda mu nu xi rho sigma tau phi chi psi omega sqrt cbrt',
-          autoOperatorNames: 'sin cos tan sec csc cot sinh cosh tanh arcsin arccos arctan log ln exp abs derivative solve simplify expand factor limit',
+          // Auto-commands for Greek letters and special symbols
+          // EXCLUDING built-in operators: lim, int, sum, prod, inf, infty
+          // Also excluding sqrt and cbrt as they might be built-in
+          autoCommands: 'pi theta alpha beta gamma delta epsilon zeta eta lambda mu nu xi rho sigma tau phi chi psi omega hbar',
+          // Auto-operator names for functions
+          autoOperatorNames: 'sin cos tan sec csc cot sinh cosh tanh arcsin arccos arctan log ln exp abs derivative solve simplify expand factor limit integrate',
           handlers: {
             edit: (mathField) => {
               if (mathField) {

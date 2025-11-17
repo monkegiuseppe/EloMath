@@ -64,7 +64,7 @@ const NotepadGuideModal: FC<NotepadGuideModalProps> = ({ isOpen, onClose }) => {
                 {/* Mathematical Symbols */}
                 <div>
                   <h3 className="text-foreground font-semibold mb-2 text-base">Quick Symbol Input</h3>
-                  <p className="mb-2">Type these words and they'll auto-convert to symbols:</p>
+                  <p className="mb-2">Type these words and they'll auto-convert to Greek letters:</p>
                   <div className="grid grid-cols-2 gap-2 p-2 bg-background/50 rounded text-xs">
                     <div><code>pi</code> → π</div>
                     <div><code>theta</code> → θ</div>
@@ -72,17 +72,22 @@ const NotepadGuideModal: FC<NotepadGuideModalProps> = ({ isOpen, onClose }) => {
                     <div><code>beta</code> → β</div>
                     <div><code>gamma</code> → γ</div>
                     <div><code>delta</code> → δ</div>
+                    <div><code>epsilon</code> → ε</div>
                     <div><code>lambda</code> → λ</div>
                     <div><code>mu</code> → μ</div>
                     <div><code>sigma</code> → σ</div>
                     <div><code>omega</code> → ω</div>
-                    <div><code>sqrt</code> → √</div>
-                    <div><code>int</code> → ∫</div>
-                    <div><code>sum</code> → Σ</div>
-                    <div><code>prod</code> → ∏</div>
-                    <div><code>lim</code> → lim</div>
-                    <div><code>inf</code> → ∞</div>
+                    <div><code>hbar</code> → ℏ (physics)</div>
                   </div>
+                  <p className="mt-2 text-xs opacity-75">
+                    <strong>Built-in operators (use with backslash or toolbar):</strong><br/>
+                    <code>\int</code> → ∫ (integral)<br/>
+                    <code>\sum</code> → Σ (summation)<br/>
+                    <code>\prod</code> → ∏ (product)<br/>
+                    <code>\lim</code> → lim (limit)<br/>
+                    <code>\sqrt</code> → √ (square root)<br/>
+                    <code>\infty</code> → ∞ (infinity)
+                  </p>
                 </div>
 
                 {/* Available Functions */}
@@ -95,8 +100,8 @@ const NotepadGuideModal: FC<NotepadGuideModalProps> = ({ isOpen, onClose }) => {
                       <div className="mt-1 p-2 bg-background/50 rounded">
                         <code>solve(equation, variable)</code><br />
                         <span className="text-xs opacity-75">Examples:</span><br />
-                        <code className="text-xs">solve(x^2 - 4 = 0, x)</code><br />
-                        <code className="text-xs">solve(2x + 5 = 13, x)</code>
+                        <code className="text-xs">solve(x^2 - 4 = 0, x)</code> → <span className="text-green-400">2, -2</span><br />
+                        <code className="text-xs">solve(2x + 5 = 13, x)</code> → <span className="text-green-400">4</span>
                       </div>
                       <p className="text-xs mt-1 opacity-75">Supports linear and quadratic equations</p>
                     </div>
@@ -107,9 +112,22 @@ const NotepadGuideModal: FC<NotepadGuideModalProps> = ({ isOpen, onClose }) => {
                         <code>derivative(expression, variable)</code><br />
                         <code>d/dx(expression)</code><br />
                         <span className="text-xs opacity-75">Examples:</span><br />
-                        <code className="text-xs">derivative(x^3 + 2x, x)</code><br />
-                        <code className="text-xs">d/dx(sin(x) * cos(x))</code>
+                        <code className="text-xs">derivative(x^3 + 2x, x)</code> → <span className="text-green-400">3x² + 2</span><br />
+                        <code className="text-xs">d/dx(sin(x) * cos(x))</code> → <span className="text-green-400">cos²(x) - sin²(x)</span>
                       </div>
+                    </div>
+
+                    <div>
+                      <strong className="text-amber-400">Integration</strong>
+                      <div className="mt-1 p-2 bg-background/50 rounded">
+                        <code>integrate(expression, variable)</code> - Indefinite integral<br />
+                        <code>integrate(expression, variable, lower, upper)</code> - Definite integral<br />
+                        <span className="text-xs opacity-75">Examples:</span><br />
+                        <code className="text-xs">integrate(x^2)</code> → <span className="text-green-400">x³/3 + C</span><br />
+                        <code className="text-xs">integrate(sin(x))</code> → <span className="text-green-400">-cos(x) + C</span><br />
+                        <code className="text-xs">integrate(x, x, 0, 2)</code> → <span className="text-green-400">2</span>
+                      </div>
+                      <p className="text-xs mt-1 opacity-75">Symbolic for simple polynomials, numerical for complex expressions</p>
                     </div>
 
                     <div>
@@ -119,17 +137,31 @@ const NotepadGuideModal: FC<NotepadGuideModalProps> = ({ isOpen, onClose }) => {
                         <div><code>expand(expression)</code> - Expand products</div>
                         <div><code>factor(expression)</code> - Factor expressions</div>
                         <span className="text-xs opacity-75">Examples:</span><br />
-                        <code className="text-xs">simplify((x^2 - 1)/(x - 1))</code><br />
-                        <code className="text-xs">expand((x + 2)^2)</code>
+                        <code className="text-xs">simplify((x^2 - 1)/(x - 1))</code> → <span className="text-green-400">x + 1</span><br />
+                        <code className="text-xs">expand((x + 2)^2)</code> → <span className="text-green-400">x² + 4x + 4</span>
                       </div>
                     </div>
 
                     <div>
-                      <strong className="text-amber-400">Limits</strong>
+                      <strong className="text-pink-400">Limits</strong>
                       <div className="mt-1 p-2 bg-background/50 rounded">
-                        <code>limit(expression, x-&gt;value)</code><br />
-                        <span className="text-xs opacity-75">Example:</span><br />
-                        <code className="text-xs">limit(sin(x)/x, x-&gt;0)</code>
+                        <code>{'limit(expression, x->value)'}</code><br />
+                        <span className="text-xs opacity-75">Examples:</span><br />
+                        <code className="text-xs">{'limit(sin(x)/x, x->0)'}</code> → <span className="text-green-400">1</span><br />
+                        <code className="text-xs">{'limit(1/x, x->infinity)'}</code> → <span className="text-green-400">0</span><br />
+                        <code className="text-xs">{'limit((x^2-1)/(x-1), x->1)'}</code> → <span className="text-green-400">2</span>
+                      </div>
+                      <p className="text-xs mt-1 opacity-75">Uses L'Hôpital's rule for indeterminate forms</p>
+                    </div>
+
+                    <div>
+                      <strong className="text-teal-400">Summation & Product</strong>
+                      <div className="mt-1 p-2 bg-background/50 rounded">
+                        <code>sum(expression, variable, start, end)</code><br />
+                        <code>product(expression, variable, start, end)</code><br />
+                        <span className="text-xs opacity-75">Examples:</span><br />
+                        <code className="text-xs">sum(k^2, k, 1, 5)</code> → <span className="text-green-400">55</span> (1² + 2² + 3² + 4² + 5²)<br />
+                        <code className="text-xs">product(k, k, 1, 5)</code> → <span className="text-green-400">120</span> (5!)
                       </div>
                     </div>
 
@@ -143,7 +175,7 @@ const NotepadGuideModal: FC<NotepadGuideModalProps> = ({ isOpen, onClose }) => {
                     </div>
 
                     <div>
-                      <strong className="text-pink-400">Other Functions</strong>
+                      <strong className="text-indigo-400">Other Functions</strong>
                       <div className="mt-1 p-2 bg-background/50 rounded">
                         <code>log(x)</code> - logarithm base 10<br />
                         <code>ln(x)</code> - natural logarithm<br />
@@ -158,15 +190,16 @@ const NotepadGuideModal: FC<NotepadGuideModalProps> = ({ isOpen, onClose }) => {
 
                 {/* Constants */}
                 <div>
-                  <h3 className="text-foreground font-semibold mb-2 text-base">Physical Constants</h3>
+                  <h3 className="text-foreground font-semibold mb-2 text-base">Mathematical & Physical Constants</h3>
                   <div className="p-2 bg-background/50 rounded grid grid-cols-2 gap-2 text-xs">
                     <div><code>pi</code> - π (3.14159...)</div>
-                    <div><code>e</code> - Euler's number</div>
-                    <div><code>hbar</code> - Reduced Planck</div>
+                    <div><code>e</code> - Euler's number (2.71828...)</div>
+                    <div><code>hbar</code> - ℏ Reduced Planck constant</div>
                     <div><code>c</code> - Speed of light</div>
                     <div><code>G</code> - Gravitational constant</div>
                     <div><code>k_B</code> - Boltzmann constant</div>
                     <div><code>e_charge</code> - Elementary charge</div>
+                    <div><code>\infty</code> - ∞ (use backslash)</div>
                   </div>
                 </div>
 
@@ -176,9 +209,36 @@ const NotepadGuideModal: FC<NotepadGuideModalProps> = ({ isOpen, onClose }) => {
                   <ul className="space-y-1 text-xs">
                     <li>• Use parentheses liberally for clarity: <code>(x+1)/(x-1)</code></li>
                     <li>• Multiplication must be explicit: <code>2*x</code> not <code>2x</code></li>
-                    <li>• For exponents use ^: <code>x^2</code> not <code>x²</code></li>
+                    <li>• For exponents use ^: <code>x^2</code> or click the superscript button</li>
                     <li>• Chain operations: <code>simplify(derivative(x^3, x))</code></li>
+                    <li>• All Greek letters auto-convert: just type their names</li>
+                    <li>• For infinity in limits, use <code>\infty</code> or type it as <code>infinity</code></li>
+                    <li>• Use backslash for built-in operators: <code>\int</code>, <code>\sum</code>, <code>\lim</code></li>
                   </ul>
+                </div>
+
+                {/* Examples Section */}
+                <div className="bg-purple-500/10 border border-purple-500/30 rounded p-3">
+                  <h3 className="text-purple-400 font-semibold mb-2">📝 Try These Examples</h3>
+                  <div className="space-y-2 text-xs">
+                    <div className="p-2 bg-background/30 rounded">
+                      <strong>Calculus:</strong><br />
+                      <code>{'limit((1+1/n)^n, n->infinity)'}</code> → Definition of e<br />
+                      <code>derivative(ln(x^2+1), x)</code> → Chain rule<br />
+                      <code>integrate(x*cos(x), x)</code> → Integration by parts
+                    </div>
+                    <div className="p-2 bg-background/30 rounded">
+                      <strong>Algebra:</strong><br />
+                      <code>solve(x^2 + 3*x - 10 = 0, x)</code> → Quadratic<br />
+                      <code>expand((a+b)^3)</code> → Binomial expansion<br />
+                      <code>simplify(sin(x)^2 + cos(x)^2)</code> → Trig identity
+                    </div>
+                    <div className="p-2 bg-background/30 rounded">
+                      <strong>Series:</strong><br />
+                      <code>sum(1/k^2, k, 1, 100)</code> → Basel problem approximation<br />
+                      <code>product(2*k/(2*k-1), k, 1, 20)</code> → Wallis product
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
