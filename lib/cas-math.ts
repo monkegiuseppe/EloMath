@@ -593,13 +593,42 @@ export const evaluateMath = (
     const result = math.evaluate(sanitizedExpr);
     console.log('Evaluation result:', result);
     
-    // Format the result
+    // Format the result with improved fraction handling
     if (result && typeof result === 'object' && 'toTex' in result && typeof result.toTex === 'function') {
       return result.toTex();
     } else if (typeof result === 'number') {
       if (Math.abs(result) < 1e-10) return '0';
       if (Math.abs(result - Math.round(result)) < 1e-10) return String(Math.round(result));
-      return result.toFixed(6);
+      
+      // Try to convert to fraction for simpler representation
+      try {
+        const fraction = math.fraction(result);
+        // Convert to numbers (fraction properties can be bigint)
+        const numerator = Number(fraction.n);
+        const denominator = Number(fraction.d);
+        const sign = Number(fraction.s);
+        
+        // Only use fraction if it's simpler than decimal (denominator < 100)
+        if (denominator < 100 && denominator > 1) {
+          // Check if decimal would be long (more than 4 decimal places or repeating)
+          const decimalStr = result.toFixed(10);
+          const significantDecimals = decimalStr.split('.')[1]?.replace(/0+$/, '').length || 0;
+          
+          if (significantDecimals > 4) {
+            // Return as LaTeX fraction
+            if (sign === -1) {
+              return `-\\frac{${Math.abs(numerator)}}{${denominator}}`;
+            }
+            return `\\frac{${numerator}}{${denominator}}`;
+          }
+        }
+      } catch (e) {
+        // If fraction conversion fails, continue with decimal
+      }
+      
+      // For decimals, limit to 6 places but remove trailing zeros
+      const formatted = parseFloat(result.toFixed(6)).toString();
+      return formatted;
     } else {
       return String(result);
     }
