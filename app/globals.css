@@ -71,19 +71,16 @@
 
 @layer utilities {
   .glass {
-    /* More opaque on small screens for better readability */
     @apply bg-card/90 backdrop-blur-md border border-border/40;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    box-shadow: none; 
   }
   
-  /* Medium screens: start showing more transparency */
   @media (min-width: 768px) {
     .glass {
       @apply bg-card/75 backdrop-blur-lg border-border/35;
     }
   }
   
-  /* Large screens: full glass effect */
   @media (min-width: 1024px) {
     .glass {
       @apply bg-card/60 backdrop-blur-xl border-border/30;
@@ -91,9 +88,8 @@
   }
 
   .glass-strong {
-    /* More opaque on small screens */
     @apply bg-card/95 backdrop-blur-lg border border-border/50;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    box-shadow: none; 
   }
   
   @media (min-width: 768px) {
