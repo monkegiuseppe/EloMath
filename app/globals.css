@@ -253,9 +253,8 @@ body::-webkit-scrollbar-thumb:hover {
 
 .notepad-content:empty:before {
   content: "Type your notes here...";
-  color: hsl(var(--muted-foreground));
+  color: rgb(var(--muted-foreground));
   pointer-events: none;
-  position: absolute;
 }
 
 /* Styles for dynamic background image */
