@@ -320,14 +320,13 @@ export default function FullscreenGraphingTool() {
     <div className="w-full h-full flex flex-col bg-card/50 rounded-b-lg overflow-hidden">
       <div className="flex-shrink-0">
         <div className={`relative transition-all ${isGraphSelectorOpen ? 'border-transparent' : 'border-b border-border'}`}>
-          {/* Note: Graph selector is full-width, so we hide the entire border when open */}
-          <div className="flex items-center justify-between p-3">
-            <div className="flex items-center gap-2 flex-1">
-              <div className="w-1.5 h-6 rounded-full" style={{ backgroundColor: selectedEquation.color }} />
-              <label className="text-sm font-medium text-foreground">f(x) =</label>
-              <input type="text" value={selectedEquation.expr} onChange={(e) => handleEquationChange(selectedEquation.id, e.target.value)} className={`flex-1 bg-background/80 border-2 rounded-lg py-1 px-2 text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-cyan-400/50 focus:border-cyan-400 transition-all ${selectedEquation.expr && !selectedEquation.compiled ? "border-red-400" : "border-border"}`} placeholder="e.g., x^2, sin(x/2)"/>
+          <div className="flex items-center justify-between p-3 gap-2">
+            <div className="flex items-center gap-2 flex-1 overflow-hidden">
+              <div className="w-1.5 h-6 rounded-full flex-shrink-0" style={{ backgroundColor: selectedEquation.color }} />
+              <label className="text-sm font-medium text-foreground flex-shrink-0">f(x) =</label>
+              <input type="text" value={selectedEquation.expr} onChange={(e) => handleEquationChange(selectedEquation.id, e.target.value)} className={`flex-1 min-w-0 bg-background/80 border-2 rounded-lg py-1 px-2 text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-cyan-400/50 focus:border-cyan-400 transition-all ${selectedEquation.expr && !selectedEquation.compiled ? "border-red-400" : "border-border"}`} placeholder="e.g., x^2, sin(x/2)"/>
             </div>
-            <button onClick={() => setIsGraphSelectorOpen(!isGraphSelectorOpen)} className="glass p-1.5 rounded-lg hover:bg-card/90 transition-all ml-2"><Settings size={16} /></button>
+            <button onClick={() => setIsGraphSelectorOpen(!isGraphSelectorOpen)} className="glass p-1.5 rounded-lg hover:bg-card/90 transition-all ml-auto flex-shrink-0"><Settings size={16} /></button>
           </div>
           <AnimatePresence>
             {isGraphSelectorOpen && (
@@ -352,10 +351,10 @@ export default function FullscreenGraphingTool() {
             )}
           </AnimatePresence>
         </div>
-        <div className={`flex items-center gap-2 p-3 min-h-[52px] transition-all ${isGraphSelectorOpen ? 'border-transparent' : 'border-b border-border'}`}>
+        <div className={`flex flex-wrap items-center gap-2 p-3 min-h-[52px] transition-all ${isGraphSelectorOpen ? 'border-transparent' : 'border-b border-border'}`}>
           <button onClick={() => setShowRoots(!showRoots)} className={`flex items-center gap-1.5 glass px-2 py-1 rounded text-xs transition-colors ${showRoots ? "bg-cyan-500/20 text-cyan-400 border-cyan-500/30" : "text-muted-foreground hover:bg-card/90"}`}><Target size={12} />Roots</button>
           <button onClick={() => setShowExtrema(!showExtrema)} className={`flex items-center gap-1.5 glass px-2 py-1 rounded text-xs transition-colors ${showExtrema ? "bg-purple-500/20 text-purple-400 border-purple-500/30" : "text-muted-foreground hover:bg-card/90"}`}><TrendingDown size={12} />Extrema</button>
-          <button onClick={() => setShowIntersections(!showIntersections)} className={`flex items-center gap-1.5 glass px-2 py-1 rounded text-xs transition-colors ${showIntersections ? "bg-green-500/20 text-green-400 border-green-500/30" : "text-muted-foreground hover:bg-card/90"}`}><Move size={12} />Intersections</button>
+          <button onClick={() => setShowIntersections(!showIntersections)} className={`flex items-center gap-1.5 glass px-2 py-1 rounded text-xs transition-colors ${showIntersections ? "bg-green-500/20 text-green-400 border-green-500/30" : "text-muted-foreground hover:bg-card/90"}`}><Move size={12} />Cross</button>
           <button onClick={() => setShowMouseTracking(!showMouseTracking)} className={`flex items-center gap-1.5 glass px-2 py-1 rounded text-xs transition-colors ${showMouseTracking ? "bg-amber-500/20 text-amber-400 border-amber-500/30" : "text-muted-foreground hover:bg-card/90"}`}><Target size={12} />Track</button>
         </div>
       </div>
@@ -363,7 +362,7 @@ export default function FullscreenGraphingTool() {
         <canvas ref={canvasRef} className="w-full h-full rounded-lg cursor-grab" />
         <div className="absolute bottom-2 right-3 text-xs text-muted-foreground flex items-center gap-1 pointer-events-none">
           <Move size={12} />
-          <span>Pan & Scroll to Zoom</span>
+          <span className="hidden sm:inline">Pan & Scroll to Zoom</span>
         </div>
         <AnimatePresence>
           {hoveredPoint && hoveredTooltipPosition && (

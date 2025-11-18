@@ -32,21 +32,22 @@ const HelpModal: FC<HelpModalProps> = ({ isOpen, onClose }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/50 backdrop-blur-md flex justify-center items-center z-50 p-4"
+          className="fixed inset-0 bg-black/50 backdrop-blur-md flex justify-center items-center z-[60] p-4"
           onClick={onClose}
         >
           <motion.div
             initial={{ scale: 0.9, y: 20 }}
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.9, y: 20 }}
-            className="glass-strong rounded-xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden"
+            // Added min-h-[600px] to prevent resizing on tab switch
+            className="glass-strong rounded-xl w-full max-w-4xl h-[80vh] min-h-[600px] flex flex-col overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-border/30 flex-shrink-0">
+            <div className="flex items-center justify-between p-4 sm:p-6 border-b border-border/30 flex-shrink-0">
               <div className="flex items-center gap-3">
                 <HelpCircle className="w-6 h-6 text-cyan-400" />
-                <h2 className="text-2xl font-bold text-foreground">EloMath Help</h2>
+                <h2 className="text-xl sm:text-2xl font-bold text-foreground">EloMath Help</h2>
               </div>
               <button
                 onClick={onClose}
@@ -56,17 +57,18 @@ const HelpModal: FC<HelpModalProps> = ({ isOpen, onClose }) => {
               </button>
             </div>
 
-            <div className="flex flex-1 overflow-hidden">
-              {/* Sidebar */}
-              <div className="w-56 border-r border-border/30 p-4 flex-shrink-0 overflow-y-auto custom-scrollbar">
-                <nav className="space-y-1">
+            {/* Content Container: Flex Row on Desktop, Flex Col on Mobile */}
+            <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
+              {/* Navigation - Top bar on mobile, Sidebar on desktop */}
+              <div className="w-full md:w-56 border-b md:border-b-0 md:border-r border-border/30 p-2 md:p-4 flex-shrink-0 overflow-x-auto md:overflow-y-auto custom-scrollbar">
+                <nav className="flex md:block space-x-2 md:space-x-0 md:space-y-1 min-w-max">
                   {categories.map((category) => {
                     const Icon = category.icon;
                     return (
                       <button
                         key={category.id}
                         onClick={() => setActiveCategory(category.id)}
-                        className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
+                        className={`flex items-center gap-2 sm:gap-3 px-3 py-2 rounded-lg text-sm transition-colors whitespace-nowrap w-full text-left ${
                           activeCategory === category.id
                             ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
                             : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
@@ -80,8 +82,8 @@ const HelpModal: FC<HelpModalProps> = ({ isOpen, onClose }) => {
                 </nav>
               </div>
 
-              {/* Content */}
-              <div className="flex-1 p-6 overflow-y-auto custom-scrollbar">
+              {/* Content Area */}
+              <div className="flex-1 p-4 sm:p-6 overflow-y-auto custom-scrollbar relative">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={activeCategory}
@@ -89,6 +91,7 @@ const HelpModal: FC<HelpModalProps> = ({ isOpen, onClose }) => {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.2 }}
+                    className="absolute inset-0 p-4 sm:p-6 overflow-y-auto custom-scrollbar"
                   >
                     {activeCategory === 'overview' && <OverviewContent />}
                     {activeCategory === 'practice' && <PracticeContent />}
@@ -155,12 +158,6 @@ const OverviewContent = () => (
         <li><strong className="text-foreground">Track Progress</strong> to see your improvement over time</li>
       </ol>
     </div>
-
-    <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
-      <p className="text-sm text-blue-400">
-        💡 <strong>Tip:</strong> Use the tabs in the header to navigate between different help topics. Each section provides detailed guidance for specific features.
-      </p>
-    </div>
   </div>
 );
 
@@ -194,6 +191,34 @@ const PracticeContent = () => (
         <li>• Focus on areas you want to improve</li>
         <li>• Uncheck categories you want to skip</li>
       </ul>
+    </div>
+
+    {/* Added missing section */}
+    <div>
+      <h4 className="text-lg font-semibold text-foreground mb-2">Problem Types</h4>
+      <p className="text-sm mb-2">
+        EloMath offers practice in two main subjects:
+      </p>
+      <div className="grid md:grid-cols-2 gap-4 text-sm">
+        <div className="bg-background/30 p-3 rounded border border-border/50">
+          <strong className="text-foreground block mb-1">Mathematics</strong>
+          <ul className="list-disc list-inside space-y-1">
+            <li>Calculus I, II, & III</li>
+            <li>Linear Algebra</li>
+            <li>Differential Equations</li>
+            <li>Complex Analysis</li>
+          </ul>
+        </div>
+        <div className="bg-background/30 p-3 rounded border border-border/50">
+          <strong className="text-foreground block mb-1">Physics</strong>
+          <ul className="list-disc list-inside space-y-1">
+            <li>Kinematics & Forces</li>
+            <li>Electromagnetism</li>
+            <li>Quantum Mechanics</li>
+            <li>Thermodynamics</li>
+          </ul>
+        </div>
+      </div>
     </div>
 
     <div>

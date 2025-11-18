@@ -10,6 +10,12 @@ import dynamic from 'next/dynamic'
 import { MathPracticeCore } from "./math-practice-core"
 import { PhysicsPracticeCore } from "./physics-practice-core"
 import { Checkbox } from "./ui/checkbox";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 const FullscreenNotepad = dynamic(() => import('./fullscreen-notepad'), { ssr: false });
 const FullscreenGraphingTool = dynamic(() => import('./fullscreen-graphing-tool'), { ssr: false });
@@ -28,13 +34,6 @@ interface WorkspaceProps {
   sessionType?: SessionType;
 }
 
-interface PracticeHandlers {
-  onAnswerSubmit: (wasCorrect: boolean, newElo: number, problemDetails: { category: string; difficulty: number }) => void;
-  onSkip: () => void;
-  userElo: number;
-  selectedCategories: string[];
-}
-
 const mathCategories = ["Calculus I", "Calculus II", "Linear Algebra", "Complex Analysis"];
 const physicsCategories = [
     "Kinematic Equations", "Forces & Newton's Laws", "Work & Energy", "Momentum & Collisions",
@@ -43,7 +42,7 @@ const physicsCategories = [
 ];
 
 export default function Workspace({ onBack, sessionType = 'default' }: WorkspaceProps) {
-  const { status } = useSession(); // Get user session status
+  const { status } = useSession(); 
   const STARTING_ELO = 1200;
 
   const getInitialTabs = (): Tab[] => {
@@ -55,7 +54,6 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
   const [tabs, setTabs] = useState<Tab[]>(getInitialTabs());
   const [activeTabId, setActiveTabId] = useState<number>(1);
   const nextTabId = useRef(2);
-  const [isAddTabMenuOpen, setIsAddTabMenuOpen] = useState(false);
   
   // State is initialized with default values
   const [userElo, setUserElo] = useState(STARTING_ELO);
@@ -66,9 +64,10 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
   // Track current problem details for skip tracking
   const currentProblemRef = useRef<{ category: string; difficulty: number } | null>(null);
   
-  // Track add tab button position for border gap
+  // Track add tab button position for border gap (Visual only, logic simplified by DropdownMenu)
   const addTabButtonRef = useRef<HTMLDivElement>(null);
   const [addTabButtonLeft, setAddTabButtonLeft] = useState<number>(0);
+  const [isAddTabMenuOpen, setIsAddTabMenuOpen] = useState(false);
 
   // --- NEW AND IMPROVED DATA FETCHING ---
   // This hook runs in the background without blocking the UI
@@ -99,11 +98,11 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
     }
   }, [sessionType]);
 
-  // Measure add tab button position when popup opens
+  // Update border gap position for the tab bar
   useEffect(() => {
     if (isAddTabMenuOpen && addTabButtonRef.current) {
       const rect = addTabButtonRef.current.getBoundingClientRect();
-      const parentRect = addTabButtonRef.current.closest('.flex.items-center.p-2')?.getBoundingClientRect();
+      const parentRect = addTabButtonRef.current.closest('.relative.overflow-x-auto')?.getBoundingClientRect();
       if (parentRect) {
         setAddTabButtonLeft(rect.left - parentRect.left);
       }
@@ -234,47 +233,59 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
 
   const currentCategoryList = sessionType === 'math' ? mathCategories : physicsCategories;
 
-  // --- The component now returns the full UI structure immediately ---
   return (
     <div className="min-h-screen relative flex flex-col">
       <div className="absolute inset-0 bg-cover bg-center bg-no-repeat dynamic-background" />
-      <div className="relative z-10 w-full max-w-7xl mx-auto p-4 flex flex-col flex-grow overflow-y-auto">
+      {/* Adjusted padding for small screens */}
+      <div className="relative z-10 w-full max-w-7xl mx-auto p-2 sm:p-4 flex flex-col flex-grow overflow-y-auto">
         <motion.header 
           initial={{ opacity: 0, y: -20 }} 
           animate={{ opacity: 1, y: 0 }} 
-          className="flex items-center justify-between mb-6 sm:mb-8 flex-shrink-0 relative z-20 pr-0 sm:pr-40 lg:pr-44"
+          className="flex flex-col gap-4 mb-4 sm:flex-row sm:items-center sm:justify-between sm:mb-8 flex-shrink-0 relative z-20 pr-0 sm:pr-40 lg:pr-44"
         >
-          <button onClick={onBack} className="group flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors glass px-3 py-2 rounded-lg">
+          <button onClick={onBack} className="self-start group flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors glass px-3 py-2 rounded-lg">
             <ArrowLeft size={20} className="transition-transform group-hover:-translate-x-1" /> Back to Home
           </button>
           
           {sessionType !== 'default' && (
-            <div className="relative">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 glass px-3 sm:px-4 py-2 rounded-lg text-sm sm:text-base">
-                <div className="flex items-center gap-2 text-lg font-semibold text-foreground">
-                  <BrainCircuit size={24} />
-                  <span>{sessionType === 'math' ? 'Math' : 'Physics'} ELO: {userElo}</span>
-                </div>
-                <div className="text-xs sm:text-sm text-muted-foreground flex items-center gap-2 sm:gap-4">
-                  <span className="flex items-center gap-1 sm:gap-3">
-                    <span className="text-green-500 flex items-center gap-1">
-                      <CheckCircle size={14} /> {sessionStats.correct}
-                    </span>
-                    <span>|</span>
-                    <span className="text-red-500 flex items-center gap-1">
-                      <XCircle size={14} /> {sessionStats.incorrect}
-                    </span>
-                    <span>|</span>
-                    <span className="text-yellow-500 flex items-center gap-1">
-                      <SkipForward size={14} /> {sessionStats.skipped}
-                    </span>
-                  </span>
-                  <button onClick={handleReset} title="Reset ELO & Stats" className="text-muted-foreground hover:text-destructive">
-                    <RefreshCw size={16} />
+            <div className="relative w-full sm:w-auto">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 glass px-3 sm:px-4 py-3 rounded-lg text-sm sm:text-base w-full sm:w-auto">
+                <div className="flex items-center justify-between w-full sm:w-auto gap-4">
+                  <div className="flex items-center gap-2 text-lg font-semibold text-foreground">
+                    <BrainCircuit size={24} />
+                    <span>{sessionType === 'math' ? 'Math' : 'Physics'} ELO: {userElo}</span>
+                  </div>
+                  
+                  {/* Mobile-only Categories toggle */}
+                  <button onClick={() => setIsCategorySelectorOpen(p => !p)} className="sm:hidden p-2 rounded-md hover:bg-muted/50 transition-colors">
+                    <SlidersHorizontal size={20} />
                   </button>
                 </div>
-                <div>
-                  <button onClick={() => setIsCategorySelectorOpen(p => !p)} className="flex items-center gap-2 text-sm px-3 py-1.5 rounded-md hover:bg-muted/50 transition-colors">
+
+                <div className="w-full h-px bg-border/30 sm:hidden" />
+
+                <div className="flex items-center justify-between w-full sm:w-auto gap-2">
+                  <div className="text-xs sm:text-sm text-muted-foreground flex items-center gap-3 sm:gap-4">
+                    <span className="flex items-center gap-1 sm:gap-3">
+                      <span className="text-green-500 flex items-center gap-1">
+                        <CheckCircle size={14} /> {sessionStats.correct}
+                      </span>
+                      <span className="opacity-30">|</span>
+                      <span className="text-red-500 flex items-center gap-1">
+                        <XCircle size={14} /> {sessionStats.incorrect}
+                      </span>
+                      <span className="opacity-30">|</span>
+                      <span className="text-yellow-500 flex items-center gap-1">
+                        <SkipForward size={14} /> {sessionStats.skipped}
+                      </span>
+                    </span>
+                    <button onClick={handleReset} title="Reset ELO & Stats" className="text-muted-foreground hover:text-destructive ml-2">
+                      <RefreshCw size={16} />
+                    </button>
+                  </div>
+                  
+                  {/* Desktop Categories Button */}
+                  <button onClick={() => setIsCategorySelectorOpen(p => !p)} className="hidden sm:flex items-center gap-2 text-sm px-3 py-1.5 rounded-md hover:bg-muted/50 transition-colors ml-auto sm:ml-0">
                     <SlidersHorizontal size={16} />
                     Categories
                   </button>
@@ -292,7 +303,7 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
                       initial={{ opacity: 0, y: 10 }} 
                       animate={{ opacity: 1, y: 0 }} 
                       exit={{ opacity: 0, y: 10 }} 
-                      className="absolute top-full right-0 mt-2 w-72 bg-card/[0.98] backdrop-blur-xl border border-border/40 rounded-lg p-4 z-50 shadow-2xl"
+                      className="absolute top-full right-0 mt-2 w-full sm:w-72 bg-card/[0.98] backdrop-blur-xl border border-border/40 rounded-lg p-4 z-50 shadow-2xl"
                     >
                       <h3 className="text-sm font-semibold text-foreground mb-3">Filter Categories</h3>
                       <div className="max-h-60 overflow-y-auto space-y-1 pr-2 custom-scrollbar">
@@ -315,22 +326,18 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
           initial={{ opacity: 0, y: 20 }} 
           animate={{ opacity: 1, y: 0 }} 
           transition={{ delay: 0.1 }} 
-          className="glass rounded-lg flex flex-col flex-grow relative z-10 border-0"
+          className="glass rounded-lg flex flex-col flex-grow relative z-10 border-0 overflow-hidden"
         >
-          <div className="flex items-center p-2 flex-shrink-0 relative">
-            {/* Border line with gap for add-tab popup */}
+          {/* Added overflow-x-auto for scrolling tabs on small screens and no-scrollbar class */}
+          <div className="flex items-center p-2 flex-shrink-0 relative overflow-x-auto no-scrollbar">
             {!isAddTabMenuOpen ? (
-              // Normal full border when closed
-              <div className="absolute bottom-0 left-0 right-0 h-px bg-border/50" />
+              <div className="absolute bottom-0 left-0 right-0 h-px bg-border/50 w-full" />
             ) : (
-              // Two segments with gap where popup appears
               <>
-                {/* Left segment: from start to button */}
                 <div 
                   className="absolute bottom-0 left-0 h-px bg-border/50" 
                   style={{ width: `${addTabButtonLeft}px` }}
                 />
-                {/* Right segment: from end of popup (button + 192px) to end */}
                 <div 
                   className="absolute bottom-0 right-0 h-px bg-border/50" 
                   style={{ left: `${addTabButtonLeft + 192}px` }}
@@ -338,7 +345,7 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
               </>
             )}
             {tabs.map(tab => (
-              <div key={tab.id} onClick={() => setActiveTabId(tab.id)} className={`flex items-center gap-2 px-4 py-2 rounded-md cursor-pointer text-sm font-medium ${activeTabId === tab.id ? 'bg-foreground/10 text-foreground' : 'text-muted-foreground hover:bg-muted/50'}`}>
+              <div key={tab.id} onClick={() => setActiveTabId(tab.id)} className={`flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-md cursor-pointer text-sm font-medium whitespace-nowrap ${activeTabId === tab.id ? 'bg-foreground/10 text-foreground' : 'text-muted-foreground hover:bg-muted/50'}`}>
                 {tab.type === 'notepad' && <Notebook size={14} />}
                 {tab.type === 'graphing' && <TrendingUp size={14} />}
                 {tab.type.includes('practice') && <BrainCircuit size={14} />}
@@ -350,35 +357,25 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
                 )}
               </div>
             ))}
-            <div ref={addTabButtonRef} className="relative ml-2">
-              <button onClick={() => setIsAddTabMenuOpen(p => !p)} className="p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50" title="Add Tab">
-                <Plus size={16} />
-              </button>
-              <AnimatePresence>
-                {isAddTabMenuOpen && (
-                  <>
-                    <div 
-                      className="fixed inset-0 z-40" 
-                      onClick={() => setIsAddTabMenuOpen(false)} 
-                    />
-                    <motion.div 
-                      initial={{ opacity: 0, y: -10 }} 
-                      animate={{ opacity: 1, y: 0 }} 
-                      exit={{ opacity: 0, y: -10 }} 
-                      className="absolute top-full left-0 mt-2 w-48 bg-card/[0.98] backdrop-blur-xl border border-border/40 rounded-lg p-2 z-50 shadow-2xl"
-                    >
-                      <button onClick={() => addTab('notepad')} className="w-full flex items-center gap-3 p-2 rounded-md hover:bg-white/10 text-sm text-left">
-                        <Notebook size={16} />
-                        Notepad
-                      </button>
-                      <button onClick={() => addTab('graphing')} className="w-full flex items-center gap-3 p-2 rounded-md hover:bg-white/10 text-sm text-left">
-                        <TrendingUp size={16} />
-                        Graphing Tool
-                      </button>
-                    </motion.div>
-                  </>
-                )}
-              </AnimatePresence>
+            <div ref={addTabButtonRef} className="relative ml-2 flex-shrink-0">
+              {/* Replaced manual popup with Radix DropdownMenu to fix clipping issues */}
+              <DropdownMenu open={isAddTabMenuOpen} onOpenChange={setIsAddTabMenuOpen}>
+                <DropdownMenuTrigger asChild>
+                  <button className="p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 outline-none" title="Add Tab">
+                    <Plus size={16} />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" sideOffset={8} className="w-48 bg-card/[0.98] backdrop-blur-xl border-border/40 z-50">
+                  <DropdownMenuItem onClick={() => addTab('notepad')} className="gap-2 cursor-pointer">
+                    <Notebook size={16} />
+                    Notepad
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => addTab('graphing')} className="gap-2 cursor-pointer">
+                    <TrendingUp size={16} />
+                    Graphing Tool
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
 

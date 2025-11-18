@@ -73,7 +73,6 @@ export const PhysicsPracticeCore: FC<PhysicsPracticeCoreProps> = ({
     const newProblem = eligibleProblems[randomIndex];
     setCurrentProblem(newProblem);
     
-    // Notify parent about the new problem
     onProblemLoad({
       category: newProblem.category,
       difficulty: newProblem.difficulty
@@ -90,20 +89,17 @@ export const PhysicsPracticeCore: FC<PhysicsPracticeCoreProps> = ({
 
     const wasCorrect = isAnswerCorrect(userAnswer, currentProblem.answer);
     
-    // Calculate new ELO
     const score = wasCorrect ? 1 : 0;
     const expectedScore = 1 / (1 + Math.pow(10, (currentProblem.difficulty - userElo) / 400));
     const kFactor = 32;
     const newElo = Math.round(userElo + kFactor * (score - expectedScore));
     const eloChange = newElo - userElo;
 
-    // Call the combined handler with all the info
     onAnswerSubmit(wasCorrect, newElo, {
       category: currentProblem.category,
       difficulty: currentProblem.difficulty
     });
 
-    // Show feedback
     setFeedback({
       type: wasCorrect ? "correct" : "incorrect",
       message: `${wasCorrect ? "Correct" : "Incorrect"}. ELO ${eloChange >= 0 ? "+" : ""}${eloChange}`,
@@ -121,7 +117,8 @@ export const PhysicsPracticeCore: FC<PhysicsPracticeCoreProps> = ({
       <FormattingGuideModal isOpen={isGuideOpen} onClose={() => setIsGuideOpen(false)} />
       <div className="w-full h-full min-h-[600px] p-4 sm:p-6 lg:p-8 flex flex-col justify-center items-center overflow-y-auto">
         <div className="w-full max-w-3xl">
-          <div className="bg-card/60 backdrop-blur-xl border border-border/30 rounded-2xl p-8 min-h-[24rem] mb-6">
+          {/* Reduced padding on mobile: p-4 sm:p-8 */}
+          <div className="bg-card/60 backdrop-blur-xl border border-border/30 rounded-2xl p-4 sm:p-8 min-h-[24rem] mb-6">
             <AnimatePresence mode="wait">
               {currentProblem && (
                 <motion.div

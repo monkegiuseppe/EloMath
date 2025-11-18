@@ -27,12 +27,14 @@
     --destructive-foreground: 248 250 252;
     
 
-    /* Primary, Secondary, and Accent are now the same as Foreground (White) */
+    /* Primary, Secondary are White, so Foreground must be Dark */
     --primary: 248 250 252;
-    --primary-foreground: 248 250 252; /* Dark text for on-white backgrounds */
+    --primary-foreground: 15 23 42; 
     --secondary: 248 250 252;
-    --secondary-foreground: 248 250 252;
-    --accent: 248 250 252;
+    --secondary-foreground: 15 23 42;
+    
+    /* Accent: Used for hovers. Set to a lighter slate (not white) for better contrast with white text */
+    --accent: 51 65 85;
     --accent-foreground: 248 250 252;
     
     /* Ring color is now based on Foreground (White) */

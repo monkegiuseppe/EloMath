@@ -124,17 +124,19 @@ export default function FullscreenNotepad({ value, onChange, sessionType = 'defa
       <div className="w-full h-full flex flex-col bg-card/50 rounded-b-lg overflow-hidden">
         <div
           ref={contentRef}
-          className="w-full flex-grow text-lg p-8 overflow-y-auto custom-scrollbar notepad-content"
+          className="w-full flex-grow text-base sm:text-lg p-4 sm:p-8 overflow-y-auto custom-scrollbar notepad-content"
           contentEditable
           suppressContentEditableWarning
           onInput={(e) => onChange(e.currentTarget.innerHTML)}
         />
         
-        {/* Changed the layout of the bottom bar */}
-        <div className="px-8 pb-4 pt-3 mt-auto border-t border-border/30 bg-card/50 flex-shrink-0 flex items-center">
-          <div className="text-sm text-muted-foreground">
-            <kbd className="px-2 py-1 bg-muted border rounded text-xs">Ctrl</kbd> + 
-            <kbd className="px-2 py-1 bg-muted border rounded text-xs">M</kbd> to insert equation.
+        <div className="px-4 sm:px-8 pb-4 pt-3 mt-auto border-t border-border/30 bg-card/50 flex-shrink-0 flex items-center justify-between">
+          <div className="text-xs sm:text-sm text-muted-foreground">
+             <span className="hidden sm:inline">Press </span> 
+             <kbd className="px-1.5 py-0.5 bg-muted border rounded text-[10px] sm:text-xs">Ctrl</kbd> + 
+             <kbd className="px-1.5 py-0.5 bg-muted border rounded text-[10px] sm:text-xs">M</kbd> 
+             <span className="hidden sm:inline"> to insert equation.</span>
+             <span className="sm:hidden"> for Math</span>
           </div>
           <button onClick={() => setIsGuideOpen(true)} className="ml-3 p-1 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/50" title="Notepad Guide">
             <Info size={18} />
