@@ -1,8 +1,3 @@
-// A huge list of calculus and linear algebra problems.
-// Format: { id, topic, difficulty, problem, answer }
-// Difficulty is an ELO-style rating from ~1000 to ~3000.
-// MATH is wrapped in $...$ for KaTeX rendering.
-
 import type { Problem } from './problems';
 
 export const mathProblems: Problem[] = [

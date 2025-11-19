@@ -3,6 +3,9 @@
 import { mathProblems as calculusProblems } from './math-problems';
 import { physicsProblems as allPhysicsProblems } from './physics-problems';
 import { arithmeticProblems } from './arithmetic-problems';
+import { beginnerPhysicsProblems } from './beginner-physics-problems';
+import { beginnerMathProblems } from './beginner-math-problems';
+
 
 // The main interface for all problems in the application.
 export interface Problem {
@@ -17,8 +20,8 @@ export interface Problem {
 }
 
 // Combine Calculus/Linear Algebra with Arithmetic/Algebra
-export const mathProblems: Problem[] = [...arithmeticProblems, ...calculusProblems];
-export const physicsProblems: Problem[] = allPhysicsProblems;
+export const mathProblems: Problem[] = [...beginnerMathProblems, ...arithmeticProblems, ...calculusProblems];
+export const physicsProblems: Problem[] = [...beginnerPhysicsProblems, ...allPhysicsProblems];
 
 export const allProblems: Problem[] = [...mathProblems, ...physicsProblems];
 
