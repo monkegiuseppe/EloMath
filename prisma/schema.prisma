@@ -19,9 +19,10 @@ model User {
   
   progress      UserProgress?
   attempts      QuestionAttempt[]
+  reports       Report[] 
 }
 
-// Progress model (Existing)
+// Progress model 
 model UserProgress {
   id            String @id @default(cuid())
   userId        String @unique
@@ -38,7 +39,7 @@ model UserProgress {
   physicsSkipped    Int @default(0)
 }
 
-// Question Attempt (Existing)
+// Question Attempt
 model QuestionAttempt {
   id            String   @id @default(cuid())
   userId        String
@@ -55,18 +56,18 @@ model QuestionAttempt {
   @@index([userId, subject, timestamp])
 }
 
-// --- NEW: Question Model ---
+// Question Model
 model Question {
   id          String   @id @default(cuid())
-  customId    String?  @unique // For your manual IDs like "C01", "KE101"
-  subject     String   // "math" or "physics"
+  customId    String?  @unique 
+  subject     String   
   topic       String
   category    String
   difficulty  Int
-  problem     String   @db.Text // The LaTeX problem text
-  answer      String   // The correct answer
-  unit        String?  // For physics (e.g., "m/s")
-  formatHint  String?  // Instructions like "Round to 2 decimals"
+  problem     String   @db.Text 
+  answer      String   
+  unit        String?  
+  formatHint  String?  
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -74,7 +75,22 @@ model Question {
   @@index([subject, category, difficulty])
 }
 
-// Auth models (Existing)
+// Report Model
+model Report {
+  id          String   @id @default(cuid())
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  questionId  String?  
+  problemText String   @db.Text 
+  category    String
+  reason      String   @db.Text
+  status      String   @default("pending") 
+  
+  createdAt   DateTime @default(now())
+}
+
+// Auth models     
 model Account {
   id                 String  @id @default(cuid())
   userId             String
