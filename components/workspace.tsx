@@ -16,7 +16,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import DifficultySelector from "./difficulty-selector"; // Import the selector
+import DifficultySelector from "./difficulty-selector";
 
 const FullscreenNotepad = dynamic(() => import('./fullscreen-notepad'), { ssr: false });
 const FullscreenGraphingTool = dynamic(() => import('./fullscreen-graphing-tool'), { ssr: false });
@@ -58,7 +58,8 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
 
   const [isEloLoaded, setIsEloLoaded] = useState(false);
   const [userElo, setUserElo] = useState<number | null>(null);
-  const [showDifficultySelector, setShowDifficultySelector] = useState(false); // NEW STATE
+  const [showDifficultySelector, setShowDifficultySelector] = useState(false);
+  const [practiceKey, setPracticeKey] = useState(0);
 
   const [sessionStats, setSessionStats] = useState({ correct: 0, incorrect: 0, skipped: 0 });
   const [isCategorySelectorOpen, setIsCategorySelectorOpen] = useState(false);
@@ -90,14 +91,11 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
               skipped: sessionType === 'math' ? data.mathSkipped : data.physicsSkipped,
             });
 
-            // Show selector if user has 0 attempts (New User)
             if (totalAttempts === 0) {
               setShowDifficultySelector(true);
             }
           } else {
             setUserElo(STARTING_ELO);
-            // Assuming error or no data implies new user? Safe to show selector or default.
-            // For now, default to selector if data is missing but auth is valid
             setShowDifficultySelector(true);
           }
         })
@@ -109,13 +107,10 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
           setIsEloLoaded(true);
         });
     } else if (status === 'unauthenticated' && sessionType !== 'default') {
-      // Guest user - Always show selector for practice modes
       setShowDifficultySelector(true);
-      // We set a temporary ELO, but the selector will overwrite it
       setUserElo(STARTING_ELO);
       setIsEloLoaded(true);
     } else {
-      // Default/Notepad mode
       setIsEloLoaded(true);
     }
   }, [status, sessionType]);
@@ -139,8 +134,8 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
   const handleDifficultySelect = (selectedElo: number) => {
     setUserElo(selectedElo);
     setShowDifficultySelector(false);
+    setPracticeKey(prev => prev + 1);
 
-    // If authenticated, save this starting ELO preference immediately
     if (status === 'authenticated' && sessionType !== 'default') {
       fetch('/api/progress', {
         method: 'POST',
@@ -148,7 +143,6 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
         body: JSON.stringify({
           sessionType,
           newElo: selectedElo,
-          // No stat update, just setting the baseline
         }),
       }).catch(err => console.error('Failed to save starting ELO:', err));
     }
@@ -189,21 +183,36 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
     setSessionStats(prev => ({ ...prev, skipped: prev.skipped + 1 }));
 
     if (status === 'authenticated' && sessionType !== 'default' && currentProblemRef.current && userElo !== null) {
+      const difficulty = currentProblemRef.current.difficulty;
+
+      // Logic: Calculate expected score (win probability). 
+      // If you skip an easy question (high expected score), you lose more points.
+      // If you skip a hard question (low expected score), you lose fewer/zero points.
+      const expectedScore = 1 / (1 + Math.pow(10, (difficulty - userElo) / 400));
+
+      // Custom K-factor for skipping. Max penalty is 5 ELO.
+      const SKIP_K_FACTOR = 5;
+      const eloDrop = Math.round(SKIP_K_FACTOR * expectedScore);
+      const newElo = userElo - eloDrop;
+
+      setUserElo(newElo); // Update UI immediately
+
       fetch('/api/progress', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           sessionType,
-          newElo: userElo,
+          newElo: newElo,
           statUpdate: { type: 'skipped' },
           questionDetails: {
             category: currentProblemRef.current.category,
             difficulty: currentProblemRef.current.difficulty,
-            eloChange: 0
+            eloChange: -eloDrop // Send the negative change
           }
         }),
       }).catch(err => console.error('Failed to save progress:', err));
     }
+
     currentProblemRef.current = null;
   };
 
@@ -229,11 +238,10 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
 
     if (!confirm(confirmMessage)) return;
 
-    // Resetting brings back the selector to let them choose again
     setShowDifficultySelector(true);
-    // Default placeholder, selector will overwrite
     setUserElo(1200);
     setSessionStats({ correct: 0, incorrect: 0, skipped: 0 });
+    setPracticeKey(prev => prev + 1);
 
     if (status === 'authenticated') {
       try {
@@ -300,7 +308,6 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
                     <BrainCircuit size={24} />
                     <span>
                       {sessionType === 'math' ? 'Math' : 'Physics'} ELO:
-                      {/* Loading Skeleton for ELO */}
                       {!isEloLoaded || userElo === null ? (
                         <span className="ml-2 animate-pulse bg-muted/50 rounded h-6 w-12 inline-block align-middle" />
                       ) : (
@@ -450,6 +457,7 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
                 {tab.type === 'math-practice' && (
                   isEloLoaded && userElo !== null ? (
                     <MathPracticeCore
+                      key={practiceKey}
                       userElo={userElo}
                       onAnswerSubmit={handleAnswerSubmit}
                       onSkip={handleSkip}
@@ -465,6 +473,7 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
                 {tab.type === 'physics-practice' && (
                   isEloLoaded && userElo !== null ? (
                     <PhysicsPracticeCore
+                      key={practiceKey}
                       userElo={userElo}
                       onAnswerSubmit={handleAnswerSubmit}
                       onSkip={handleSkip}

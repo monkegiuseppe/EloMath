@@ -13,7 +13,7 @@ export const mathProblems: Problem[] = [
     category: "Arithmetic",
     id: "AR01",
     topic: "Basic Multiplication",
-    difficulty: 400, // Increased from 300 (12x12 is hard for beginners)
+    difficulty: 400,
     problem: "Calculate: $12 \\times 12$.",
     answer: "144",
   },
@@ -21,7 +21,7 @@ export const mathProblems: Problem[] = [
     category: "Arithmetic",
     id: "AR02",
     topic: "Order of Operations",
-    difficulty: 420, // Increased from 320
+    difficulty: 420,
     problem: "Calculate: $2 + 3 \\times 4$.",
     answer: "14",
   },
@@ -29,7 +29,7 @@ export const mathProblems: Problem[] = [
     category: "Arithmetic",
     id: "AR03",
     topic: "Fractions",
-    difficulty: 450, // Increased from 340
+    difficulty: 450,
     problem: "Simplify: $\\frac{1}{2} + \\frac{1}{4}$.",
     answer: "0.75",
   },
@@ -37,7 +37,7 @@ export const mathProblems: Problem[] = [
     category: "Arithmetic",
     id: "AR04",
     topic: "Negative Numbers",
-    difficulty: 430, // Increased from 350
+    difficulty: 430,
     problem: "Calculate: $5 - (-3)$.",
     answer: "8",
   },
@@ -45,7 +45,7 @@ export const mathProblems: Problem[] = [
     category: "Arithmetic",
     id: "AR05",
     topic: "Percentages",
-    difficulty: 480, // Increased from 360
+    difficulty: 480,
     problem: "What is 20% of 50?",
     answer: "10",
   },
@@ -53,7 +53,7 @@ export const mathProblems: Problem[] = [
     category: "Arithmetic",
     id: "AR06",
     topic: "Decimals",
-    difficulty: 460, // Increased from 310
+    difficulty: 460,
     problem: "Calculate: $0.5 \\times 0.2$.",
     answer: "0.1",
   },
@@ -61,7 +61,7 @@ export const mathProblems: Problem[] = [
     category: "Arithmetic",
     id: "AR07",
     topic: "Exponents",
-    difficulty: 410, // Increased from 330
+    difficulty: 410,
     problem: "Calculate: $2^3$.",
     answer: "8",
   },
@@ -69,7 +69,7 @@ export const mathProblems: Problem[] = [
     category: "Arithmetic",
     id: "AR08",
     topic: "Square Roots",
-    difficulty: 470, // Increased from 370
+    difficulty: 470,
     problem: "Calculate: $\\sqrt{49}$.",
     answer: "7",
   },
@@ -77,7 +77,7 @@ export const mathProblems: Problem[] = [
     category: "Arithmetic",
     id: "AR09",
     topic: "Basic Division",
-    difficulty: 350, // Increased from 305
+    difficulty: 350,
     problem: "Calculate: $56 / 8$.",
     answer: "7",
   },
@@ -85,7 +85,7 @@ export const mathProblems: Problem[] = [
     category: "Arithmetic",
     id: "AR10",
     topic: "Mixed Operations",
-    difficulty: 440, // Increased from 380
+    difficulty: 440,
     problem: "Calculate: $(10 - 2) / 2$.",
     answer: "4",
   },
@@ -93,7 +93,7 @@ export const mathProblems: Problem[] = [
     category: "Pre-Algebra",
     id: "PA01",
     topic: "Solving for x",
-    difficulty: 450, // Increased from 400
+    difficulty: 450,
     problem: "Solve for x: $x + 5 = 12$.",
     answer: "7",
   },
@@ -101,7 +101,7 @@ export const mathProblems: Problem[] = [
     category: "Pre-Algebra",
     id: "PA02",
     topic: "Solving for x",
-    difficulty: 460, // Increased from 420
+    difficulty: 460,
     problem: "Solve for x: $2x = 10$.",
     answer: "5",
   },
@@ -109,7 +109,7 @@ export const mathProblems: Problem[] = [
     category: "Pre-Algebra",
     id: "PA03",
     topic: "Solving for x",
-    difficulty: 480, // Increased from 440
+    difficulty: 480,
     problem: "Solve for x: $3x - 1 = 8$.",
     answer: "3",
   },
@@ -117,7 +117,7 @@ export const mathProblems: Problem[] = [
     category: "Pre-Algebra",
     id: "PA04",
     topic: "Substitution",
-    difficulty: 440, // Increased from 410
+    difficulty: 440,
     problem: "If $x=2$, find the value of $3x + 1$.",
     answer: "7",
   },
@@ -125,7 +125,7 @@ export const mathProblems: Problem[] = [
     category: "Pre-Algebra",
     id: "PA05",
     topic: "Ratios",
-    difficulty: 470, // Increased from 430
+    difficulty: 470,
     problem: "Solve for x: $\\frac{x}{4} = \\frac{3}{2}$.",
     answer: "6",
   },
