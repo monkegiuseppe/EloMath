@@ -16,6 +16,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import DifficultySelector from "./difficulty-selector"; // Import the selector
 
 const FullscreenNotepad = dynamic(() => import('./fullscreen-notepad'), { ssr: false });
 const FullscreenGraphingTool = dynamic(() => import('./fullscreen-graphing-tool'), { ssr: false });
@@ -43,7 +44,7 @@ const physicsCategories = [
 
 export default function Workspace({ onBack, sessionType = 'default' }: WorkspaceProps) {
   const { status } = useSession();
-  const STARTING_ELO = 1200; // Fallback if fetch fails entirely
+  const STARTING_ELO = 1200;
 
   const getInitialTabs = (): Tab[] => {
     if (sessionType === 'math') return [{ id: 1, type: 'math-practice', title: 'Math Practice' }];
@@ -55,10 +56,9 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
   const [activeTabId, setActiveTabId] = useState<number>(1);
   const nextTabId = useRef(2);
 
-  // --- NEW: Loading State Logic ---
   const [isEloLoaded, setIsEloLoaded] = useState(false);
-  // Initialize as null to prevent "default value" glitches
   const [userElo, setUserElo] = useState<number | null>(null);
+  const [showDifficultySelector, setShowDifficultySelector] = useState(false); // NEW STATE
 
   const [sessionStats, setSessionStats] = useState({ correct: 0, incorrect: 0, skipped: 0 });
   const [isCategorySelectorOpen, setIsCategorySelectorOpen] = useState(false);
@@ -73,20 +73,32 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
   // --- DATA FETCHING ---
   useEffect(() => {
     if (status === 'authenticated' && sessionType !== 'default') {
-      setIsEloLoaded(false); // Reset to ensure we don't show stale data
+      setIsEloLoaded(false);
       fetch('/api/progress')
         .then(res => res.json())
         .then(data => {
           if (data && !data.error) {
-            setUserElo(sessionType === 'math' ? data.mathElo : data.physicsElo);
+            const currentElo = sessionType === 'math' ? data.mathElo : data.physicsElo;
+            const totalAttempts = sessionType === 'math'
+              ? (data.mathCorrect + data.mathIncorrect + data.mathSkipped)
+              : (data.physicsCorrect + data.physicsIncorrect + data.physicsSkipped);
+
+            setUserElo(currentElo);
             setSessionStats({
               correct: sessionType === 'math' ? data.mathCorrect : data.physicsCorrect,
               incorrect: sessionType === 'math' ? data.mathIncorrect : data.physicsIncorrect,
               skipped: sessionType === 'math' ? data.mathSkipped : data.physicsSkipped,
             });
+
+            // Show selector if user has 0 attempts (New User)
+            if (totalAttempts === 0) {
+              setShowDifficultySelector(true);
+            }
           } else {
-            // Fallback if DB is empty or user is new (handled by DB default now, but good safety)
             setUserElo(STARTING_ELO);
+            // Assuming error or no data implies new user? Safe to show selector or default.
+            // For now, default to selector if data is missing but auth is valid
+            setShowDifficultySelector(true);
           }
         })
         .catch(err => {
@@ -94,11 +106,16 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
           setUserElo(STARTING_ELO);
         })
         .finally(() => {
-          setIsEloLoaded(true); // Only NOW do we allow rendering practice components
+          setIsEloLoaded(true);
         });
-    } else if (status === 'unauthenticated') {
-      // Guest logic: Start them at default immediately
+    } else if (status === 'unauthenticated' && sessionType !== 'default') {
+      // Guest user - Always show selector for practice modes
+      setShowDifficultySelector(true);
+      // We set a temporary ELO, but the selector will overwrite it
       setUserElo(STARTING_ELO);
+      setIsEloLoaded(true);
+    } else {
+      // Default/Notepad mode
       setIsEloLoaded(true);
     }
   }, [status, sessionType]);
@@ -119,12 +136,30 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
     }
   }, [isAddTabMenuOpen]);
 
+  const handleDifficultySelect = (selectedElo: number) => {
+    setUserElo(selectedElo);
+    setShowDifficultySelector(false);
+
+    // If authenticated, save this starting ELO preference immediately
+    if (status === 'authenticated' && sessionType !== 'default') {
+      fetch('/api/progress', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionType,
+          newElo: selectedElo,
+          // No stat update, just setting the baseline
+        }),
+      }).catch(err => console.error('Failed to save starting ELO:', err));
+    }
+  };
+
   const handleAnswerSubmit = (
     wasCorrect: boolean,
     newElo: number,
     problemDetails: { category: string; difficulty: number }
   ) => {
-    if (userElo === null) return; // Guard clause
+    if (userElo === null) return;
 
     const type = wasCorrect ? 'correct' : 'incorrect';
     const eloChange = newElo - userElo;
@@ -194,7 +229,10 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
 
     if (!confirm(confirmMessage)) return;
 
-    setUserElo(350); // Reset to new lower default
+    // Resetting brings back the selector to let them choose again
+    setShowDifficultySelector(true);
+    // Default placeholder, selector will overwrite
+    setUserElo(1200);
     setSessionStats({ correct: 0, incorrect: 0, skipped: 0 });
 
     if (status === 'authenticated') {
@@ -238,6 +276,11 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
 
   return (
     <div className="min-h-screen relative flex flex-col">
+      <DifficultySelector
+        isOpen={showDifficultySelector}
+        onSelect={handleDifficultySelect}
+      />
+
       <div className="absolute inset-0 bg-cover bg-center bg-no-repeat dynamic-background" />
       <div className="relative z-10 w-full max-w-7xl mx-auto p-2 sm:p-4 flex flex-col flex-grow overflow-y-auto">
         <motion.header
@@ -390,8 +433,8 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
               <div
                 key={tab.id}
                 className={`absolute inset-0 w-full h-full overflow-y-auto transition-opacity duration-150 ease-in-out ${activeTabId === tab.id
-                    ? 'opacity-100 z-10 pointer-events-auto'
-                    : 'opacity-0 z-0 pointer-events-none'
+                  ? 'opacity-100 z-10 pointer-events-auto'
+                  : 'opacity-0 z-0 pointer-events-none'
                   }`}
               >
                 {tab.type === 'notepad' && (
