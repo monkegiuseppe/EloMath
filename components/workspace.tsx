@@ -3,9 +3,9 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { useSession } from "next-auth/react"; 
+import { useSession } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion"
-import { ArrowLeft, Plus, X, Notebook, TrendingUp, BrainCircuit, RefreshCw, SlidersHorizontal, CheckCircle, XCircle, SkipForward } from "lucide-react"
+import { ArrowLeft, Plus, X, Notebook, TrendingUp, BrainCircuit, RefreshCw, SlidersHorizontal, CheckCircle, XCircle, SkipForward, Loader2 } from "lucide-react"
 import dynamic from 'next/dynamic'
 import { MathPracticeCore } from "./math-practice-core"
 import { PhysicsPracticeCore } from "./physics-practice-core"
@@ -34,16 +34,16 @@ interface WorkspaceProps {
   sessionType?: SessionType;
 }
 
-const mathCategories = ["Calculus I", "Calculus II", "Linear Algebra", "Complex Analysis"];
+const mathCategories = ["Arithmetic", "Pre-Algebra", "Algebra I", "Geometry", "Algebra II", "Pre-Calculus", "Calculus I", "Calculus II", "Calculus III", "Differential Equations", "Linear Algebra"];
 const physicsCategories = [
-    "Kinematic Equations", "Forces & Newton's Laws", "Work & Energy", "Momentum & Collisions",
-    "Circular Motion & Gravitation", "Rotational Motion", "Simple Harmonic Motion", "Electric Fields & Potential",
-    "Circuits & Capacitance", "Magnetic Fields & Forces", "Electromagnetic Induction", "Thermodynamics", "Quantum Mechanics"
+  "Kinematic Equations", "Forces & Newton's Laws", "Work & Energy", "Momentum & Collisions",
+  "Circular Motion & Gravitation", "Rotational Motion", "Simple Harmonic Motion", "Electric Fields & Potential",
+  "Circuits & Capacitance", "Magnetic Fields & Forces", "Electromagnetic Induction", "Thermodynamics", "Quantum Mechanics"
 ];
 
 export default function Workspace({ onBack, sessionType = 'default' }: WorkspaceProps) {
-  const { status } = useSession(); 
-  const STARTING_ELO = 1200;
+  const { status } = useSession();
+  const STARTING_ELO = 1200; // Fallback if fetch fails entirely
 
   const getInitialTabs = (): Tab[] => {
     if (sessionType === 'math') return [{ id: 1, type: 'math-practice', title: 'Math Practice' }];
@@ -54,41 +54,52 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
   const [tabs, setTabs] = useState<Tab[]>(getInitialTabs());
   const [activeTabId, setActiveTabId] = useState<number>(1);
   const nextTabId = useRef(2);
-  
-  // State is initialized with default values
-  const [userElo, setUserElo] = useState(STARTING_ELO);
+
+  // --- NEW: Loading State Logic ---
+  const [isEloLoaded, setIsEloLoaded] = useState(false);
+  // Initialize as null to prevent "default value" glitches
+  const [userElo, setUserElo] = useState<number | null>(null);
+
   const [sessionStats, setSessionStats] = useState({ correct: 0, incorrect: 0, skipped: 0 });
   const [isCategorySelectorOpen, setIsCategorySelectorOpen] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  
-  // Track current problem details for skip tracking
+
   const currentProblemRef = useRef<{ category: string; difficulty: number } | null>(null);
-  
-  // Track add tab button position for border gap (Visual only, logic simplified by DropdownMenu)
+
   const addTabButtonRef = useRef<HTMLDivElement>(null);
   const [addTabButtonLeft, setAddTabButtonLeft] = useState<number>(0);
   const [isAddTabMenuOpen, setIsAddTabMenuOpen] = useState(false);
 
-  // --- NEW AND IMPROVED DATA FETCHING ---
-  // This hook runs in the background without blocking the UI
+  // --- DATA FETCHING ---
   useEffect(() => {
-    // Only fetch if the user is logged in and it's a practice session
     if (status === 'authenticated' && sessionType !== 'default') {
+      setIsEloLoaded(false); // Reset to ensure we don't show stale data
       fetch('/api/progress')
         .then(res => res.json())
         .then(data => {
           if (data && !data.error) {
-            // When data arrives, update the state. React will then
-            // seamlessly update the ELO and stats in the header.
             setUserElo(sessionType === 'math' ? data.mathElo : data.physicsElo);
             setSessionStats({
               correct: sessionType === 'math' ? data.mathCorrect : data.physicsCorrect,
               incorrect: sessionType === 'math' ? data.mathIncorrect : data.physicsIncorrect,
               skipped: sessionType === 'math' ? data.mathSkipped : data.physicsSkipped,
             });
+          } else {
+            // Fallback if DB is empty or user is new (handled by DB default now, but good safety)
+            setUserElo(STARTING_ELO);
           }
         })
-        .catch(console.error); // Log errors but don't crash the page
+        .catch(err => {
+          console.error(err);
+          setUserElo(STARTING_ELO);
+        })
+        .finally(() => {
+          setIsEloLoaded(true); // Only NOW do we allow rendering practice components
+        });
+    } else if (status === 'unauthenticated') {
+      // Guest logic: Start them at default immediately
+      setUserElo(STARTING_ELO);
+      setIsEloLoaded(true);
     }
   }, [status, sessionType]);
 
@@ -98,7 +109,6 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
     }
   }, [sessionType]);
 
-  // Update border gap position for the tab bar
   useEffect(() => {
     if (isAddTabMenuOpen && addTabButtonRef.current) {
       const rect = addTabButtonRef.current.getBoundingClientRect();
@@ -109,27 +119,26 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
     }
   }, [isAddTabMenuOpen]);
 
-  // Combined handler that updates both ELO and stats together
   const handleAnswerSubmit = (
     wasCorrect: boolean,
     newElo: number,
     problemDetails: { category: string; difficulty: number }
   ) => {
+    if (userElo === null) return; // Guard clause
+
     const type = wasCorrect ? 'correct' : 'incorrect';
     const eloChange = newElo - userElo;
-    
-    // Update UI state immediately
+
     setUserElo(newElo);
     setSessionStats(prev => ({ ...prev, [type]: prev[type] + 1 }));
 
-    // Send to server if authenticated
     if (status === 'authenticated' && sessionType !== 'default') {
       fetch('/api/progress', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           sessionType,
-          newElo: newElo, // Use the NEW elo, not the stale state
+          newElo: newElo,
           statUpdate: { type },
           questionDetails: {
             category: problemDetails.category,
@@ -141,18 +150,16 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
     }
   };
 
-  // Handler for when user skips a question
   const handleSkip = () => {
     setSessionStats(prev => ({ ...prev, skipped: prev.skipped + 1 }));
-    
-    // We don't update ELO on skip, but we still track it
-    if (status === 'authenticated' && sessionType !== 'default' && currentProblemRef.current) {
+
+    if (status === 'authenticated' && sessionType !== 'default' && currentProblemRef.current && userElo !== null) {
       fetch('/api/progress', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           sessionType,
-          newElo: userElo, // ELO stays the same for skips
+          newElo: userElo,
           statUpdate: { type: 'skipped' },
           questionDetails: {
             category: currentProblemRef.current.category,
@@ -162,15 +169,13 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
         }),
       }).catch(err => console.error('Failed to save progress:', err));
     }
-    
     currentProblemRef.current = null;
   };
-  
-  // Called when a new problem is loaded
+
   const handleProblemLoad = (problemDetails: { category: string; difficulty: number }) => {
     currentProblemRef.current = problemDetails;
   };
-  
+
   const handleCategoryToggle = (category: string) => {
     const newSelection = selectedCategories.includes(category)
       ? selectedCategories.filter(c => c !== category)
@@ -179,21 +184,19 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
       setSelectedCategories(newSelection);
     }
   };
-  
+
   const handleReset = async () => {
     if (sessionType === 'default') return;
-    
-    const confirmMessage = status === 'authenticated' 
+
+    const confirmMessage = status === 'authenticated'
       ? `Are you sure you want to PERMANENTLY reset your ${sessionType} ELO and ALL stats? This will delete all your ${sessionType} history and cannot be undone.`
       : `Are you sure you want to reset your ${sessionType} ELO and session stats? (This session only - not saved to database)`;
-    
+
     if (!confirm(confirmMessage)) return;
-    
-    // Reset local state immediately
-    setUserElo(STARTING_ELO);
+
+    setUserElo(350); // Reset to new lower default
     setSessionStats({ correct: 0, incorrect: 0, skipped: 0 });
-    
-    // If authenticated, also reset in database
+
     if (status === 'authenticated') {
       try {
         await fetch('/api/progress/reset', {
@@ -226,7 +229,7 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
     }
     setTabs(newTabs);
   };
-  
+
   const handleContentChange = (tabId: number, newContent: string) => {
     setTabs(tabs.map(tab => tab.id === tabId ? { ...tab, content: newContent } : tab));
   };
@@ -236,27 +239,33 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
   return (
     <div className="min-h-screen relative flex flex-col">
       <div className="absolute inset-0 bg-cover bg-center bg-no-repeat dynamic-background" />
-      {/* Adjusted padding for small screens */}
       <div className="relative z-10 w-full max-w-7xl mx-auto p-2 sm:p-4 flex flex-col flex-grow overflow-y-auto">
-        <motion.header 
-          initial={{ opacity: 0, y: -20 }} 
-          animate={{ opacity: 1, y: 0 }} 
+        <motion.header
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
           className="flex flex-col gap-4 mb-4 sm:flex-row sm:items-center sm:justify-between sm:mb-8 flex-shrink-0 relative z-20 pr-0 sm:pr-40 lg:pr-44"
         >
           <button onClick={onBack} className="self-start group flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors glass px-3 py-2 rounded-lg">
             <ArrowLeft size={20} className="transition-transform group-hover:-translate-x-1" /> Back to Home
           </button>
-          
+
           {sessionType !== 'default' && (
             <div className="relative w-full sm:w-auto">
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 glass px-3 sm:px-4 py-3 rounded-lg text-sm sm:text-base w-full sm:w-auto">
                 <div className="flex items-center justify-between w-full sm:w-auto gap-4">
                   <div className="flex items-center gap-2 text-lg font-semibold text-foreground">
                     <BrainCircuit size={24} />
-                    <span>{sessionType === 'math' ? 'Math' : 'Physics'} ELO: {userElo}</span>
+                    <span>
+                      {sessionType === 'math' ? 'Math' : 'Physics'} ELO:
+                      {/* Loading Skeleton for ELO */}
+                      {!isEloLoaded || userElo === null ? (
+                        <span className="ml-2 animate-pulse bg-muted/50 rounded h-6 w-12 inline-block align-middle" />
+                      ) : (
+                        ` ${userElo}`
+                      )}
+                    </span>
                   </div>
-                  
-                  {/* Mobile-only Categories toggle */}
+
                   <button onClick={() => setIsCategorySelectorOpen(p => !p)} className="sm:hidden p-2 rounded-md hover:bg-muted/50 transition-colors">
                     <SlidersHorizontal size={20} />
                   </button>
@@ -283,26 +292,25 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
                       <RefreshCw size={16} />
                     </button>
                   </div>
-                  
-                  {/* Desktop Categories Button */}
+
                   <button onClick={() => setIsCategorySelectorOpen(p => !p)} className="hidden sm:flex items-center gap-2 text-sm px-3 py-1.5 rounded-md hover:bg-muted/50 transition-colors ml-auto sm:ml-0">
                     <SlidersHorizontal size={16} />
                     Categories
                   </button>
                 </div>
               </div>
-              
+
               <AnimatePresence>
                 {isCategorySelectorOpen && (
                   <>
-                    <div 
-                      className="fixed inset-0 z-40" 
-                      onClick={() => setIsCategorySelectorOpen(false)} 
+                    <div
+                      className="fixed inset-0 z-40"
+                      onClick={() => setIsCategorySelectorOpen(false)}
                     />
-                    <motion.div 
-                      initial={{ opacity: 0, y: 10 }} 
-                      animate={{ opacity: 1, y: 0 }} 
-                      exit={{ opacity: 0, y: 10 }} 
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
                       className="absolute top-full right-0 mt-2 w-full sm:w-72 bg-card/[0.98] backdrop-blur-xl border border-border/40 rounded-lg p-4 z-50 shadow-2xl"
                     >
                       <h3 className="text-sm font-semibold text-foreground mb-3">Filter Categories</h3>
@@ -322,24 +330,23 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
           )}
         </motion.header>
 
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }} 
-          animate={{ opacity: 1, y: 0 }} 
-          transition={{ delay: 0.1 }} 
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
           className="glass rounded-lg flex flex-col flex-grow relative z-10 border-0 overflow-hidden"
         >
-          {/* Added overflow-x-auto for scrolling tabs on small screens and no-scrollbar class */}
           <div className="flex items-center p-2 flex-shrink-0 relative overflow-x-auto no-scrollbar">
             {!isAddTabMenuOpen ? (
               <div className="absolute bottom-0 left-0 right-0 h-px bg-border/50 w-full" />
             ) : (
               <>
-                <div 
-                  className="absolute bottom-0 left-0 h-px bg-border/50" 
+                <div
+                  className="absolute bottom-0 left-0 h-px bg-border/50"
                   style={{ width: `${addTabButtonLeft}px` }}
                 />
-                <div 
-                  className="absolute bottom-0 right-0 h-px bg-border/50" 
+                <div
+                  className="absolute bottom-0 right-0 h-px bg-border/50"
                   style={{ left: `${addTabButtonLeft + 192}px` }}
                 />
               </>
@@ -358,7 +365,6 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
               </div>
             ))}
             <div ref={addTabButtonRef} className="relative ml-2 flex-shrink-0">
-              {/* Replaced manual popup with Radix DropdownMenu to fix clipping issues */}
               <DropdownMenu open={isAddTabMenuOpen} onOpenChange={setIsAddTabMenuOpen}>
                 <DropdownMenuTrigger asChild>
                   <button className="p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 outline-none" title="Add Tab">
@@ -383,37 +389,50 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
             {tabs.map((tab) => (
               <div
                 key={tab.id}
-                className={`absolute inset-0 w-full h-full overflow-y-auto transition-opacity duration-150 ease-in-out ${
-                  activeTabId === tab.id 
-                    ? 'opacity-100 z-10 pointer-events-auto' 
+                className={`absolute inset-0 w-full h-full overflow-y-auto transition-opacity duration-150 ease-in-out ${activeTabId === tab.id
+                    ? 'opacity-100 z-10 pointer-events-auto'
                     : 'opacity-0 z-0 pointer-events-none'
-                }`}
+                  }`}
               >
                 {tab.type === 'notepad' && (
-                  <FullscreenNotepad 
-                    value={tab.content || ''} 
-                    onChange={(newContent) => handleContentChange(tab.id, newContent)} 
-                    sessionType={sessionType} 
+                  <FullscreenNotepad
+                    value={tab.content || ''}
+                    onChange={(newContent) => handleContentChange(tab.id, newContent)}
+                    sessionType={sessionType}
                   />
                 )}
                 {tab.type === 'graphing' && <FullscreenGraphingTool />}
+
+                {/* Conditional Rendering for Practice Cores */}
                 {tab.type === 'math-practice' && (
-                  <MathPracticeCore 
-                    userElo={userElo} 
-                    onAnswerSubmit={handleAnswerSubmit}
-                    onSkip={handleSkip}
-                    onProblemLoad={handleProblemLoad}
-                    selectedCategories={selectedCategories} 
-                  />
+                  isEloLoaded && userElo !== null ? (
+                    <MathPracticeCore
+                      userElo={userElo}
+                      onAnswerSubmit={handleAnswerSubmit}
+                      onSkip={handleSkip}
+                      onProblemLoad={handleProblemLoad}
+                      selectedCategories={selectedCategories}
+                    />
+                  ) : (
+                    <div className="flex h-full items-center justify-center">
+                      <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                    </div>
+                  )
                 )}
                 {tab.type === 'physics-practice' && (
-                  <PhysicsPracticeCore 
-                    userElo={userElo} 
-                    onAnswerSubmit={handleAnswerSubmit}
-                    onSkip={handleSkip}
-                    onProblemLoad={handleProblemLoad}
-                    selectedCategories={selectedCategories} 
-                  />
+                  isEloLoaded && userElo !== null ? (
+                    <PhysicsPracticeCore
+                      userElo={userElo}
+                      onAnswerSubmit={handleAnswerSubmit}
+                      onSkip={handleSkip}
+                      onProblemLoad={handleProblemLoad}
+                      selectedCategories={selectedCategories}
+                    />
+                  ) : (
+                    <div className="flex h-full items-center justify-center">
+                      <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                    </div>
+                  )
                 )}
               </div>
             ))}

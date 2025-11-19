@@ -1,31 +1,36 @@
 // lib/problems.ts
 
-import { mathProblems as allMathProblems } from './math-problems';
+import { mathProblems as calculusProblems } from './math-problems';
 import { physicsProblems as allPhysicsProblems } from './physics-problems';
+import { arithmeticProblems } from './arithmetic-problems';
 
 // The main interface for all problems in the application.
-
 export interface Problem {
   id: string;
   topic: string;
   category: string;
   difficulty: number;
   problem: string;
-  answer: string; // Changed to just string for consistency
-  unit?: string; // Optional field for the answer's unit
-  format_hint?: string; // ADDED: Optional field for formatting instructions
+  answer: string;
+  unit?: string;
+  format_hint?: string;
 }
 
-// These imports now correctly match the extended Problem type.
-export const mathProblems: Problem[] = allMathProblems;
+// Combine Calculus/Linear Algebra with Arithmetic/Algebra
+export const mathProblems: Problem[] = [...arithmeticProblems, ...calculusProblems];
 export const physicsProblems: Problem[] = allPhysicsProblems;
 
-// This combined array now works seamlessly with both data types.
 export const allProblems: Problem[] = [...mathProblems, ...physicsProblems];
 
-// physics categories to the master list for filtering.
 export const allCategories: string[] = [
-  // Math
+  // Basic Math (New)
+  "Addition",
+  "Subtraction",
+  "Multiplication",
+  "Division",
+  "Linear Equations",
+  "Exponents",
+  // Advanced Math
   "Calculus I",
   "Calculus II",
   "Calculus III",
@@ -34,8 +39,17 @@ export const allCategories: string[] = [
   "Linear Algebra2",
   "Complex Analysis",
   // Physics
-  "Classical Mechanics",
-  "Electromagnetism",
+  "Kinematic Equations",
+  "Forces & Newton's Laws",
+  "Work & Energy",
+  "Momentum & Collisions",
+  "Circular Motion & Gravitation",
+  "Rotational Motion",
+  "Simple Harmonic Motion",
+  "Electric Fields & Potential",
+  "Circuits & Capacitance",
+  "Magnetic Fields & Forces",
+  "Electromagnetic Induction",
   "Thermodynamics",
   "Statistical Mechanics",
   "Optics and Waves",
