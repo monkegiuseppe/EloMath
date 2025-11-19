@@ -7,7 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// User model required by NextAuth, with a link to our custom progress model
+// User model (Existing)
 model User {
   id            String    @id @default(cuid())
   name          String?
@@ -17,11 +17,11 @@ model User {
   accounts      Account[]
   sessions      Session[]
   
-  progress      UserProgress? // One-to-one relation to UserProgress
-  attempts      QuestionAttempt[] // Track individual question attempts
+  progress      UserProgress?
+  attempts      QuestionAttempt[]
 }
 
-// Our custom model to store ELO and stats
+// Progress model (Existing)
 model UserProgress {
   id            String @id @default(cuid())
   userId        String @unique
@@ -38,24 +38,43 @@ model UserProgress {
   physicsSkipped    Int @default(0)
 }
 
-// New model to track individual question attempts for progress history
+// Question Attempt (Existing)
 model QuestionAttempt {
   id            String   @id @default(cuid())
   userId        String
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   
-  subject       String   // "math" or "physics"
-  category      String   // e.g., "Calculus I", "Quantum Mechanics"
-  difficulty    Int      // Problem difficulty
-  result        String   // "correct", "incorrect", or "skipped"
-  eloChange     Int      // How much ELO changed
+  subject       String   
+  category      String   
+  difficulty    Int      
+  result        String   
+  eloChange     Int      
   timestamp     DateTime @default(now())
   
-  @@index([userId, timestamp]) // For efficient queries by user and date
-  @@index([userId, subject, timestamp]) // For subject-specific queries
+  @@index([userId, timestamp])
+  @@index([userId, subject, timestamp])
 }
 
-// --- The rest of the models are required by the PrismaAdapter for NextAuth ---
+// --- NEW: Question Model ---
+model Question {
+  id          String   @id @default(cuid())
+  customId    String?  @unique // For your manual IDs like "C01", "KE101"
+  subject     String   // "math" or "physics"
+  topic       String
+  category    String
+  difficulty  Int
+  problem     String   @db.Text // The LaTeX problem text
+  answer      String   // The correct answer
+  unit        String?  // For physics (e.g., "m/s")
+  formatHint  String?  // Instructions like "Round to 2 decimals"
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([subject, category, difficulty])
+}
+
+// Auth models (Existing)
 model Account {
   id                 String  @id @default(cuid())
   userId             String

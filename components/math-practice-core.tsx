@@ -2,12 +2,11 @@
 
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import type { FC } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { CheckCircle, XCircle, SkipForward } from "lucide-react"
-import { mathProblems, type Problem } from "../lib/problems"
-import { isAnswerCorrect } from "../lib/utils"
+import { CheckCircle, XCircle, SkipForward, Loader2 } from "lucide-react"
+import { checkAnswer } from "../lib/answer-verification" // NEW IMPORT
 import ProblemRenderer from "./problem-renderer"
 import FormattingGuideModal from "./formatting-guide-modal"
 import dynamic from 'next/dynamic'
@@ -22,73 +21,82 @@ interface MathPracticeCoreProps {
   selectedCategories: string[];
 }
 
+interface ProblemData {
+  id: string;
+  topic: string;
+  category: string;
+  difficulty: number;
+  problem: string;
+  answer: string;
+}
+
 interface Feedback {
   type: 'correct' | 'incorrect';
   message: string;
   correctAnswer: string | number;
 }
 
-export const MathPracticeCore: FC<MathPracticeCoreProps> = ({ 
-  userElo, 
-  onAnswerSubmit, 
+export const MathPracticeCore: FC<MathPracticeCoreProps> = ({
+  userElo,
+  onAnswerSubmit,
   onSkip,
   onProblemLoad,
-  selectedCategories 
+  selectedCategories
 }) => {
-  const [currentProblem, setCurrentProblem] = useState<Problem | null>(null);
+  const [currentProblem, setCurrentProblem] = useState<ProblemData | null>(null);
   const [userAnswer, setUserAnswer] = useState<string>("");
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [isGuideOpen, setIsGuideOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const getNewProblem = () => {
+  const getNewProblem = useCallback(async () => {
+    if (selectedCategories.length === 0) return;
+
+    setIsLoading(true);
     setFeedback(null);
     setUserAnswer("");
 
-    const availableProblems = mathProblems.filter((p) => selectedCategories.includes(p.category));
-
-    if (availableProblems.length === 0) {
-      setCurrentProblem({
-        id: "no-problems", topic: "System", category: "System", difficulty: 0,
-        problem: "No math problems available for the selected categories. Please select categories from the header.",
-        answer: "",
+    try {
+      const params = new URLSearchParams({
+        subject: 'math',
+        elo: userElo.toString(),
+        categories: selectedCategories.join(',')
       });
-      return;
-    }
 
-    const eloRange = 150;
-    let eligibleProblems = availableProblems.filter(p => Math.abs(p.difficulty - userElo) <= eloRange && p.id !== currentProblem?.id);
-    if (eligibleProblems.length === 0) {
-      eligibleProblems = availableProblems.filter(p => p.id !== currentProblem?.id);
-    }
-    if (eligibleProblems.length === 0) {
-      setCurrentProblem({
-        id: "no-problems-left", topic: "System", category: "System", difficulty: 0,
-        problem: "You have seen all available problems. Please select more categories or reset.",
-        answer: "",
-      });
-      return;
-    }
+      const res = await fetch(`/api/problems?${params.toString()}`);
+      const data = await res.json();
 
-    const randomIndex = Math.floor(Math.random() * eligibleProblems.length);
-    const newProblem = eligibleProblems[randomIndex];
-    setCurrentProblem(newProblem);
-    
-    onProblemLoad({
-      category: newProblem.category,
-      difficulty: newProblem.difficulty
-    });
-  };
+      if (data.error) {
+        // Handle no questions found
+        console.warn(data.error);
+        setCurrentProblem(null);
+      } else {
+        setCurrentProblem(data);
+        onProblemLoad({
+          category: data.category,
+          difficulty: data.difficulty
+        });
+      }
+    } catch (error) {
+      console.error("Failed to load problem", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [userElo, selectedCategories, onProblemLoad]);
 
+  // Initial Load
   useEffect(() => {
     getNewProblem();
-  }, [selectedCategories]);
+  }, [selectedCategories]); // Reload when categories change
 
   const handleSubmit = (e?: React.FormEvent<HTMLFormElement>) => {
     if (e) e.preventDefault();
-    if (!userAnswer.trim() || !currentProblem || currentProblem.id.startsWith("no-problems")) return;
+    if (!userAnswer.trim() || !currentProblem) return;
 
-    const wasCorrect = isAnswerCorrect(userAnswer, currentProblem.answer);
-    
+    // Use new robust verification
+    const wasCorrect = checkAnswer(userAnswer, currentProblem.answer);
+
+    // ELO Calculation (Simplified K-factor logic)
     const score = wasCorrect ? 1 : 0;
     const expectedScore = 1 / (1 + Math.pow(10, (currentProblem.difficulty - userElo) / 400));
     const kFactor = 32;
@@ -111,22 +119,27 @@ export const MathPracticeCore: FC<MathPracticeCoreProps> = ({
     onSkip();
     getNewProblem();
   };
-  
+
   return (
     <>
       <FormattingGuideModal isOpen={isGuideOpen} onClose={() => setIsGuideOpen(false)} />
       <div className="w-full h-full min-h-[600px] p-4 sm:p-6 lg:p-8 flex flex-col justify-center items-center overflow-y-auto">
         <div className="w-full max-w-3xl">
-          {/* Reduced padding on mobile: p-4 sm:p-8 */}
-          <div className="bg-card/60 backdrop-blur-xl border border-border/30 rounded-2xl p-4 sm:p-8 min-h-[24rem] mb-6">
+          <div className="bg-card/60 backdrop-blur-xl border border-border/30 rounded-2xl p-4 sm:p-8 min-h-[24rem] mb-6 relative">
+
+            {isLoading && (
+              <div className="absolute inset-0 flex items-center justify-center z-10 bg-card/50 rounded-2xl">
+                <Loader2 className="animate-spin text-primary w-10 h-10" />
+              </div>
+            )}
+
             <AnimatePresence mode="wait">
-              {currentProblem && (
+              {!isLoading && currentProblem ? (
                 <motion.div
                   key={currentProblem.id}
-                  initial={{ opacity: 0, y: 30 }}
+                  initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -30 }}
-                  transition={{ duration: 0.4, ease: "easeInOut" }}
+                  exit={{ opacity: 0, y: -10 }}
                   className="flex flex-col h-full"
                 >
                   <div className="flex justify-between items-center mb-4">
@@ -147,22 +160,30 @@ export const MathPracticeCore: FC<MathPracticeCoreProps> = ({
                       value={userAnswer}
                       onChange={setUserAnswer}
                       onSubmit={handleSubmit}
-                      disabled={!!feedback || currentProblem.id.startsWith("no-problems")}
-                      placeholder={currentProblem.id.startsWith("no-problems") ? "Please select categories..." : "Your Answer..."}
+                      disabled={!!feedback}
+                      placeholder="Your Answer..."
                       onOpenGuide={() => setIsGuideOpen(true)}
                     />
                     <div className="flex items-center justify-end gap-4 mt-4">
-                      {!feedback && !currentProblem.id.startsWith("no-problems") && (
-                        <motion.button type="button" onClick={handleSkip} className="flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground hover:text-foreground">
+                      {!feedback && (
+                        <button type="button" onClick={handleSkip} className="flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground hover:text-foreground">
                           <SkipForward size={16} /> Skip
-                        </motion.button>
+                        </button>
                       )}
-                      <motion.button type="submit" disabled={!!feedback || !userAnswer.trim() || currentProblem.id.startsWith("no-problems")} className="px-8 py-3 bg-foreground text-background font-bold rounded-lg hover:bg-foreground/90 disabled:bg-muted/50 disabled:text-muted-foreground disabled:cursor-not-allowed">
+                      <button
+                        type="submit"
+                        disabled={!!feedback || !userAnswer.trim()}
+                        className="px-8 py-3 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      >
                         {feedback ? "Answered" : "Submit"}
-                      </motion.button>
+                      </button>
                     </div>
                   </form>
                 </motion.div>
+              ) : !isLoading && (
+                <div className="flex flex-col items-center justify-center h-64 text-muted-foreground">
+                  <p>Select categories to start practicing.</p>
+                </div>
               )}
             </AnimatePresence>
           </div>
@@ -182,9 +203,9 @@ export const MathPracticeCore: FC<MathPracticeCoreProps> = ({
                     <p className="text-sm text-muted-foreground">The correct answer is: <span className="font-mono">{feedback.correctAnswer}</span></p>
                   </div>
                 </div>
-                <motion.button onClick={getNewProblem} className="glass px-4 py-2 hover:bg-card/90 font-semibold rounded-lg text-foreground">
+                <button onClick={getNewProblem} className="glass px-4 py-2 hover:bg-card/90 font-semibold rounded-lg text-foreground">
                   Next Question →
-                </motion.button>
+                </button>
               </motion.div>
             )}
           </AnimatePresence>
