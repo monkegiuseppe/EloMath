@@ -1578,8 +1578,86 @@ export const mathProblems: Problem[] = [
 
 
 
-
-
+  {
+    category: "Calculus II",
+    id: "C_NEW_INT01",
+    topic: "Definite Integral",
+    difficulty: 1200,
+    problem: "Evaluate $\\int_0^3 2x dx$.",
+    answer: "9",
+  },
+  {
+    category: "Calculus II",
+    id: "C_NEW_INT02",
+    topic: "Power Rule Integral",
+    difficulty: 1250,
+    problem: "Evaluate $\\int_1^2 x^2 dx$.",
+    answer: "7/3",
+  },
+  {
+    category: "Calculus II",
+    id: "C_NEW_INT03",
+    topic: "Trig Integral",
+    difficulty: 1400,
+    problem: "Evaluate $\\int_0^{\\pi} \\sin(x) dx$.",
+    answer: "2",
+  },
+  {
+    category: "Calculus II",
+    id: "C_NEW_INT04",
+    topic: "Exponential Integral",
+    difficulty: 1450,
+    problem: "Evaluate $\\int_0^1 e^{2x} dx$.",
+    answer: "0.5(e^2 - 1)",
+  },
+  {
+    category: "Calculus II",
+    id: "C_NEW_INT05",
+    topic: "U-Sub",
+    difficulty: 1600,
+    problem: "Evaluate $\\int \\cos(2x) dx$. (No +C)",
+    answer: "0.5sin(2x)",
+  },
+  {
+    category: "Calculus I",
+    id: "C_NEW_01",
+    topic: "Power Rule",
+    difficulty: 1000,
+    problem: "Differentiate $f(x) = 4x^5$. Find $f'(x)$.",
+    answer: "20x^4",
+  },
+  {
+    category: "Calculus I",
+    id: "C_NEW_02",
+    topic: "Trig Derivative",
+    difficulty: 1100,
+    problem: "Differentiate $f(x) = 3\\cos(x)$. Find $f'(x)$.",
+    answer: "-3sin(x)",
+  },
+  {
+    category: "Calculus I",
+    id: "C_NEW_03",
+    topic: "Chain Rule",
+    difficulty: 1400,
+    problem: "Differentiate $y = (2x+1)^3$. Find $y'$.",
+    answer: "6(2x+1)^2",
+  },
+  {
+    category: "Calculus I",
+    id: "C_NEW_04",
+    topic: "Product Rule",
+    difficulty: 1450,
+    problem: "Differentiate $y = x^2 e^x$. Find $y'(1)$.",
+    answer: "3e",
+  },
+  {
+    category: "Calculus I",
+    id: "C_NEW_05",
+    topic: "Quotient Rule",
+    difficulty: 1500,
+    problem: "Let $f(x) = \\frac{1}{x}$. Find $f''(2)$.",
+    answer: "0.25",
+  },
   {
     category: "Calculus II",
     id: "C10",
@@ -5384,7 +5462,46 @@ export const mathProblems: Problem[] = [
 
 
 
-
+  {
+    category: "Linear Algebra1",
+    id: "LA_NEW_01",
+    topic: "Matrix Add",
+    difficulty: 950,
+    problem: "Add: $\\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix} + \\begin{pmatrix} 1 & 1 \\\\ 1 & 1 \\end{pmatrix}$. Top-left element?",
+    answer: "2",
+  },
+  {
+    category: "Linear Algebra1",
+    id: "LA_NEW_02",
+    topic: "Matrix Mult",
+    difficulty: 1150,
+    problem: "Calculate product: $\\begin{pmatrix} 1 & 0 \\\\ 0 & 2 \\end{pmatrix} \\begin{pmatrix} 3 \\\\ 4 \\end{pmatrix}$. Bottom element?",
+    answer: "8",
+  },
+  {
+    category: "Linear Algebra1",
+    id: "LA_NEW_03",
+    topic: "Determinant",
+    difficulty: 1300,
+    problem: "Find determinant: $\\begin{pmatrix} 2 & 3 \\\\ 1 & 5 \\end{pmatrix}$.",
+    answer: "7",
+  },
+  {
+    category: "Linear Algebra2",
+    id: "LA_NEW_04",
+    topic: "Eigenvalue",
+    difficulty: 1800,
+    problem: "Find the largest eigenvalue of $\\begin{pmatrix} 4 & 0 \\\\ 0 & 1 \\end{pmatrix}$.",
+    answer: "4",
+  },
+  {
+    category: "Linear Algebra1",
+    id: "LA_NEW_05",
+    topic: "Transpose",
+    difficulty: 1000,
+    problem: "If $A = \\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}$, what is $(A^T)_{12}$?",
+    answer: "3",
+  },
   {
     category: "Linear Algebra1",
     id: "LA01",
@@ -6601,6 +6718,30 @@ export const mathProblems: Problem[] = [
 
 
 
+  {
+    category: "Complex Analysis",
+    id: "CA_NEW_01",
+    topic: "Arithmetic",
+    difficulty: 1400,
+    problem: "Calculate $|3 + 4i|$.",
+    answer: "5",
+  },
+  {
+    category: "Complex Analysis",
+    id: "CA_NEW_02",
+    topic: "Multiplication",
+    difficulty: 1500,
+    problem: "Calculate $(1+i)(1-i)$.",
+    answer: "2",
+  },
+  {
+    category: "Complex Analysis",
+    id: "CA_NEW_03",
+    topic: "Powers of i",
+    difficulty: 1450,
+    problem: "Simplify $i^5$.",
+    answer: "i",
+  },
   {
     category: "Complex Analysis",
     id: "CA01",

@@ -5,7 +5,7 @@ import { physicsProblems as allPhysicsProblems } from './physics-problems';
 import { arithmeticProblems } from './arithmetic-problems';
 import { beginnerPhysicsProblems } from './beginner-physics-problems';
 import { beginnerMathProblems } from './beginner-math-problems';
-
+import { statisticsProblems } from './statistics-problems';
 
 // The main interface for all problems in the application.
 export interface Problem {
@@ -19,14 +19,23 @@ export interface Problem {
   format_hint?: string;
 }
 
-// Combine Calculus/Linear Algebra with Arithmetic/Algebra
-export const mathProblems: Problem[] = [...beginnerMathProblems, ...arithmeticProblems, ...calculusProblems];
-export const physicsProblems: Problem[] = [...beginnerPhysicsProblems, ...allPhysicsProblems];
+// Combine Calculus/Linear Algebra with Arithmetic/Algebra/Statistics
+export const mathProblems: Problem[] = [
+  ...beginnerMathProblems,
+  ...arithmeticProblems,
+  ...calculusProblems,
+  ...statisticsProblems
+];
+
+export const physicsProblems: Problem[] = [
+  ...beginnerPhysicsProblems,
+  ...allPhysicsProblems
+];
 
 export const allProblems: Problem[] = [...mathProblems, ...physicsProblems];
 
 export const allCategories: string[] = [
-  // Basic Math (New)
+  // Basic Math
   "Addition",
   "Subtraction",
   "Multiplication",
@@ -34,6 +43,7 @@ export const allCategories: string[] = [
   "Linear Equations",
   "Exponents",
   // Advanced Math
+  "Statistics",
   "Calculus I",
   "Calculus II",
   "Calculus III",
@@ -41,6 +51,13 @@ export const allCategories: string[] = [
   "Linear Algebra1",
   "Linear Algebra2",
   "Complex Analysis",
+  // Algebra
+  "Algebra I",
+  "Algebra II",
+  "Geometry",
+  "Pre-Calculus",
+  "Pre-Algebra",
+  "Arithmetic",
   // Physics
   "Kinematic Equations",
   "Forces & Newton's Laws",

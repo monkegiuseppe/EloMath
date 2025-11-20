@@ -4,6 +4,25 @@ import type { Problem } from './problems';
 
 export const physicsProblems: Problem[] = [
   // --- Kinematic Equations (8 Problems) ---
+
+  {
+    category: "Kinematic Equations",
+    id: "KE_NEW_01",
+    topic: "Displacement",
+    difficulty: 1100,
+    problem: "Calculate $\\Delta x = v t$. $v=30$, $t=4$.",
+    answer: "120",
+    unit: "m"
+  },
+  {
+    category: "Kinematic Equations",
+    id: "KE_NEW_02",
+    topic: "Acceleration",
+    difficulty: 1150,
+    problem: "Find $a = \\Delta v / t$. $\\Delta v = 40$, $t=5$.",
+    answer: "8",
+    unit: "m/s²"
+  },
   {
     category: "Kinematic Equations",
     id: "KE101",
@@ -155,7 +174,7 @@ export const physicsProblems: Problem[] = [
     answer: "2.5",
     unit: "s"
   },
-    {
+  {
     category: "Kinematic Equations",
     id: "KE209",
     topic: "Stopping Distance",
@@ -263,7 +282,7 @@ export const physicsProblems: Problem[] = [
     answer: "2.45",
     unit: "m/s²",
   },
- {
+  {
     category: "Forces & Newton's Laws",
     id: "FNL201",
     topic: "Force with Friction",
@@ -317,7 +336,7 @@ export const physicsProblems: Problem[] = [
     answer: "16",
     unit: "m/s"
   },
-    {
+  {
     category: "Forces & Newton's Laws",
     id: "FNL207",
     topic: "Angled Friction",
@@ -493,7 +512,7 @@ export const physicsProblems: Problem[] = [
     answer: "25",
     unit: "m"
   },
-    {
+  {
     category: "Work & Energy",
     id: "WE207",
     topic: "Work-Energy with Angled Force",
@@ -669,7 +688,7 @@ export const physicsProblems: Problem[] = [
     answer: "30",
     unit: "J"
   },
-    {
+  {
     category: "Momentum & Collisions",
     id: "MC207",
     topic: "Bouncing Ball",
@@ -824,7 +843,7 @@ export const physicsProblems: Problem[] = [
     problem: "Planet X has twice the mass of Earth and three times the radius. What is the acceleration due to gravity on Planet X, as a multiple of Earth's g?",
     answer: "2/9",
   },
-    {
+  {
     category: "Circular Motion & Gravitation",
     id: "CG205",
     topic: "Artificial Gravity",
@@ -944,7 +963,7 @@ export const physicsProblems: Problem[] = [
     answer: "8",
     unit: "rad/s"
   },
-    {
+  {
     category: "Rotational Motion",
     id: "RM201",
     topic: "Rolling without Slipping",
@@ -978,7 +997,7 @@ export const physicsProblems: Problem[] = [
     problem: "A thin rod of mass M and length L has inertia $I_{cm}=ML^2/12$ about its center. What is its moment of inertia about one end?",
     answer: "ML^2/3",
   },
-    {
+  {
     category: "Rotational Motion",
     id: "RM205",
     topic: "Conservation of Angular Momentum",
@@ -1109,7 +1128,7 @@ export const physicsProblems: Problem[] = [
     unit: "C*m",
     format_hint: "Use scientific notation."
   },
-    {
+  {
     category: "Electric Fields & Potential",
     id: "EFP201",
     topic: "Zero Field Point",
@@ -1143,7 +1162,7 @@ export const physicsProblems: Problem[] = [
     answer: "-12",
     unit: "V/m"
   },
-    {
+  {
     category: "Electric Fields & Potential",
     id: "EFP205",
     topic: "Electron Volt",
@@ -1198,7 +1217,42 @@ export const physicsProblems: Problem[] = [
 
   // --- Circuits & Capacitance (8 Problems) ---
 
-
+  {
+    category: "Circuits & Capacitance",
+    id: "CC_NEW_01",
+    topic: "Resistors in Series",
+    difficulty: 900,
+    problem: "Given $R_1=100\\Omega, R_2=200\\Omega$ in series. Find $R_{eq}$.",
+    answer: "300",
+    unit: "Ω"
+  },
+  {
+    category: "Circuits & Capacitance",
+    id: "CC_NEW_02",
+    topic: "Resistors in Parallel",
+    difficulty: 1100,
+    problem: "Given $R_1=100\\Omega, R_2=100\\Omega$ in parallel. Find $R_{eq}$.",
+    answer: "50",
+    unit: "Ω"
+  },
+  {
+    category: "Circuits & Capacitance",
+    id: "CC_NEW_03",
+    topic: "Power",
+    difficulty: 1200,
+    problem: "Calculate power dissipated if $V=10$V and $R=5\\Omega$. ($P=V^2/R$)",
+    answer: "20",
+    unit: "W"
+  },
+  {
+    category: "Circuits & Capacitance",
+    id: "CC_NEW_04",
+    topic: "Current",
+    difficulty: 1000,
+    problem: "Find current $I$ if $V=9$V and $R=4.5\\Omega$.",
+    answer: "2",
+    unit: "A"
+  },
   {
     category: "Circuits & Capacitance",
     id: "CC101",
@@ -1317,7 +1371,7 @@ export const physicsProblems: Problem[] = [
     answer: "5",
     unit: "s"
   },
-    {
+  {
     category: "Circuits & Capacitance",
     id: "CC206",
     topic: "Kirchhoff's Loop Rule",
@@ -1476,7 +1530,7 @@ export const physicsProblems: Problem[] = [
     problem: "A circular loop of wire with radius 0.1 m is in a uniform 1.5 T magnetic field. The loop is oriented parallel to the field. What is the magnetic flux through the loop?",
     answer: "0",
   },
-    {
+  {
     category: "Magnetic Fields & Forces",
     id: "MF205",
     topic: "Faraday's Law",
@@ -1657,7 +1711,7 @@ export const physicsProblems: Problem[] = [
     problem: "A photon scatters off a stationary electron. If the photon is deflected by 180 degrees, its wavelength will increase by the Compton wavelength, $h/(m_e c)$. Will the scattered photon's energy be higher, lower, or the same?",
     answer: "lower",
   },
-    {
+  {
     category: "Quantum Mechanics",
     id: "QM207",
     topic: "Harmonic Oscillator",
@@ -1696,5 +1750,83 @@ export const physicsProblems: Problem[] = [
     difficulty: 1750,
     problem: "A qubit can be in a superposition of states, written as $|\\psi\\rangle = \\alpha|0\\rangle + \\beta|1\\rangle$. The probabilities of measuring 0 or 1 are $|\alpha|^2$ and $|\beta|^2$. If a qubit is in the state $|\\psi\\rangle = \\frac{1}{\\sqrt{5}}|0\\rangle + \\frac{2}{\\sqrt{5}}|1\\rangle$, what is the probability of measuring it in the state $|1\\rangle$?",
     answer: "4/5",
+  },
+
+
+  // Thermodynamics (Ideal Gas & Heat)
+
+
+
+  {
+    category: "Thermodynamics",
+    id: "TH_NEW_01",
+    topic: "Ideal Gas Law",
+    difficulty: 1400,
+    problem: "Using $PV=nRT$, find $P$ if $n=1$, $R=8.31$, $T=300$, $V=0.0831$.",
+    answer: "30000",
+    unit: "Pa"
+  },
+  {
+    category: "Thermodynamics",
+    id: "TH_NEW_02",
+    topic: "Specific Heat",
+    difficulty: 1300,
+    problem: "Calculate heat $Q$ to raise 2kg water by $10^\\circ$C. ($c=4186$ J/kgC)",
+    answer: "83720",
+    unit: "J"
+  },
+  {
+    category: "Thermodynamics",
+    id: "TH_NEW_03",
+    topic: "Efficiency",
+    difficulty: 1500,
+    problem: "Carnot efficiency $\\eta = 1 - T_c/T_h$. If $T_c=300$K and $T_h=600$K, find $\\eta$.",
+    answer: "0.5"
+  },
+  {
+    category: "Thermodynamics",
+    id: "TH_NEW_04",
+    topic: "Work",
+    difficulty: 1550,
+    problem: "Gas expands at constant pressure $P=100$ Pa from $V_1=1$ to $V_2=3$. Find Work ($W=P\\Delta V$).",
+    answer: "200",
+    unit: "J"
+  },
+
+  // Waves & Optics
+  {
+    category: "Optics and Waves",
+    id: "OW_NEW_01",
+    topic: "Wave Speed",
+    difficulty: 1100,
+    problem: "Find wave speed if $f=50$ Hz and $\\lambda=4$ m.",
+    answer: "200",
+    unit: "m/s"
+  },
+  {
+    category: "Optics and Waves",
+    id: "OW_NEW_02",
+    topic: "Frequency",
+    difficulty: 1000,
+    problem: "Find frequency of a wave with period $T=0.02$ s.",
+    answer: "50",
+    unit: "Hz"
+  },
+  {
+    category: "Optics and Waves",
+    id: "OW_NEW_03",
+    topic: "Snell's Law",
+    difficulty: 1600,
+    problem: "Light passes from air ($n_1=1$) to glass ($n_2=1.5$). If $\\sin(\\theta_1)=0.6$, find $\\sin(\\theta_2)$.",
+    answer: "0.4"
+  },
+  {
+    category: "Optics and Waves",
+    id: "OW_NEW_04",
+    topic: "Mirror Equation",
+    difficulty: 1700,
+    problem: "Using $1/f = 1/d_o + 1/d_i$, find $1/d_i$ if $f=10$ and $d_o=20$.",
+    answer: "0.05",
+    unit: "1/cm"
   },
 ];
