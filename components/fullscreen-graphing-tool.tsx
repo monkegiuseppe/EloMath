@@ -1,20 +1,24 @@
-// components/fullscreen-graphing-tool.tsx
-
 "use client"
 
 import { useState, useEffect, useRef, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { X, TrendingUp, Plus, Trash2, Move, Settings, Target, TrendingDown } from "lucide-react"
+import {
+  X, Plus, Trash2, Move, Settings, Target, TrendingDown,
+  Eye, EyeOff, Maximize, Minus, Search, Calculator, ChevronRight, ChevronLeft
+} from "lucide-react"
 import { create, all, type EvalFunction } from "mathjs"
 
 const math = create(all)
 
+// A vibrant, fun color palette
 const GRAPH_COLORS = [
-  "#06b6d4", // cyan
-  "#a855f7", // purple
-  "#22c55e", // green
-  "#f43f5e", // rose
-  "#f59e0b", // amber
+  "#22d3ee", // Cyan (Electric)
+  "#e879f9", // Fuchsia (Neon)
+  "#4ade80", // Green (Lime)
+  "#fb7185", // Rose (Soft)
+  "#facc15", // Yellow (Bright)
+  "#818cf8", // Indigo (Cool)
+  "#fb923c", // Orange (Warm)
 ]
 
 interface Equation {
@@ -22,6 +26,8 @@ interface Equation {
   expr: string
   compiled: EvalFunction | null
   color: string
+  visible: boolean
+  error?: boolean
 }
 
 interface AnalysisPoint {
@@ -33,56 +39,62 @@ interface AnalysisPoint {
 }
 
 export default function FullscreenGraphingTool() {
+  // --- State ---
   const [equations, setEquations] = useState<Equation[]>([
-    { id: 1, expr: "sin(x)", compiled: math.compile("sin(x)"), color: GRAPH_COLORS[0] },
+    { id: 1, expr: "sin(x)", compiled: math.compile("sin(x)"), color: GRAPH_COLORS[0], visible: true },
+    { id: 2, expr: "x^2 / 10", compiled: math.compile("x^2 / 10"), color: GRAPH_COLORS[1], visible: true },
   ])
+
   const [view, setView] = useState({ zoom: 40, centerX: 0, centerY: 0 })
   const [isPanning, setIsPanning] = useState(false)
-  const [isGraphSelectorOpen, setIsGraphSelectorOpen] = useState(false)
-  const [selectedGraphId, setSelectedGraphId] = useState(1)
-  const [hasAutoFitted, setHasAutoFitted] = useState(false)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
+
+  // Analysis Toggles
   const [showRoots, setShowRoots] = useState(false)
   const [showExtrema, setShowExtrema] = useState(false)
   const [showIntersections, setShowIntersections] = useState(false)
   const [showMouseTracking, setShowMouseTracking] = useState(false)
-  const [trackingPoint, setTrackingPoint] = useState<{ x: number; y: number } | null>(null)
+
+  // Interaction State
+  const [trackingPoint, setTrackingPoint] = useState<{ x: number; y: number; color: string } | null>(null)
   const [analysisPoints, setAnalysisPoints] = useState<AnalysisPoint[]>([])
   const [hoveredPoint, setHoveredPoint] = useState<AnalysisPoint | null>(null)
 
+  // Refs
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const lastMousePos = useRef({ x: 0, y: 0 })
   const analysisTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const lastAnalysisViewRef = useRef<string>("")
 
+  // --- Canvas Resizing ---
   useEffect(() => {
     const canvas = canvasRef.current
     const container = containerRef.current
     if (!canvas || !container) return
 
-    const resizeObserver = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        const { width, height } = entry.contentRect
-        canvas.width = width
-        canvas.height = height
-      }
-    })
+    const updateSize = () => {
+      const { width, height } = container.getBoundingClientRect()
+      // Set actual canvas size to match display size for sharpness
+      const dpr = window.devicePixelRatio || 1
+      canvas.width = width * dpr
+      canvas.height = height * dpr
+      canvas.style.width = `${width}px`
+      canvas.style.height = `${height}px`
 
+      // Scale context to match dpr
+      const ctx = canvas.getContext('2d')
+      if (ctx) ctx.scale(dpr, dpr)
+    }
+
+    const resizeObserver = new ResizeObserver(updateSize)
     resizeObserver.observe(container)
-    const { width, height } = container.getBoundingClientRect()
-    canvas.width = width
-    canvas.height = height
+    updateSize() // Initial size
 
     return () => resizeObserver.disconnect()
   }, [])
 
-  useEffect(() => {
-    if (!hasAutoFitted || equations.length > 1) {
-      setView({ zoom: 40, centerX: 0, centerY: 0 })
-      setHasAutoFitted(true)
-    }
-  }, [equations.length, hasAutoFitted])
-
+  // --- Analysis Calculation (Heavy Math) ---
   const calculateAnalysisPoints = useCallback(() => {
     if (!showRoots && !showExtrema && !showIntersections) {
       setAnalysisPoints([])
@@ -92,315 +104,673 @@ export default function FullscreenGraphingTool() {
     const canvas = canvasRef.current
     if (!canvas || canvas.width === 0) return
 
-    const points: AnalysisPoint[] = []
-    const width = canvas.width
+    // Use logical width (CSS pixels), not physical width
+    const width = canvas.clientWidth
     const toWorldX = (screenX: number) => (screenX - width / 2) / view.zoom + view.centerX
 
-    equations.forEach((eq) => {
-      if (!eq.compiled) return
+    const points: AnalysisPoint[] = []
 
-      const samples = 1000
+    // 1. Analyze individual equations
+    equations.forEach((eq) => {
+      if (!eq.compiled || !eq.visible) return
+
+      const samples = 500 // Reduce samples slightly for performance
       const xMin = toWorldX(0)
       const xMax = toWorldX(width)
       const step = (xMax - xMin) / samples
       const values: { x: number; y: number }[] = []
 
+      // Generate points
       for (let i = 0; i <= samples; i++) {
         const x = xMin + i * step
         try {
           const y = eq.compiled.evaluate({ x })
           if (isNaN(y) || !isFinite(y)) continue
           values.push({ x, y })
-        } catch (e) {
-          continue
-        }
+        } catch (e) { continue }
       }
 
+      // Find roots and extrema
       for (let i = 1; i < values.length; i++) {
         const curr = values[i]
         const prev = values[i - 1]
 
+        // Roots
         if (showRoots && Math.sign(curr.y) !== Math.sign(prev.y)) {
+          // Binary search for precision
           let x1 = prev.x, x2 = curr.x
-          for (let j = 0; j < 8; j++) {
+          for (let j = 0; j < 6; j++) {
             const xMid = (x1 + x2) / 2
             const yMid = eq.compiled.evaluate({ x: xMid })
             if (Math.sign(yMid) === Math.sign(prev.y)) x1 = xMid; else x2 = xMid
           }
           const rootX = (x1 + x2) / 2
-          points.push({ x: rootX, y: 0, type: "root", equationId: eq.id, info: `(${(Math.abs(rootX) < 1e-6 ? 0 : rootX.toFixed(3))}, 0)` })
+          points.push({
+            x: rootX, y: 0, type: "root", equationId: eq.id,
+            info: `Root: (${rootX.toFixed(3)}, 0)`
+          })
         }
       }
 
+      // Extrema
       if (showExtrema && values.length > 4) {
         for (let i = 2; i < values.length - 2; i++) {
-            const [p2, p1, c, n1, n2] = [values[i - 2], values[i - 1], values[i], values[i + 1], values[i + 2]]
-            const isMin = c.y < p1.y && c.y < n1.y && p1.y < p2.y && n1.y < n2.y;
-            const isMax = c.y > p1.y && c.y > n1.y && p1.y > p2.y && n1.y > n2.y;
-            if (isMin || isMax) {
-                points.push({ x: c.x, y: c.y, type: isMin ? "minimum" : "maximum", equationId: eq.id, info: `(${(c.x.toFixed(2))}, ${(c.y.toFixed(2))})`})
-                i += 2
-            }
+          const [p2, p1, c, n1, n2] = [values[i - 2], values[i - 1], values[i], values[i + 1], values[i + 2]]
+          const isMin = c.y < p1.y && c.y < n1.y && p1.y < p2.y && n1.y < n2.y;
+          const isMax = c.y > p1.y && c.y > n1.y && p1.y > p2.y && n1.y > n2.y;
+          if (isMin || isMax) {
+            points.push({
+              x: c.x, y: c.y, type: isMin ? "minimum" : "maximum", equationId: eq.id,
+              info: `${isMin ? "Min" : "Max"}: (${c.x.toFixed(2)}, ${c.y.toFixed(2)})`
+            })
+            i += 2 // Skip neighbors
+          }
         }
       }
     })
 
-    if (showIntersections && equations.length > 1) {
-      for (let i = 0; i < equations.length; i++) {
-        for (let j = i + 1; j < equations.length; j++) {
-          const eq1 = equations[i], eq2 = equations[j]
+    // 2. Find Intersections
+    if (showIntersections && equations.filter(e => e.visible).length > 1) {
+      const visibleEqs = equations.filter(e => e.visible && e.compiled);
+      for (let i = 0; i < visibleEqs.length; i++) {
+        for (let j = i + 1; j < visibleEqs.length; j++) {
+          const eq1 = visibleEqs[i], eq2 = visibleEqs[j]
           if (!eq1.compiled || !eq2.compiled) continue
-          const samples = 1000
+
+          const samples = 400
           const xMin = toWorldX(0), xMax = toWorldX(width), step = (xMax - xMin) / samples
+
           for (let k = 0; k < samples; k++) {
             const x1 = xMin + k * step, x2 = xMin + (k + 1) * step
             try {
-              const diff1 = eq1.compiled.evaluate({x: x1}) - eq2.compiled.evaluate({x: x1})
-              const diff2 = eq1.compiled.evaluate({x: x2}) - eq2.compiled.evaluate({x: x2})
-              if(Math.sign(diff1) !== Math.sign(diff2)) {
-                const intersectX = (x1+x2)/2
-                const intersectY = eq1.compiled.evaluate({x: intersectX})
-                points.push({ x: intersectX, y: intersectY, type: "intersection", info: `(${(intersectX.toFixed(2))}, ${(intersectY.toFixed(2))})`})
+              const diff1 = eq1.compiled.evaluate({ x: x1 }) - eq2.compiled.evaluate({ x: x1 })
+              const diff2 = eq1.compiled.evaluate({ x: x2 }) - eq2.compiled.evaluate({ x: x2 })
+
+              if (Math.sign(diff1) !== Math.sign(diff2)) {
+                // Binary search for intersection
+                let low = x1, high = x2, intersectX = x1
+                for (let iter = 0; iter < 5; iter++) {
+                  const mid = (low + high) / 2
+                  const dMid = eq1.compiled.evaluate({ x: mid }) - eq2.compiled.evaluate({ x: mid })
+                  if (Math.sign(dMid) === Math.sign(diff1)) low = mid; else high = mid
+                  intersectX = mid
+                }
+                const intersectY = eq1.compiled.evaluate({ x: intersectX })
+                points.push({
+                  x: intersectX, y: intersectY, type: "intersection",
+                  info: `Intersect: (${intersectX.toFixed(2)}, ${intersectY.toFixed(2)})`
+                })
               }
-            } catch(e) { continue }
+            } catch (e) { continue }
           }
         }
       }
     }
     setAnalysisPoints(points)
-  }, [equations, view.zoom, view.centerX, view.centerY, showRoots, showExtrema, showIntersections])
+  }, [equations, view, showRoots, showExtrema, showIntersections])
 
+  // Debounce analysis calculation
   useEffect(() => {
-    const viewSignature = `${view.zoom.toFixed(1)}-${view.centerX.toFixed(2)}-${view.centerY.toFixed(2)}-${equations.map((eq) => eq.expr).join(",")}-${showRoots}-${showExtrema}-${showIntersections}`
+    const viewSignature = `${view.zoom.toFixed(1)}-${view.centerX.toFixed(2)}-${view.centerY.toFixed(2)}-${equations.map(eq => eq.visible ? eq.expr : '').join(",")}-${showRoots}-${showExtrema}-${showIntersections}`
     if (viewSignature === lastAnalysisViewRef.current) return
+
     if (analysisTimeoutRef.current) clearTimeout(analysisTimeoutRef.current)
     analysisTimeoutRef.current = setTimeout(() => {
-        calculateAnalysisPoints()
-        lastAnalysisViewRef.current = viewSignature
-      }, isPanning ? 100 : 50)
+      calculateAnalysisPoints()
+      lastAnalysisViewRef.current = viewSignature
+    }, isPanning ? 150 : 50) // Delay more while panning
+
     return () => { if (analysisTimeoutRef.current) clearTimeout(analysisTimeoutRef.current) }
   }, [calculateAnalysisPoints, isPanning])
 
+  // --- Event Listeners ---
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
-    const handleMouseDown = (e: MouseEvent) => { setIsPanning(true); lastMousePos.current = { x: e.clientX, y: e.clientY }; canvas.style.cursor = "grabbing" }
-    const handleMouseUp = () => { setIsPanning(false); canvas.style.cursor = "grab" }
-    const handleMouseLeave = () => { setIsPanning(false); setTrackingPoint(null); setHoveredPoint(null); canvas.style.cursor = "grab" }
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!canvas) return;
-      const rect = canvas.getBoundingClientRect();
-      const toWorldX = (screenX: number) => (screenX - canvas.width / 2) / view.zoom + view.centerX;
 
-      if (!isPanning) {
-        const canvasX = e.clientX - rect.left;
-        const canvasY = e.clientY - rect.top;
-
-        if (showMouseTracking) {
-          const worldX = toWorldX(canvasX);
-          const selectedEq = equations.find((eq) => eq.id === selectedGraphId);
-          if (selectedEq?.compiled) {
-            try {
-              const worldY = selectedEq.compiled.evaluate({ x: worldX });
-              if (!isNaN(worldY) && isFinite(worldY)) setTrackingPoint({ x: worldX, y: worldY });
-              else setTrackingPoint(null);
-            } catch (e) {
-              setTrackingPoint(null);
-            }
-          }
-        } else {
-          setTrackingPoint(null);
-        }
-
-        let foundPoint: AnalysisPoint | null = null;
-        for (const point of analysisPoints) {
-          const screenX = (point.x - view.centerX) * view.zoom + canvas.width / 2;
-          const screenY = -(point.y - view.centerY) * view.zoom + canvas.height / 2;
-          if (Math.sqrt((canvasX - screenX) ** 2 + (canvasY - screenY) ** 2) < 15) {
-            foundPoint = point;
-            break;
-          }
-        }
-        setHoveredPoint(foundPoint);
-        return;
-      }
-      const dx = e.clientX - lastMousePos.current.x, dy = e.clientY - lastMousePos.current.y
-      setView((prev) => ({ ...prev, centerX: prev.centerX - dx / prev.zoom, centerY: prev.centerY + dy / prev.zoom }))
+    const handleMouseDown = (e: MouseEvent) => {
+      setIsPanning(true)
       lastMousePos.current = { x: e.clientX, y: e.clientY }
+      canvas.style.cursor = "grabbing"
     }
-    const handleWheel = (e: WheelEvent) => { e.preventDefault(); setView((prev) => ({ ...prev, zoom: Math.max(5, Math.min(1000, prev.zoom * (e.deltaY < 0 ? 1.1 : 1/1.1))) })) }
-    canvas.addEventListener("mousedown", handleMouseDown as EventListener); canvas.addEventListener("mouseup", handleMouseUp as EventListener); canvas.addEventListener("mouseleave", handleMouseLeave as EventListener); canvas.addEventListener("mousemove", handleMouseMove as EventListener); canvas.addEventListener("wheel", handleWheel as EventListener)
-    return () => { canvas.removeEventListener("mousedown", handleMouseDown as EventListener); canvas.removeEventListener("mouseup", handleMouseUp as EventListener); canvas.removeEventListener("mouseleave", handleMouseLeave as EventListener); canvas.removeEventListener("mousemove", handleMouseMove as EventListener); canvas.removeEventListener("wheel", handleWheel as EventListener) }
-  }, [isPanning, view.zoom, analysisPoints, view, showMouseTracking, equations, selectedGraphId])
 
+    const handleMouseUp = () => {
+      setIsPanning(false)
+      canvas.style.cursor = "crosshair"
+    }
+
+    const handleMouseLeave = () => {
+      setIsPanning(false)
+      setTrackingPoint(null)
+      setHoveredPoint(null)
+      canvas.style.cursor = "crosshair"
+    }
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!canvas) return
+      const rect = canvas.getBoundingClientRect()
+      // Use client dimensions for coordinate mapping
+      const width = canvas.clientWidth
+      const height = canvas.clientHeight
+
+      // Mouse pos relative to canvas
+      const canvasX = e.clientX - rect.left
+      const canvasY = e.clientY - rect.top
+
+      // Panning Logic
+      if (isPanning) {
+        const dx = e.clientX - lastMousePos.current.x
+        const dy = e.clientY - lastMousePos.current.y
+        setView(prev => ({
+          ...prev,
+          centerX: prev.centerX - dx / prev.zoom,
+          centerY: prev.centerY + dy / prev.zoom
+        }))
+        lastMousePos.current = { x: e.clientX, y: e.clientY }
+        return
+      }
+
+      // Tracking Logic
+      const toWorldX = (screenX: number) => (screenX - width / 2) / view.zoom + view.centerX
+
+      if (showMouseTracking) {
+        const worldX = toWorldX(canvasX)
+        // Find closest equation value
+        let closestY = Infinity
+        let closestEqColor = "#fff"
+        let minDist = Infinity
+
+        equations.filter(eq => eq.visible && eq.compiled).forEach(eq => {
+          try {
+            const worldY = eq.compiled!.evaluate({ x: worldX })
+            // Convert back to screen to check distance
+            const screenY = -(worldY - view.centerY) * view.zoom + height / 2
+            const dist = Math.abs(canvasY - screenY)
+
+            // Snap if within 50px vertical distance
+            if (dist < 50 && dist < minDist) {
+              minDist = dist
+              closestY = worldY
+              closestEqColor = eq.color
+            }
+          } catch (e) { }
+        })
+
+        if (minDist < Infinity) {
+          setTrackingPoint({ x: worldX, y: closestY, color: closestEqColor })
+        } else {
+          setTrackingPoint(null) // No graph near cursor
+        }
+      } else {
+        setTrackingPoint(null)
+      }
+
+      // Hover Analysis Point Logic
+      let foundPoint: AnalysisPoint | null = null
+      let minPointDist = 20 // Grab radius
+
+      for (const point of analysisPoints) {
+        const screenX = (point.x - view.centerX) * view.zoom + width / 2
+        const screenY = -(point.y - view.centerY) * view.zoom + height / 2
+        const dist = Math.sqrt((canvasX - screenX) ** 2 + (canvasY - screenY) ** 2)
+
+        if (dist < minPointDist) {
+          minPointDist = dist
+          foundPoint = point
+        }
+      }
+      setHoveredPoint(foundPoint)
+    }
+
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault()
+      // Zoom towards mouse pointer
+      const rect = canvas.getBoundingClientRect()
+      const mouseX = e.clientX - rect.left
+      const mouseY = e.clientY - rect.top
+      const width = canvas.clientWidth
+      const height = canvas.clientHeight
+
+      // World coordinates before zoom
+      const worldX = (mouseX - width / 2) / view.zoom + view.centerX
+      const worldY = -(mouseY - height / 2) / view.zoom + view.centerY
+
+      const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9
+      const newZoom = Math.max(5, Math.min(5000, view.zoom * zoomFactor))
+
+      // Adjust center so world X,Y remains at mouse X,Y
+      const newCenterX = worldX - (mouseX - width / 2) / newZoom
+      const newCenterY = worldY + (mouseY - height / 2) / newZoom
+
+      setView({ zoom: newZoom, centerX: newCenterX, centerY: newCenterY })
+    }
+
+    canvas.addEventListener("mousedown", handleMouseDown)
+    window.addEventListener("mouseup", handleMouseUp)
+    canvas.addEventListener("mouseleave", handleMouseLeave)
+    canvas.addEventListener("mousemove", handleMouseMove)
+    canvas.addEventListener("wheel", handleWheel, { passive: false })
+
+    return () => {
+      canvas.removeEventListener("mousedown", handleMouseDown)
+      window.removeEventListener("mouseup", handleMouseUp)
+      canvas.removeEventListener("mouseleave", handleMouseLeave)
+      canvas.removeEventListener("mousemove", handleMouseMove)
+      canvas.removeEventListener("wheel", handleWheel)
+    }
+  }, [isPanning, view, analysisPoints, showMouseTracking, equations])
+
+  // --- Render Loop ---
   useEffect(() => {
-    const canvas = canvasRef.current, ctx = canvas?.getContext("2d");
+    const canvas = canvasRef.current
+    const ctx = canvas?.getContext("2d")
     if (!canvas || !ctx) return
-    const width = canvas.width, height = canvas.height
+
+    // Use client dimensions for rendering logic
+    const width = canvas.clientWidth
+    const height = canvas.clientHeight
+
+    // Reset transform to identity then scale for high DPI
+    // Note: We already scaled context in ResizeObserver, but clearRect works on transformed coordinates
+    // It's safer to use the internal width/height for clearing
+    const dpr = window.devicePixelRatio || 1
+    ctx.clearRect(0, 0, canvas.width / dpr, canvas.height / dpr)
+
+    // Background
+    // ctx.fillStyle = "#0f172a" // Slate 950
+    // ctx.fillRect(0, 0, width, height)
+
+    // Coordinate Conversion Helpers
     const toScreenX = (worldX: number) => (worldX - view.centerX) * view.zoom + width / 2
     const toScreenY = (worldY: number) => -(worldY - view.centerY) * view.zoom + height / 2
     const toWorldX = (screenX: number) => (screenX - width / 2) / view.zoom + view.centerX
-    ctx.clearRect(0, 0, width, height)
-    ctx.fillStyle = "rgba(30, 41, 59, 0.85)"; ctx.fillRect(0, 0, width, height)
-    const gridSize = Math.pow(10, Math.floor(Math.log10(150 / view.zoom)));
-    ctx.strokeStyle = "rgba(51, 65, 85, 0.3)"; ctx.lineWidth = 0.5; ctx.font = "10px sans-serif"; ctx.fillStyle = "rgba(148, 163, 184, 0.6)"
-    for (let x = Math.floor(toWorldX(0) / gridSize) * gridSize; x < toWorldX(width); x += gridSize) { const screenX = toScreenX(x); if (screenX < 0 || screenX > width) continue; ctx.beginPath(); ctx.moveTo(screenX, 0); ctx.lineTo(screenX, height); ctx.stroke(); if (Math.abs(x) > 1e-9 && Math.abs(x / gridSize) % 2 === 0) ctx.fillText(x.toPrecision(2), screenX + 2, toScreenY(0) - 2) }
-    for (let y = Math.floor(toWorldX(height) / gridSize) * gridSize; y > toWorldX(0) - gridSize; y -= gridSize) { const screenY = toScreenY(y); if (screenY < 0 || screenY > height) continue; ctx.beginPath(); ctx.moveTo(0, screenY); ctx.lineTo(width, screenY); ctx.stroke(); if (Math.abs(y) > 1e-9 && Math.abs(y / gridSize) % 2 === 0) ctx.fillText(y.toPrecision(2), toScreenX(0) + 2, screenY - 2) }
-    ctx.strokeStyle = "rgba(148, 163, 184, 0.8)"; ctx.lineWidth = 1.5; const originX = toScreenX(0), originY = toScreenY(0); ctx.beginPath(); ctx.moveTo(0, originY); ctx.lineTo(width, originY); ctx.moveTo(originX, 0); ctx.lineTo(originX, height); ctx.stroke()
-    ctx.lineWidth = 2.5; ctx.lineCap = "round"
+
+    // --- Grid ---
+    const gridSize = Math.pow(10, Math.floor(Math.log10(100 / view.zoom)))
+
+    ctx.lineWidth = 1 / dpr // Hairline
+    ctx.font = "10px Inter, sans-serif"
+    ctx.textAlign = "center"
+    ctx.textBaseline = "top"
+
+    // Vertical Lines & Labels
+    const startX = Math.floor(toWorldX(0) / gridSize) * gridSize
+    const endX = toWorldX(width)
+
+    for (let x = startX; x < endX; x += gridSize) {
+      const sx = toScreenX(x)
+
+      // Axis Line vs Grid Line
+      if (Math.abs(x) < gridSize / 10) {
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.5)"
+        ctx.lineWidth = 2
+      } else {
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.1)"
+        ctx.lineWidth = 1
+      }
+
+      ctx.beginPath(); ctx.moveTo(sx, 0); ctx.lineTo(sx, height); ctx.stroke()
+
+      // Label
+      if (Math.abs(x) > gridSize / 10) {
+        ctx.fillStyle = "rgba(148, 163, 184, 0.8)"
+        ctx.fillText(parseFloat(x.toPrecision(4)).toString(), sx, toScreenY(0) + 6)
+      }
+    }
+
+    // Horizontal Lines & Labels
+    const startY = Math.floor(toWorldX(height) / gridSize) * gridSize // Approximation for Y range
+    // Actually calculate Y world range
+    const worldBottom = -(height - height / 2) / view.zoom + view.centerY
+    const worldTop = -(0 - height / 2) / view.zoom + view.centerY
+
+    const startYReal = Math.floor(worldBottom / gridSize) * gridSize
+
+    for (let y = startYReal; y < worldTop; y += gridSize) {
+      const sy = toScreenY(y)
+
+      if (Math.abs(y) < gridSize / 10) {
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.5)"
+        ctx.lineWidth = 2
+      } else {
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.1)"
+        ctx.lineWidth = 1
+      }
+
+      ctx.beginPath(); ctx.moveTo(0, sy); ctx.lineTo(width, sy); ctx.stroke()
+
+      if (Math.abs(y) > gridSize / 10) {
+        ctx.fillStyle = "rgba(148, 163, 184, 0.8)"
+        ctx.fillText(parseFloat(y.toPrecision(4)).toString(), toScreenX(0) - 15, sy - 4)
+      }
+    }
+
+    // --- Equations ---
     equations.forEach((eq) => {
-      if (!eq.compiled) return;
-      ctx.strokeStyle = eq.color; ctx.beginPath(); let firstPoint = true
-      for (let px = 0; px < width; px++) {
+      if (!eq.compiled || !eq.visible) return
+
+      ctx.strokeStyle = eq.color
+      ctx.lineWidth = 2.5
+      ctx.lineJoin = "round"
+      ctx.beginPath()
+
+      let isDrawing = false
+
+      // Draw in small chunks to handle asymptotes better
+      for (let px = 0; px < width; px += 2) {
         const x = toWorldX(px)
         try {
-          const y = eq.compiled.evaluate({ x: x });
-          if (isNaN(y) || !isFinite(y)) { firstPoint = true; continue }
+          const y = eq.compiled.evaluate({ x: x })
           const py = toScreenY(y)
-          if (firstPoint) { ctx.moveTo(px, py); firstPoint = false } else ctx.lineTo(px, py)
-        } catch (e) { firstPoint = true }
+
+          // Check for discontinuity / asymptote / NaN
+          if (isNaN(y) || !isFinite(y) || Math.abs(py) > height * 2) {
+            isDrawing = false
+            continue
+          }
+
+          if (!isDrawing) {
+            ctx.moveTo(px, py)
+            isDrawing = true
+          } else {
+            // Check if jump is too large (likely asymptote)
+            // const prevX = toWorldX(px - 2)
+            // const prevY = eq.compiled.evaluate({x: prevX})
+            // const prevPY = toScreenY(prevY)
+            // if (Math.abs(py - prevPY) > height) {
+            //   ctx.moveTo(px, py)
+            // } else {
+            ctx.lineTo(px, py)
+            // }
+          }
+        } catch (e) { isDrawing = false }
       }
       ctx.stroke()
     })
+
+    // --- Analysis Points ---
     analysisPoints.forEach((point) => {
-      const screenX = toScreenX(point.x), screenY = toScreenY(point.y)
-      if (screenX < 0 || screenX > width || screenY < 0 || screenY > height) return
+      const screenX = toScreenX(point.x)
+      const screenY = toScreenY(point.y)
+
+      // Don't draw if way off screen
+      if (screenX < -20 || screenX > width + 20 || screenY < -20 || screenY > height + 20) return
+
       ctx.fillStyle = point.type === "intersection" ? "#ffffff" : equations.find(eq => eq.id === point.equationId)?.color || "#ffffff"
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.8)"; ctx.lineWidth = 2; ctx.beginPath()
-      if (point.type === "root") { ctx.moveTo(screenX, screenY-6); ctx.lineTo(screenX+6, screenY); ctx.lineTo(screenX, screenY+6); ctx.lineTo(screenX-6, screenY); ctx.closePath() }
-      else if (point.type === "intersection") ctx.rect(screenX - 5, screenY - 5, 10, 10)
-      else ctx.arc(screenX, screenY, 5, 0, 2 * Math.PI)
-      ctx.fill(); ctx.stroke()
+      ctx.strokeStyle = "rgba(0, 0, 0, 0.5)"
+      ctx.lineWidth = 2
+
+      ctx.beginPath()
+      ctx.arc(screenX, screenY, 5, 0, 2 * Math.PI)
+      ctx.fill()
+      ctx.stroke()
     })
+
+    // --- Tracking Point ---
     if (trackingPoint && showMouseTracking) {
-      const screenX = toScreenX(trackingPoint.x), screenY = toScreenY(trackingPoint.y)
-      if (screenX >= 0 && screenX <= width && screenY >= 0 && screenY <= height) {
-        ctx.fillStyle = equations.find((eq) => eq.id === selectedGraphId)?.color || "#ffffff"; ctx.strokeStyle = "rgba(255, 255, 255, 0.9)"; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(screenX, screenY, 6, 0, 2 * Math.PI); ctx.fill(); ctx.stroke()
-        ctx.strokeStyle = "rgba(255, 255, 255, 0.4)"; ctx.lineWidth = 1; ctx.setLineDash([3, 3]); ctx.beginPath(); ctx.moveTo(screenX, 0); ctx.lineTo(screenX, height); ctx.moveTo(0, screenY); ctx.lineTo(width, screenY); ctx.stroke(); ctx.setLineDash([])
-      }
+      const screenX = toScreenX(trackingPoint.x)
+      const screenY = toScreenY(trackingPoint.y)
+
+      ctx.fillStyle = trackingPoint.color
+      ctx.strokeStyle = "white"
+      ctx.lineWidth = 3
+
+      ctx.beginPath()
+      ctx.arc(screenX, screenY, 6, 0, 2 * Math.PI)
+      ctx.fill()
+      ctx.stroke()
+
+      // Dotted lines to axes
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.3)"
+      ctx.lineWidth = 1
+      ctx.setLineDash([4, 4])
+
+      // Vertical
+      ctx.beginPath(); ctx.moveTo(screenX, 0); ctx.lineTo(screenX, height); ctx.stroke()
+      // Horizontal
+      ctx.beginPath(); ctx.moveTo(0, screenY); ctx.lineTo(width, screenY); ctx.stroke()
+
+      ctx.setLineDash([])
     }
-  }, [equations, view, analysisPoints, trackingPoint, showMouseTracking, selectedGraphId])
+
+  }, [equations, view, analysisPoints, trackingPoint, showMouseTracking])
+
+  // --- Logic Handlers ---
 
   const handleEquationChange = (id: number, newExpr: string) => {
     setEquations((prev) =>
       prev.map((eq) => {
         if (eq.id === id) {
-          if (!newExpr.trim()) return { ...eq, expr: newExpr, compiled: null };
-          try {
-            return { ...eq, expr: newExpr, compiled: math.compile(newExpr) };
-          } catch (e) {
-            return { ...eq, expr: newExpr, compiled: null };
+          // Try compile
+          let compiled = null
+          let error = false
+          if (newExpr.trim()) {
+            try {
+              compiled = math.compile(newExpr)
+            } catch (e) { error = true }
           }
+          return { ...eq, expr: newExpr, compiled, error }
         }
-        return eq;
+        return eq
       })
-    );
-  };
-  
-  const addEquation = () => { if (equations.length >= GRAPH_COLORS.length) return; const newId = (equations[equations.length - 1]?.id || 0) + 1; const newColor = GRAPH_COLORS[equations.length % GRAPH_COLORS.length]; setEquations((prev) => [...prev, { id: newId, expr: "", compiled: null, color: newColor }]); setSelectedGraphId(newId) }
-  const removeEquation = (id: number) => { if (equations.length === 1) return; setEquations((prev) => prev.filter((eq) => eq.id !== id)); if (selectedGraphId === id) setSelectedGraphId(equations.filter(eq => eq.id !== id)[0]?.id || 1) }
+    )
+  }
 
-  const selectedEquation = equations.find((eq) => eq.id === selectedGraphId) || equations[0]
-  
-  const getTooltipPosition = (point: { x: number; y: number } | null) => {
-    if (!point || !canvasRef.current) return null;
-    const canvas = canvasRef.current;
-    const toScreenX = (worldX: number) => (worldX - view.centerX) * view.zoom + canvas.width / 2;
-    const toScreenY = (worldY: number) => -(worldY - view.centerY) * view.zoom + canvas.height / 2;
-    return {
-      left: toScreenX(point.x),
-      bottom: canvas.height - toScreenY(point.y) + 12, // 12px gap
-    };
-  };
+  const toggleVisibility = (id: number) => {
+    setEquations(prev => prev.map(eq => eq.id === id ? { ...eq, visible: !eq.visible } : eq))
+  }
 
-  const hoveredTooltipPosition = getTooltipPosition(hoveredPoint);
-  const trackingTooltipPosition = getTooltipPosition(trackingPoint);
+  const deleteEquation = (id: number) => {
+    setEquations(prev => prev.filter(eq => eq.id !== id))
+  }
+
+  const addEquation = () => {
+    const newId = Math.max(0, ...equations.map(e => e.id)) + 1
+    const nextColor = GRAPH_COLORS[equations.length % GRAPH_COLORS.length]
+    setEquations([...equations, { id: newId, expr: "", compiled: null, color: nextColor, visible: true }])
+  }
 
   return (
-    <div className="w-full h-full flex flex-col bg-card/50 rounded-b-lg overflow-hidden">
-      <div className="flex-shrink-0">
-        <div className={`relative transition-all ${isGraphSelectorOpen ? 'border-transparent' : 'border-b border-border'}`}>
-          <div className="flex items-center justify-between p-3 gap-2">
-            <div className="flex items-center gap-2 flex-1 overflow-hidden">
-              <div className="w-1.5 h-6 rounded-full flex-shrink-0" style={{ backgroundColor: selectedEquation.color }} />
-              <label className="text-sm font-medium text-foreground flex-shrink-0">f(x) =</label>
-              <input type="text" value={selectedEquation.expr} onChange={(e) => handleEquationChange(selectedEquation.id, e.target.value)} className={`flex-1 min-w-0 bg-background/80 border-2 rounded-lg py-1 px-2 text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-cyan-400/50 focus:border-cyan-400 transition-all ${selectedEquation.expr && !selectedEquation.compiled ? "border-red-400" : "border-border"}`} placeholder="e.g., x^2, sin(x/2)"/>
+    <div className="w-full h-full flex bg-[#0f172a] relative overflow-hidden">
+
+      {/* --- Sidebar (Functions List) --- */}
+      <AnimatePresence>
+        {isSidebarOpen && (
+          <motion.div
+            initial={{ x: -320, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: -320, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            className="absolute top-4 bottom-4 left-4 w-80 glass-strong rounded-2xl z-20 flex flex-col border border-white/10 shadow-2xl overflow-hidden"
+          >
+            <div className="p-4 border-b border-white/10 flex items-center justify-between bg-white/5">
+              <h2 className="font-bold text-foreground flex items-center gap-2">
+                <Calculator className="w-5 h-5 text-cyan-400" />
+                Functions
+              </h2>
+              <button onClick={() => setIsSidebarOpen(false)} className="p-1 hover:bg-white/10 rounded-lg transition-colors">
+                <ChevronLeft size={18} />
+              </button>
             </div>
-            <button onClick={() => setIsGraphSelectorOpen(!isGraphSelectorOpen)} className="glass p-1.5 rounded-lg hover:bg-card/90 transition-all ml-auto flex-shrink-0"><Settings size={16} /></button>
-          </div>
-          <AnimatePresence>
-            {isGraphSelectorOpen && (
-              <>
-                <div className="fixed inset-0 z-40" onClick={() => setIsGraphSelectorOpen(false)} />
-                <motion.div className="absolute top-full left-0 right-0 bg-card/[0.98] backdrop-blur-xl border-t border-border/40 rounded-b-xl shadow-2xl z-50" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
-                  <div className="p-3 space-y-2 max-h-60 overflow-y-auto">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-foreground">All Graphs ({equations.length})</span>
-                      {equations.length < GRAPH_COLORS.length && (<button onClick={addEquation} className="flex items-center gap-1 text-xs text-cyan-400 hover:bg-slate-700/30 px-2 py-1 rounded transition-colors"><Plus size={14} /> Add</button>)}
-                    </div>
-                    {equations.map((eq) => (
-                      <div key={eq.id} className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-colors ${selectedGraphId === eq.id ? "bg-slate-700/50 border border-cyan-400/30" : "hover:bg-slate-700/30"}`} onClick={() => { setSelectedGraphId(eq.id); setIsGraphSelectorOpen(false) }}>
-                        <div className="w-1.5 h-6 rounded-full" style={{ backgroundColor: eq.color }} />
-                        <span className="text-sm text-foreground flex-1">f(x) = {eq.expr || "empty"}</span>
-                        <button onClick={(e) => { e.stopPropagation(); removeEquation(eq.id) }} disabled={equations.length === 1} className="p-1 rounded text-muted-foreground hover:text-destructive disabled:opacity-30 transition-colors"><Trash2 size={14} /></button>
-                      </div>
-                    ))}
+
+            <div className="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-3">
+              {equations.map((eq) => (
+                <motion.div
+                  layout
+                  key={eq.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className={`group relative bg-card/40 backdrop-blur-sm border rounded-xl p-3 transition-all duration-200 ${eq.error ? 'border-red-500/50 bg-red-500/5' : 'border-white/5 hover:border-white/20'}`}
+                  style={{ borderLeftColor: eq.color, borderLeftWidth: 4 }}
+                >
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-xs font-mono text-muted-foreground" style={{ color: eq.color }}>f{eq.id}(x) =</span>
+                    <div className="flex-1" />
+                    <button onClick={() => toggleVisibility(eq.id)} className="text-muted-foreground hover:text-white transition-colors p-1">
+                      {eq.visible ? <Eye size={14} /> : <EyeOff size={14} />}
+                    </button>
+                    <button onClick={() => deleteEquation(eq.id)} className="text-muted-foreground hover:text-red-400 transition-colors p-1">
+                      <Trash2 size={14} />
+                    </button>
                   </div>
+                  <input
+                    type="text"
+                    value={eq.expr}
+                    onChange={(e) => handleEquationChange(eq.id, e.target.value)}
+                    placeholder="Type expression..."
+                    className="w-full bg-transparent border-none outline-none text-lg font-medium text-foreground placeholder-white/20"
+                    spellCheck={false}
+                  />
+                  {eq.error && <div className="text-xs text-red-400 mt-1">Invalid syntax</div>}
                 </motion.div>
-              </>
-            )}
-          </AnimatePresence>
-        </div>
-        <div className={`flex flex-wrap items-center gap-2 p-3 min-h-[52px] transition-all ${isGraphSelectorOpen ? 'border-transparent' : 'border-b border-border'}`}>
-          <button onClick={() => setShowRoots(!showRoots)} className={`flex items-center gap-1.5 glass px-2 py-1 rounded text-xs transition-colors ${showRoots ? "bg-cyan-500/20 text-cyan-400 border-cyan-500/30" : "text-muted-foreground hover:bg-card/90"}`}><Target size={12} />Roots</button>
-          <button onClick={() => setShowExtrema(!showExtrema)} className={`flex items-center gap-1.5 glass px-2 py-1 rounded text-xs transition-colors ${showExtrema ? "bg-purple-500/20 text-purple-400 border-purple-500/30" : "text-muted-foreground hover:bg-card/90"}`}><TrendingDown size={12} />Extrema</button>
-          <button onClick={() => setShowIntersections(!showIntersections)} className={`flex items-center gap-1.5 glass px-2 py-1 rounded text-xs transition-colors ${showIntersections ? "bg-green-500/20 text-green-400 border-green-500/30" : "text-muted-foreground hover:bg-card/90"}`}><Move size={12} />Cross</button>
-          <button onClick={() => setShowMouseTracking(!showMouseTracking)} className={`flex items-center gap-1.5 glass px-2 py-1 rounded text-xs transition-colors ${showMouseTracking ? "bg-amber-500/20 text-amber-400 border-amber-500/30" : "text-muted-foreground hover:bg-card/90"}`}><Target size={12} />Track</button>
-        </div>
-      </div>
-      <div ref={containerRef} className="relative flex-grow p-1">
-        <canvas ref={canvasRef} className="w-full h-full rounded-lg cursor-grab" />
-        <div className="absolute bottom-2 right-3 text-xs text-muted-foreground flex items-center gap-1 pointer-events-none">
-          <Move size={12} />
-          <span className="hidden sm:inline">Pan & Scroll to Zoom</span>
-        </div>
+              ))}
+
+              <button
+                onClick={addEquation}
+                className="w-full py-3 rounded-xl border border-dashed border-white/20 text-muted-foreground hover:text-white hover:border-white/40 hover:bg-white/5 transition-all flex items-center justify-center gap-2"
+              >
+                <Plus size={18} />
+                Add Function
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* --- Sidebar Toggle (When Closed) --- */}
+      {!isSidebarOpen && (
+        <button
+          onClick={() => setIsSidebarOpen(true)}
+          className="absolute top-6 left-6 z-20 glass p-3 rounded-xl hover:bg-white/20 transition-all shadow-lg"
+        >
+          <ChevronRight className="text-white" />
+        </button>
+      )}
+
+      {/* --- Main Canvas --- */}
+      <div ref={containerRef} className="flex-1 relative h-full w-full cursor-crosshair">
+        <canvas ref={canvasRef} className="block w-full h-full touch-none" />
+
+        {/* --- Tooltip --- */}
         <AnimatePresence>
-          {hoveredPoint && hoveredTooltipPosition && (
+          {(hoveredPoint || trackingPoint) && (
             <motion.div
-              key="hover-tooltip"
-              className="absolute z-10 glass-strong rounded-lg px-2 py-1 text-xs text-foreground pointer-events-none shadow-xl"
-              style={{
-                left: hoveredTooltipPosition.left,
-                bottom: hoveredTooltipPosition.bottom,
-                transform: "translateX(-50%)",
-              }}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0, scale: 0.9, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.1 }}
-            >
-              {hoveredPoint.info}
-            </motion.div>
-          )}
-          {trackingPoint && showMouseTracking && trackingTooltipPosition && (
-            <motion.div
-              key="track-tooltip"
-              className="absolute z-10 bg-amber-800/95 backdrop-blur-lg border border-amber-700/50 rounded-lg px-2 py-1 text-xs text-amber-100 pointer-events-none shadow-xl"
+              className="absolute z-30 pointer-events-none"
               style={{
-                left: trackingTooltipPosition.left,
-                bottom: trackingTooltipPosition.bottom,
-                transform: "translateX(-50%)",
+                left: (function () {
+                  if (hoveredPoint) return (hoveredPoint.x - view.centerX) * view.zoom + containerRef.current!.clientWidth / 2
+                  if (trackingPoint) return (trackingPoint.x - view.centerX) * view.zoom + containerRef.current!.clientWidth / 2
+                  return 0
+                })(),
+                top: (function () {
+                  if (hoveredPoint) return -(hoveredPoint.y - view.centerY) * view.zoom + containerRef.current!.clientHeight / 2 - 50
+                  if (trackingPoint) return -(trackingPoint.y - view.centerY) * view.zoom + containerRef.current!.clientHeight / 2 - 50
+                  return 0
+                })(),
+                transform: 'translate(-50%, 0)'
               }}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.1 }}
             >
-              ({(Math.abs(trackingPoint.x) < 1e-6 ? 0 : trackingPoint.x.toFixed(3))}, {(Math.abs(trackingPoint.y) < 1e-6 ? 0 : trackingPoint.y.toFixed(3))})
+              <div className="glass-strong px-3 py-2 rounded-lg text-xs font-medium text-white shadow-xl border border-white/10 backdrop-blur-md">
+                {hoveredPoint ? hoveredPoint.info : `(${trackingPoint?.x.toFixed(2)}, ${trackingPoint?.y.toFixed(2)})`}
+              </div>
+              {/* Arrow pointer */}
+              <div className="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] border-t-white/20 mx-auto" />
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* --- Bottom Tool Dock --- */}
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
+          <motion.div
+            className="glass-strong p-1.5 rounded-2xl border border-white/10 shadow-2xl flex items-center gap-1"
+            initial={{ y: 50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+          >
+            <ToolButton
+              active={showRoots}
+              onClick={() => setShowRoots(!showRoots)}
+              icon={Target}
+              label="Roots"
+              color="cyan"
+            />
+            <ToolButton
+              active={showExtrema}
+              onClick={() => setShowExtrema(!showExtrema)}
+              icon={TrendingDown}
+              label="Extrema"
+              color="purple"
+            />
+            <ToolButton
+              active={showIntersections}
+              onClick={() => setShowIntersections(!showIntersections)}
+              icon={Move}
+              label="Intersect"
+              color="green"
+            />
+            <div className="w-px h-8 bg-white/10 mx-1" />
+            <ToolButton
+              active={showMouseTracking}
+              onClick={() => setShowMouseTracking(!showMouseTracking)}
+              icon={Search}
+              label="Trace"
+              color="amber"
+            />
+          </motion.div>
+        </div>
+
+        {/* --- Zoom Controls --- */}
+        <div className="absolute bottom-6 right-6 z-20 flex flex-col gap-2">
+          <button
+            onClick={() => setView(prev => ({ ...prev, zoom: prev.zoom * 1.2 }))}
+            className="glass p-3 rounded-full hover:bg-white/20 transition-colors"
+          >
+            <Plus size={20} />
+          </button>
+          <button
+            onClick={() => setView(prev => ({ ...prev, zoom: prev.zoom / 1.2 }))}
+            className="glass p-3 rounded-full hover:bg-white/20 transition-colors"
+          >
+            <Minus size={20} />
+          </button>
+          <button
+            onClick={() => setView({ zoom: 40, centerX: 0, centerY: 0 })}
+            className="glass p-3 rounded-full hover:bg-white/20 transition-colors mt-2"
+            title="Reset View"
+          >
+            <Maximize size={20} />
+          </button>
+        </div>
+
       </div>
     </div>
+  )
+}
+
+// Helper Component for Tools
+const ToolButton = ({ active, onClick, icon: Icon, label, color }: any) => {
+  const colorClasses: Record<string, string> = {
+    cyan: "bg-cyan-500/20 text-cyan-300 border-cyan-500/30",
+    purple: "bg-purple-500/20 text-purple-300 border-purple-500/30",
+    green: "bg-green-500/20 text-green-300 border-green-500/30",
+    amber: "bg-amber-500/20 text-amber-300 border-amber-500/30",
+  }
+
+  return (
+    <button
+      onClick={onClick}
+      className={`
+        flex flex-col items-center justify-center w-16 h-14 rounded-xl transition-all duration-200 border
+        ${active
+          ? colorClasses[color]
+          : "border-transparent text-muted-foreground hover:bg-white/5 hover:text-white"
+        }
+      `}
+    >
+      <Icon size={20} className={`mb-1 ${active ? "" : "opacity-70"}`} />
+      <span className="text-[10px] font-medium">{label}</span>
+    </button>
   )
 }

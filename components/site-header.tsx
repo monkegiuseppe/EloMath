@@ -2,24 +2,61 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ThemeToggle } from "./theme-toggle";
 import { Bug, Github, HelpCircle } from "lucide-react";
 import HelpModal from "./help-modal";
+import { cn } from "@/lib/utils";
 
 export function SiteHeader() {
   const [isHelpOpen, setIsHelpOpen] = useState(false);
+  // FOR TESTING: Default to true so you can see it immediately
+  const [highlightHelp, setHighlightHelp] = useState(true);
+
+  useEffect(() => {
+    // FOR TESTING: Commented out the check so it always shows
+    // const hasSeen = localStorage.getItem("elomath-help-seen");
+    // if (!hasSeen) {
+    //   setHighlightHelp(true);
+    // }
+  }, []);
+
+  const handleOpenHelp = () => {
+    setIsHelpOpen(true);
+    // Once clicked, remove highlight (this resets on refresh due to the change above)
+    if (highlightHelp) {
+      setHighlightHelp(false);
+      localStorage.setItem("elomath-help-seen", "true");
+    }
+  };
 
   return (
     <>
       <div className="fixed top-2 right-2 sm:top-4 sm:right-4 z-50 flex items-center gap-1 sm:gap-2">
         <button
-          onClick={() => setIsHelpOpen(true)}
+          onClick={handleOpenHelp}
           aria-label="Help & Guide"
           title="Help & Guide"
-          className="glass p-2 sm:p-3 rounded-full hover:glass-strong transition-colors duration-300 group"
+          className={cn(
+            "glass p-2 sm:p-3 rounded-full transition-all duration-300 group relative",
+            // Conditional styling for new users
+            highlightHelp
+              ? "bg-cyan-500/20 border-cyan-400/50 hover:bg-cyan-500/30 shadow-[0_0_15px_rgba(34,211,238,0.3)]"
+              : "hover:glass-strong"
+          )}
         >
-          <HelpCircle className="w-5 h-5 sm:w-6 sm:h-6 text-foreground/80 group-hover:text-foreground transition-colors" />
+          {highlightHelp && (
+            <span className="absolute -top-1 -right-1 flex h-3 w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-cyan-500"></span>
+            </span>
+          )}
+          <HelpCircle
+            className={cn(
+              "w-5 h-5 sm:w-6 sm:h-6 transition-colors",
+              highlightHelp ? "text-cyan-400" : "text-foreground/80 group-hover:text-foreground"
+            )}
+          />
         </button>
         <a
           href="https://github.com/monkegiuseppe"
@@ -43,7 +80,7 @@ export function SiteHeader() {
         </a>
         <ThemeToggle />
       </div>
-      
+
       <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
     </>
   );
