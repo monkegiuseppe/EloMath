@@ -8,8 +8,8 @@ import { motion } from "framer-motion"
 import { Brain, Calculator, Atom, BarChart3, LogIn, LogOut, LucideProps, BookOpen } from "lucide-react"
 import Workspace from "../components/workspace"
 import Progress from "../components/progress"
-import { useSession, signIn, signOut } from "next-auth/react" 
-import Image from "next/image" 
+import { useSession, signIn, signOut } from "next-auth/react"
+import Image from "next/image"
 
 interface MenuItem {
   id: 'practice-math' | 'practice-physics' | 'progress' | 'workspace';
@@ -21,7 +21,7 @@ interface MenuItem {
 export default function Home() {
   const [currentView, setCurrentView] = useState("home")
   const [sessionType, setSessionType] = useState<'math' | 'physics' | 'default'>('default');
-  const { data: session, status } = useSession(); 
+  const { data: session, status } = useSession();
 
   const menuItems: MenuItem[] = [
     { id: "practice-math", label: "Math Practice", icon: Calculator, description: "Calculus, Linear Algebra, etc." },
@@ -84,13 +84,13 @@ export default function Home() {
               {status === 'authenticated' ? (
                 // If the user is logged in, show their info and a sign-out button
                 <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2 glass px-4 py-2 rounded-xl">
-                      {session.user?.image && <Image src={session.user.image} alt="User avatar" width={24} height={24} className="rounded-full" />}
-                      <span className="text-sm font-medium text-foreground">{session.user?.name}</span>
-                    </div>
-                    <button onClick={() => signOut()} className="glass px-4 py-3 rounded-xl flex items-center gap-2 text-foreground hover:bg-card/90" title="Sign Out">
-                      <LogOut size={20} />
-                    </button>
+                  <div className="flex items-center gap-2 glass px-4 py-2 rounded-xl">
+                    {session.user?.image && <Image src={session.user.image} alt="User avatar" width={24} height={24} className="rounded-full" />}
+                    <span className="text-sm font-medium text-foreground">{session.user?.name}</span>
+                  </div>
+                  <button onClick={() => signOut()} className="glass px-4 py-3 rounded-xl flex items-center gap-2 text-foreground hover:bg-card/90" title="Sign Out">
+                    <LogOut size={20} />
+                  </button>
                 </div>
               ) : (
                 // If the user is not logged in, show the sign-in button

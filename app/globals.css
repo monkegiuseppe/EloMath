@@ -25,27 +25,32 @@
     --input: 30 41 59;
     --destructive: 239 68 68;
     --destructive-foreground: 248 250 252;
-    
+
 
     /* Primary, Secondary are White, so Foreground must be Dark */
     --primary: 248 250 252;
-    --primary-foreground: 15 23 42; 
+    --primary-foreground: 15 23 42;
     --secondary: 248 250 252;
     --secondary-foreground: 15 23 42;
-    
+
     /* Accent: Used for hovers. Set to a lighter slate (not white) for better contrast with white text */
     --accent: 51 65 85;
     --accent-foreground: 248 250 252;
-    
+
     /* Ring color is now based on Foreground (White) */
     --ring: 248 250 252 / 0.5;
 
     /* Chart colors updated to a neutral, white, and red palette */
-    --chart-1: 148 163 184; /* Muted Grey */
-    --chart-2: 248 250 252; /* White */
-    --chart-3: 148 163 184; /* Muted Grey */
-    --chart-4: 239 68 68;   /* Destructive Red */
-    --chart-5: 244 114 182; /* Pink */
+    --chart-1: 148 163 184;
+    /* Muted Grey */
+    --chart-2: 248 250 252;
+    /* White */
+    --chart-3: 148 163 184;
+    /* Muted Grey */
+    --chart-4: 239 68 68;
+    /* Destructive Red */
+    --chart-5: 244 114 182;
+    /* Pink */
 
 
     --radius: 0.5rem;
@@ -59,14 +64,13 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
-    background: linear-gradient(
-      135deg,
-      rgb(var(--gradient-from)) 0%,
-      rgb(var(--gradient-via)) 50%,
-      rgb(var(--gradient-to)) 100%
-    );
+    background: linear-gradient(135deg,
+        rgb(var(--gradient-from)) 0%,
+        rgb(var(--gradient-via)) 50%,
+        rgb(var(--gradient-to)) 100%);
     min-height: 100vh;
   }
 }
@@ -74,15 +78,15 @@
 @layer utilities {
   .glass {
     @apply bg-card/90 backdrop-blur-md border border-border/40;
-    box-shadow: none; 
+    box-shadow: none;
   }
-  
+
   @media (min-width: 768px) {
     .glass {
       @apply bg-card/75 backdrop-blur-lg border-border/35;
     }
   }
-  
+
   @media (min-width: 1024px) {
     .glass {
       @apply bg-card/60 backdrop-blur-xl border-border/30;
@@ -91,15 +95,15 @@
 
   .glass-strong {
     @apply bg-card/95 backdrop-blur-lg border border-border/50;
-    box-shadow: none; 
+    box-shadow: none;
   }
-  
+
   @media (min-width: 768px) {
     .glass-strong {
       @apply bg-card/90 backdrop-blur-xl border-border/45;
     }
   }
-  
+
   @media (min-width: 1024px) {
     .glass-strong {
       @apply bg-card/80 backdrop-blur-2xl border-border/40;
@@ -113,13 +117,13 @@
   .responsive-container {
     @apply p-2;
   }
-  
+
   @media (min-width: 768px) {
     .responsive-container {
       @apply p-4;
     }
   }
-  
+
   @media (min-width: 1024px) {
     .responsive-container {
       @apply p-6;
@@ -198,22 +202,18 @@
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: linear-gradient(
-    180deg,
-    rgba(248, 250, 252, 0.4) 0%,
-    rgba(248, 250, 252, 0.2) 100%
-  );
+  background: linear-gradient(180deg,
+      rgba(248, 250, 252, 0.4) 0%,
+      rgba(248, 250, 252, 0.2) 100%);
   border-radius: 10px;
   border: 2px solid rgba(30, 41, 59, 0.3);
   backdrop-filter: blur(10px);
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(
-    180deg,
-    rgba(248, 250, 252, 0.6) 0%,
-    rgba(248, 250, 252, 0.4) 100%
-  );
+  background: linear-gradient(180deg,
+      rgba(248, 250, 252, 0.6) 0%,
+      rgba(248, 250, 252, 0.4) 100%);
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:active {
@@ -236,21 +236,17 @@ body::-webkit-scrollbar-track {
 }
 
 body::-webkit-scrollbar-thumb {
-  background: linear-gradient(
-    180deg,
-    rgba(248, 250, 252, 0.4) 0%,
-    rgba(248, 250, 252, 0.2) 100%
-  );
+  background: linear-gradient(180deg,
+      rgba(248, 250, 252, 0.4) 0%,
+      rgba(248, 250, 252, 0.2) 100%);
   border-radius: 10px;
   border: 2px solid rgba(30, 41, 59, 0.3);
 }
 
 body::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(
-    180deg,
-    rgba(248, 250, 252, 0.6) 0%,
-    rgba(248, 250, 252, 0.4) 100%
-  );
+  background: linear-gradient(180deg,
+      rgba(248, 250, 252, 0.6) 0%,
+      rgba(248, 250, 252, 0.4) 100%);
 }
 
 .notepad-content:empty:before {
