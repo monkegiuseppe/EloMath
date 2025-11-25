@@ -39,7 +39,7 @@ export function ThemeToggle() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          className="glass p-3 rounded-full hover:glass-strong transition-all duration-300 group flex items-center gap-1"
+          className="glass p-3 rounded-full hover:glass-strong transition-all duration-300 group flex items-center gap-1 outline-none focus:outline-none focus-visible:ring-0"
           aria-label="Select theme"
         >
           <div className="relative w-6 h-6">
