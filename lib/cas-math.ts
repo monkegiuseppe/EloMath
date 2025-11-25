@@ -13,6 +13,8 @@ math.import({
   infinity: Infinity,
 }, { override: true });
 
+const MAX_ITERATIONS = 50;
+
 function latexToMathJS(latex: string): string {
   let s = latex;
 
@@ -22,13 +24,12 @@ function latexToMathJS(latex: string): string {
   s = s.replace(/\\text\{([^}]+)\}/g, "$1");
   s = s.replace(/\\,/g, "");
 
-  while (s.includes("\\frac{")) {
-    s = s.replace(/\\frac\{([^{}]+)\}\{([^{}]+)\}/g, "($1)/($2)");
-    if (s.includes("\\frac{") && !s.match(/\\frac\{([^{}]+)\}\{([^{}]+)\}/)) {
-      s = s.replace(/\\frac/g, "");
-      break;
-    }
+  let iterations = 0;
+  while (s.includes("\\frac{") && iterations < 10) {
+    s = s.replace(/\\frac\{([^{}]+)\}\{([^{}]+)\}/g, "(($1)/($2))");
+    iterations++;
   }
+  s = s.replace(/\\frac/g, "");
 
   const replacements: [RegExp, string][] = [
     [/\\sqrt\[3\]\{([^{}]+)\}/g, "cbrt($1)"],
@@ -41,7 +42,6 @@ function latexToMathJS(latex: string): string {
     [/\\cdot/g, "*"], [/\\times/g, "*"], [/\\ast/g, "*"],
     [/\\pi/g, "pi"], [/\\theta/g, "theta"],
     [/\\infty/g, "Infinity"],
-    [/\^/g, "^"],
   ];
 
   replacements.forEach(([regex, replacement]) => {
@@ -49,315 +49,792 @@ function latexToMathJS(latex: string): string {
   });
 
   s = s.replace(/\{/g, "(").replace(/\}/g, ")");
-
-  s = s.replace(/(\d)([a-zA-Z\\(])/g, '$1*$2');
-  s = s.replace(/(\))([a-zA-Z0-9\\(])/g, '$1*$2');
+  s = s.replace(/(\d)([a-zA-Z(])/g, '$1*$2');
+  s = s.replace(/(\))([a-zA-Z0-9(])/g, '$1*$2');
 
   return s;
 }
 
 function formatNumberLatex(num: number): string {
+  if (!isFinite(num)) {
+    if (num === Infinity) return "\\infty";
+    if (num === -Infinity) return "-\\infty";
+    return "undefined";
+  }
+
   if (Math.abs(num) < 1e-10) return "0";
 
-  if (Math.abs(num - Math.round(num)) < 1e-9) return Math.round(num).toString();
+  if (Math.abs(num - Math.round(num)) < 1e-9) {
+    return Math.round(num).toString();
+  }
+
   try {
     const f = math.fraction(num);
-    // Only accept "simple" fractions (small denominator)
-    if ((f as any).d < 1000) {
-      const ratio = math.format(f, { fraction: 'ratio' });
-      if (ratio.includes("/")) {
-        const [n, d] = ratio.split("/");
-        return `\\frac{${n}}{${d}}`;
-      }
-      return ratio;
+    const n = Number((f as any).n);
+    const d = Number((f as any).d);
+    const s = Number((f as any).s);
+
+    if (d < 1000 && d > 1) {
+      const sign = s < 0 ? '-' : '';
+      return `${sign}\\frac{${Math.abs(n)}}{${d}}`;
     }
   } catch (e) { }
 
-  // 3. Fallback to fixed decimal
-  return parseFloat(num.toFixed(4)).toString();
+  return parseFloat(num.toFixed(6)).toString();
 }
 
-function simplifyRadicalLatex(num: number): string {
-  if (num < 0) return `\\sqrt{${num}}`;
-  const n = Math.round(num);
-  if (Math.abs(n - num) > 1e-6) return `\\sqrt{${parseFloat(num.toFixed(4))}}`;
-
-  let maxSquare = 1;
-  for (let i = 2; i * i <= n; i++) {
-    if (n % (i * i) === 0) {
-      maxSquare = i * i;
-    }
+function isBalanced(s: string): boolean {
+  let count = 0;
+  for (const c of s) {
+    if (c === '(') count++;
+    if (c === ')') count--;
+    if (count < 0) return false;
   }
-
-  const outside = Math.sqrt(maxSquare);
-  const inside = n / maxSquare;
-
-  if (inside === 1) return outside.toString();
-  if (outside === 1) return `\\sqrt{${inside}}`;
-  return `${outside}\\sqrt{${inside}}`;
+  return count === 0;
 }
 
-function getGcd(x: number, y: number): number {
-  x = Math.abs(x); y = Math.abs(y);
-  while (y) { var t = y; y = x % y; x = t; }
-  return x;
-}
+function splitIntoTerms(expr: string): string[] {
+  const terms: string[] = [];
+  let current = '';
+  let depth = 0;
 
-function solveNumerically(expr: any, variable: string, initialGuess = 1): string {
-  let x = initialGuess;
-  for (let i = 0; i < 20; i++) {
-    try {
-      const y = expr.evaluate({ [variable]: x });
-      // Approximate derivative
-      const h = 0.0001;
-      const y_plus = expr.evaluate({ [variable]: x + h });
-      const dy = (y_plus - y) / h;
+  for (let i = 0; i < expr.length; i++) {
+    const c = expr[i];
 
-      if (Math.abs(dy) < 1e-9) break; // stationary point
-      const nextX = x - y / dy;
+    if (c === '(') depth++;
+    else if (c === ')') depth--;
 
-      if (Math.abs(nextX - x) < 1e-6) {
-        return formatNumberLatex(nextX);
+    if (depth === 0 && (c === '+' || c === '-') && i > 0) {
+      if (current.trim()) {
+        terms.push(current.trim());
       }
-      x = nextX;
-    } catch (e) {
-      return "Error";
+      current = c;
+    } else {
+      current += c;
     }
   }
-  return "No solution found";
+
+  if (current.trim()) {
+    terms.push(current.trim());
+  }
+
+  return terms;
 }
+
+function safeEvaluate(expr: any, scope: Record<string, number>): number | null {
+  try {
+    const result = expr.evaluate(scope);
+    if (typeof result === 'number' && isFinite(result)) {
+      return result;
+    }
+    return null;
+  } catch (e) {
+    return null;
+  }
+}
+
 
 function solveEquation(equationStr: string, variable: string): string {
   try {
     const parts = equationStr.split("=");
-    let exprStr = parts[0];
-    if (parts.length > 1) {
-      exprStr = `(${parts[0]}) - (${parts[1]})`;
-    }
+    let exprStr: string;
 
-    const expr = math.compile(exprStr);
-
-    const c = expr.evaluate({ [variable]: 0 });
-    const val1 = expr.evaluate({ [variable]: 1 });
-    const valMinus1 = expr.evaluate({ [variable]: -1 });
-    let a = (val1 + valMinus1) / 2 - c;
-    let b = (val1 - valMinus1) / 2;
-    let c_term = c;
-
-    const roundIfClose = (n: number) => Math.abs(n - Math.round(n)) < 1e-6 ? Math.round(n) : n;
-    a = roundIfClose(a);
-    b = roundIfClose(b);
-    c_term = roundIfClose(c_term);
-
-    const threshold = 1e-10;
-
-    const valTest = expr.evaluate({ [variable]: 10 });
-    const predicted = a * 100 + b * 10 + c_term;
-
-    if (Math.abs(valTest - predicted) > 0.001) {
-      return solveNumerically(expr, variable);
-    }
-
-    if (Math.abs(a) < threshold) {
-      if (Math.abs(b) < threshold) return "No solution";
-      const res = -c_term / b;
-      return formatNumberLatex(res);
-    }
-
-    const discriminant = b * b - 4 * a * c_term;
-
-    if (discriminant < 0) {
-      const real = -b / (2 * a);
-      const imag = Math.sqrt(-discriminant) / (2 * a);
-      return `${formatNumberLatex(real)} \\pm ${formatNumberLatex(imag)}i`;
-    }
-
-    const rootD = Math.sqrt(discriminant);
-    if (Math.abs(rootD - Math.round(rootD)) < 1e-6) {
-      const r1 = (-b + Math.round(rootD)) / (2 * a);
-      const r2 = (-b - Math.round(rootD)) / (2 * a);
-      if (Math.abs(r1 - r2) < threshold) return formatNumberLatex(r1);
-      return `${formatNumberLatex(r1)}, ${formatNumberLatex(r2)}`;
+    if (parts.length === 2) {
+      exprStr = `(${parts[0].trim()}) - (${parts[1].trim()})`;
+    } else if (parts.length === 1) {
+      exprStr = parts[0].trim();
     } else {
-      const n = Math.round(discriminant);
-      let maxSquare = 1;
-      for (let i = 2; i * i <= n; i++) {
-        if (n % (i * i) === 0) {
-          maxSquare = i * i;
-        }
-      }
-      const rootCoeff = Math.sqrt(maxSquare);
-      const insideRoot = n / maxSquare;
+      return "Error: Invalid equation format";
+    }
 
-      let termB = -b;
-      let termRoot = rootCoeff;
-      let termDenom = 2 * a;
+    let expr: any;
+    try {
+      expr = math.compile(exprStr);
+    } catch (e) {
+      return "Error: Cannot parse expression";
+    }
 
-      if (termDenom < 0) {
-        termB = -termB;
-        termDenom = -termDenom;
-      }
+    const analysis = detectEquationType(expr, variable);
 
-      let commonDivisor = 1;
-      if (Math.abs(termB) < threshold) {
-        commonDivisor = getGcd(Math.round(termRoot), Math.round(termDenom));
-      } else {
-        const gcd1 = getGcd(Math.round(termB), Math.round(termRoot));
-        commonDivisor = getGcd(gcd1, Math.round(termDenom));
-      }
+    if (analysis.type === 'error') {
+      return "Error: Cannot analyze equation";
+    }
 
-      termB /= commonDivisor;
-      termRoot /= commonDivisor;
-      termDenom /= commonDivisor;
-
-      let rootPart = "";
-      if (termRoot === 1) rootPart = `\\sqrt{${insideRoot}}`;
-      else rootPart = `${formatNumberLatex(termRoot)}\\sqrt{${insideRoot}}`;
-
-      if (Math.abs(termB) < threshold) {
-        if (termDenom === 1) return `\\pm ${rootPart}`;
-        return `\\pm \\frac{${rootPart}}{${formatNumberLatex(termDenom)}}`;
-      }
-
-      if (termDenom === 1) {
-        return `${formatNumberLatex(termB)} \\pm ${rootPart}`;
-      }
-
-      return `\\frac{${formatNumberLatex(termB)} \\pm ${rootPart}}{${formatNumberLatex(termDenom)}}`;
+    switch (analysis.type) {
+      case 'linear':
+        return solveLinear(analysis.a!, analysis.b!);
+      case 'quadratic':
+        return solveQuadratic(analysis.a!, analysis.b!, analysis.c!);
+      case 'rational':
+      case 'other':
+        return solveNumerically(expr, variable, analysis.hints || [1, -1, 0.5, 2]);
+      default:
+        return solveNumerically(expr, variable, [1, -1, 0.5]);
     }
 
   } catch (e) {
+    console.error('Solve error:', e);
     return "Error";
   }
 }
 
-function integrateTerm(term: string, variable: string): string {
-  term = term.replace(/\s/g, "");
-  const varPlaceholder = "VAR";
-  const normalized = term.split(variable).join(varPlaceholder);
+interface EquationAnalysis {
+  type: 'linear' | 'quadratic' | 'rational' | 'other' | 'error';
+  a?: number;
+  b?: number;
+  c?: number;
+  hints?: number[];
+}
 
-  const powerRule = /^([+-]?[\d\.]*)?[\*]?VAR(?:\^([+-]?[\d\.]+))?$/;
-  const powerMatch = normalized.match(powerRule);
+function detectEquationType(expr: any, variable: string): EquationAnalysis {
+  const testPoints = [1, 2, 3, -1, -2, 0.5, -0.5];
+  const values: { x: number; y: number }[] = [];
 
-  if (powerMatch) {
-    let coeff = 1;
-    if (powerMatch[1] === "-") coeff = -1;
-    else if (powerMatch[1] && powerMatch[1] !== "+") coeff = parseFloat(powerMatch[1]);
+  for (const x of testPoints) {
+    const y = safeEvaluate(expr, { [variable]: x });
+    if (y !== null) {
+      values.push({ x, y });
+    }
+  }
 
-    let power = 1;
-    if (powerMatch[2]) power = parseFloat(powerMatch[2]);
+  if (values.length < 3) {
+    const hints: number[] = [];
+    for (let x = -10; x <= 10; x += 0.5) {
+      const y = safeEvaluate(expr, { [variable]: x });
+      if (y !== null && Math.abs(y) < 1000) {
+        hints.push(x);
+        if (hints.length >= 5) break;
+      }
+    }
+    return { type: 'rational', hints: hints.length > 0 ? hints : [1, -1, 2] };
+  }
 
-    if (power === -1) {
-      const cStr = formatNumberLatex(coeff);
-      if (cStr === "1") return `\\ln(${variable})`;
-      if (cStr === "-1") return `-\\ln(${variable})`;
-      return `${cStr}\\ln(${variable})`;
+  const [p1, p2, p3] = values;
+
+  const slope1 = (p2.y - p1.y) / (p2.x - p1.x);
+  const slope2 = (p3.y - p2.y) / (p3.x - p2.x);
+
+  if (Math.abs(slope1 - slope2) < 0.001) {
+    const a = slope1;
+    const b = p1.y - a * p1.x;
+    return { type: 'linear', a, b };
+  }
+
+  try {
+    const [[x1, y1], [x2, y2], [x3, y3]] = values.slice(0, 3).map(p => [p.x, p.y]);
+
+    const denom = (x1 - x2) * (x1 - x3) * (x2 - x3);
+    if (Math.abs(denom) < 1e-10) {
+      return { type: 'other', hints: values.map(v => v.x) };
     }
 
-    const newPower = power + 1;
-    const newCoeff = coeff / newPower;
-    const coeffStr = formatNumberLatex(newCoeff);
+    const a = (x3 * (y2 - y1) + x2 * (y1 - y3) + x1 * (y3 - y2)) / denom;
+    const b = (x3 * x3 * (y1 - y2) + x2 * x2 * (y3 - y1) + x1 * x1 * (y2 - y3)) / denom;
+    const c = (x2 * x3 * (x2 - x3) * y1 + x3 * x1 * (x3 - x1) * y2 + x1 * x2 * (x1 - x2) * y3) / denom;
 
-    let prefix = coeffStr;
-    if (coeffStr === "1") prefix = "";
-    if (coeffStr === "-1") prefix = "-";
+    if (values.length >= 4) {
+      const p4 = values[3];
+      const predicted = a * p4.x * p4.x + b * p4.x + c;
+      if (Math.abs(predicted - p4.y) < 0.01) {
+        return { type: 'quadratic', a, b, c };
+      }
+    } else if (Math.abs(a) > 1e-6) {
+      return { type: 'quadratic', a, b, c };
+    }
+  } catch (e) { }
 
-    return `${prefix}${variable}^{${newPower}}`;
+  const hints = values
+    .filter(v => Math.abs(v.y) < 10)
+    .sort((a, b) => Math.abs(a.y) - Math.abs(b.y))
+    .slice(0, 3)
+    .map(v => v.x);
+
+  return { type: 'other', hints: hints.length > 0 ? hints : [1, -1, 0] };
+}
+
+function solveLinear(a: number, b: number): string {
+  if (Math.abs(a) < 1e-10) {
+    if (Math.abs(b) < 1e-10) return "All real numbers";
+    return "No solution";
+  }
+  return formatNumberLatex(-b / a);
+}
+
+function solveQuadratic(a: number, b: number, c: number): string {
+  if (Math.abs(a) < 1e-10) {
+    return solveLinear(b, c);
   }
 
-  if (!normalized.includes(varPlaceholder)) {
-    const val = parseFloat(term);
-    if (!isNaN(val)) return `${formatNumberLatex(val)}${variable}`;
+  const discriminant = b * b - 4 * a * c;
+
+  if (discriminant < -1e-10) {
+    const real = -b / (2 * a);
+    const imag = Math.sqrt(-discriminant) / (2 * a);
+    return `${formatNumberLatex(real)} \\pm ${formatNumberLatex(Math.abs(imag))}i`;
   }
 
-  if (normalized === `sin(${varPlaceholder})`) return `-\\cos(${variable})`;
-  if (normalized === `cos(${varPlaceholder})`) return `\\sin(${variable})`;
-  if (normalized === `e^${varPlaceholder}` || normalized === `exp(${varPlaceholder})`) return `e^{${variable}}`;
+  if (Math.abs(discriminant) < 1e-10) {
+    return formatNumberLatex(-b / (2 * a));
+  }
 
-  if (normalized === `VAR*cos(VAR)`) return `\\cos(${variable}) + ${variable}\\sin(${variable})`;
-  if (normalized === `VAR*sin(VAR)`) return `\\sin(${variable}) - ${variable}\\cos(${variable})`;
-  if (normalized === `VAR*e^VAR`) return `${variable}e^{${variable}} - e^{${variable}}`;
+  const sqrtD = Math.sqrt(discriminant);
+  const r1 = (-b + sqrtD) / (2 * a);
+  const r2 = (-b - sqrtD) / (2 * a);
 
-  return `\\int ${term}`;
+  const sqrtDRounded = Math.round(sqrtD);
+  if (Math.abs(sqrtD - sqrtDRounded) < 1e-6) {
+    return `${formatNumberLatex(r1)}, ${formatNumberLatex(r2)}`;
+  }
+
+  const discRounded = Math.round(discriminant);
+  if (Math.abs(discriminant - discRounded) < 1e-6 && discRounded > 0) {
+    let outside = 1;
+    let inside = discRounded;
+    for (let i = 2; i * i <= inside; i++) {
+      while (inside % (i * i) === 0) {
+        inside /= (i * i);
+        outside *= i;
+      }
+    }
+
+    if (inside === 1) {
+      return `${formatNumberLatex(r1)}, ${formatNumberLatex(r2)}`;
+    }
+
+    let denominator = 2 * Math.abs(a);
+    const bPart = -b;
+
+    const g = gcd(outside, denominator);
+    outside = outside / g;
+    denominator = denominator / g;
+    let bPartSimplified = bPart;
+    if (bPart !== 0) {
+      const gB = gcd(Math.abs(bPart), denominator);
+      if (gB === denominator) {
+        bPartSimplified = bPart / gB;
+      }
+    }
+
+    const sqrtPart = outside === 1 ? `\\sqrt{${inside}}` : `${outside}\\sqrt{${inside}}`;
+
+    const signFromA = a < 0 ? -1 : 1;
+
+    if (denominator === 1) {
+      if (Math.abs(bPart) < 1e-10) {
+        return `\\pm ${sqrtPart}`;
+      }
+      return `${formatNumberLatex(bPart * signFromA)} \\pm ${sqrtPart}`;
+    }
+
+    if (Math.abs(bPart) < 1e-10) {
+      return `\\pm \\frac{${sqrtPart}}{${denominator}}`;
+    }
+
+    return `\\frac{${formatNumberLatex(bPart * signFromA)} \\pm ${sqrtPart}}{${denominator}}`;
+  }
+
+  return `${formatNumberLatex(r1)}, ${formatNumberLatex(r2)}`;
+}
+
+function gcd(x: number, y: number): number {
+  x = Math.abs(Math.round(x));
+  y = Math.abs(Math.round(y));
+  while (y) {
+    const t = y;
+    y = x % y;
+    x = t;
+  }
+  return x;
+}
+
+function solveNumerically(expr: any, variable: string, startingPoints: number[]): string {
+  const solutions: number[] = [];
+  const tolerance = 1e-8;
+  const h = 1e-6;
+  const searchMin = -100;
+  const searchMax = 100;
+  const divisions = 400;
+  const step = (searchMax - searchMin) / divisions;
+
+  for (let i = 0; i < divisions; i++) {
+    const a = searchMin + i * step;
+    const b = a + step;
+
+    const fa = safeEvaluate(expr, { [variable]: a });
+    const fb = safeEvaluate(expr, { [variable]: b });
+
+    if (fa === null || fb === null) continue;
+
+    if (Math.abs(fa) < tolerance) {
+      if (!solutions.some(s => Math.abs(s - a) < 1e-4)) {
+        solutions.push(a);
+      }
+    }
+
+    if (fa * fb < 0) {
+      let lo = a, hi = b, flo = fa;
+      for (let iter = 0; iter < MAX_ITERATIONS; iter++) {
+        const mid = (lo + hi) / 2;
+        const fmid = safeEvaluate(expr, { [variable]: mid });
+        if (fmid === null) break;
+
+        if (Math.abs(fmid) < tolerance || Math.abs(hi - lo) < tolerance) {
+          if (!solutions.some(s => Math.abs(s - mid) < 1e-4)) {
+            solutions.push(mid);
+          }
+          break;
+        }
+
+        if (flo * fmid < 0) { hi = mid; }
+        else { lo = mid; flo = fmid; }
+      }
+    }
+  }
+
+  const hints: number[] = [...startingPoints];
+  for (let x = -20; x <= 20; x += 0.5) {
+    const y = safeEvaluate(expr, { [variable]: x });
+    if (y !== null && Math.abs(y) < 50) {
+      hints.push(x);
+    }
+  }
+
+  for (const start of hints.slice(0, 30)) {
+    let x = start;
+
+    for (let iter = 0; iter < MAX_ITERATIONS; iter++) {
+      const y = safeEvaluate(expr, { [variable]: x });
+      if (y === null) break;
+      if (Math.abs(y) < tolerance) {
+        if (!solutions.some(s => Math.abs(s - x) < 1e-4)) {
+          solutions.push(x);
+        }
+        break;
+      }
+
+      const y_plus = safeEvaluate(expr, { [variable]: x + h });
+      const y_minus = safeEvaluate(expr, { [variable]: x - h });
+      if (y_plus === null || y_minus === null) break;
+
+      const dy = (y_plus - y_minus) / (2 * h);
+      if (Math.abs(dy) < 1e-12) break;
+
+      let newtonStep = y / dy;
+      if (Math.abs(newtonStep) > 10) newtonStep = Math.sign(newtonStep) * 10;
+
+      const newX = x - newtonStep;
+      if (Math.abs(newX - x) < tolerance) {
+        if (!solutions.some(s => Math.abs(s - newX) < 1e-4)) {
+          solutions.push(newX);
+        }
+        break;
+      }
+      x = newX;
+    }
+  }
+
+  if (solutions.length === 0) {
+    return "No real solution found";
+  }
+
+  solutions.sort((a, b) => a - b);
+  return solutions.map(s => formatNumberLatex(s)).join(", ");
+}
+
+interface IntegrationResult {
+  success: boolean;
+  result: string;
 }
 
 function integrateExpression(exprStr: string, variable: string): string {
   try {
-    const terms = exprStr.match(/([+-]?[^+-]+)/g);
-    if (!terms) return integrateTerm(exprStr, variable) + " + C";
+    let normalized = exprStr.trim();
 
-    const results = terms.map(t => integrateTerm(t, variable));
-    let final = results.join(" + ").replace(/\+ \-/g, "- ").replace(/\+ \+/g, "+ ");
-    if (final.startsWith("+ ")) final = final.substring(2);
+    while (normalized.startsWith('(') && normalized.endsWith(')') && isBalanced(normalized.slice(1, -1))) {
+      normalized = normalized.slice(1, -1).trim();
+    }
+    normalized = normalized.replace(/\(\((\d+)\)\/\(([^()]+)\)\)/g, '$1/($2)');
+    normalized = normalized.replace(/\(\(([^()]+)\)\/\(([^()]+)\)\)/g, '($1)/($2)');
 
-    return final + " + C";
+    const terms = splitIntoTerms(normalized);
+
+    if (terms.length === 0) {
+      return "0 + C";
+    }
+
+    const results: string[] = [];
+
+    for (const term of terms) {
+      const result = integrateTerm(term.trim(), variable);
+      results.push(result.result);
+    }
+
+    let combined = results[0];
+    for (let i = 1; i < results.length; i++) {
+      const r = results[i];
+      if (r.startsWith('-')) {
+        combined += ` ${r}`;
+      } else {
+        combined += ` + ${r}`;
+      }
+    }
+
+    combined = combined
+      .replace(/\+ -/g, '- ')
+      .replace(/- -/g, '+ ')
+      .replace(/\+ \+/g, '+ ')
+      .replace(/^\s*\+\s*/, '');
+
+    return combined + " + C";
   } catch (e) {
-    return "Error";
+    console.error('Integration error:', e);
+    return `\\int (${exprStr})\\, d${variable} + C`;
   }
+}
+
+function parsePowerTerm(term: string, variable: string): { coeff: number; power: number } | null {
+  const v = variable;
+  let s = term.trim();
+
+  while (s.startsWith('(') && s.endsWith(')') && isBalanced(s.slice(1, -1))) {
+    s = s.slice(1, -1).trim();
+  }
+
+  let sign = 1;
+  if (s.startsWith('-')) {
+    sign = -1;
+    s = s.slice(1).trim();
+  } else if (s.startsWith('+')) {
+    s = s.slice(1).trim();
+  }
+
+  const parenFracMatch = s.match(new RegExp(`^\\(?([\\d.]+)?\\)?\\s*\\/\\s*\\(?\\s*${v}(?:\\^([\\d.]+))?\\s*\\)?$`));
+  if (parenFracMatch) {
+    const numerator = parenFracMatch[1] ? parseFloat(parenFracMatch[1]) : 1;
+    const denomPower = parenFracMatch[2] ? parseFloat(parenFracMatch[2]) : 1;
+    return { coeff: sign * numerator, power: -denomPower };
+  }
+
+  const simpleFracMatch = s.match(new RegExp(`^([\\d.]*)?\\s*\\/\\s*${v}(?:\\^([\\d.]+))?$`));
+  if (simpleFracMatch) {
+    const numerator = simpleFracMatch[1] ? parseFloat(simpleFracMatch[1]) : 1;
+    const denomPower = simpleFracMatch[2] ? parseFloat(simpleFracMatch[2]) : 1;
+    return { coeff: sign * numerator, power: -denomPower };
+  }
+
+  const fracWithParenMatch = s.match(new RegExp(`^([\\d.]*)?\\s*\\/\\s*\\(\\s*${v}(?:\\^([\\d.]+))?\\s*\\)$`));
+  if (fracWithParenMatch) {
+    const numerator = fracWithParenMatch[1] ? parseFloat(fracWithParenMatch[1]) : 1;
+    const denomPower = fracWithParenMatch[2] ? parseFloat(fracWithParenMatch[2]) : 1;
+    return { coeff: sign * numerator, power: -denomPower };
+  }
+
+  const powerMatch = s.match(new RegExp(`^([\\d.]*)?\\s*\\*?\\s*${v}(?:\\^([+-]?[\\d.]+))?$`));
+  if (powerMatch) {
+    let coeff = 1;
+    if (powerMatch[1] && powerMatch[1].trim() !== '') {
+      coeff = parseFloat(powerMatch[1]);
+    }
+    const power = powerMatch[2] ? parseFloat(powerMatch[2]) : 1;
+    return { coeff: sign * coeff, power };
+  }
+
+  if (s === v) {
+    return { coeff: sign, power: 1 };
+  }
+  const numMatch = s.match(/^([\d.]+)$/);
+  if (numMatch && !s.includes(v)) {
+    return { coeff: sign * parseFloat(numMatch[1]), power: 0 };
+  }
+
+  const fullMatch = s.match(new RegExp(`^([\\d.]+)\\s*\\*\\s*${v}(?:\\^([+-]?[\\d.]+))?$`));
+  if (fullMatch) {
+    const coeff = parseFloat(fullMatch[1]);
+    const power = fullMatch[2] ? parseFloat(fullMatch[2]) : 1;
+    return { coeff: sign * coeff, power };
+  }
+
+  const negPowerMatch = s.match(new RegExp(`^${v}\\^\\((-?[\\d.]+)\\)$`));
+  if (negPowerMatch) {
+    return { coeff: sign, power: parseFloat(negPowerMatch[1]) };
+  }
+
+  return null;
+}
+
+function integrateTerm(term: string, variable: string): IntegrationResult {
+  const v = variable;
+  let s = term.trim();
+
+  if (!s || s === '0') {
+    return { success: true, result: '0' };
+  }
+
+  const powerParsed = parsePowerTerm(s, v);
+  if (powerParsed !== null) {
+    const { coeff, power } = powerParsed;
+
+    if (Math.abs(power + 1) < 1e-10) {
+      if (Math.abs(coeff - 1) < 1e-10) return { success: true, result: `\\ln|${v}|` };
+      if (Math.abs(coeff + 1) < 1e-10) return { success: true, result: `-\\ln|${v}|` };
+      return { success: true, result: `${formatNumberLatex(coeff)}\\ln|${v}|` };
+    }
+
+    const newPower = power + 1;
+    const newCoeff = coeff / newPower;
+
+    return formatPowerResult(newCoeff, newPower, v);
+  }
+
+  const funcResult = integrateKnownFunction(s, v);
+  if (funcResult.success) {
+    return funcResult;
+  }
+  try {
+    const simplified = math.simplify(s).toString();
+    if (simplified !== s) {
+      const simplifiedParsed = parsePowerTerm(simplified, v);
+      if (simplifiedParsed !== null) {
+        const { coeff, power } = simplifiedParsed;
+        if (Math.abs(power + 1) < 1e-10) {
+          if (Math.abs(coeff - 1) < 1e-10) return { success: true, result: `\\ln|${v}|` };
+          if (Math.abs(coeff + 1) < 1e-10) return { success: true, result: `-\\ln|${v}|` };
+          return { success: true, result: `${formatNumberLatex(coeff)}\\ln|${v}|` };
+        }
+        const newPower = power + 1;
+        const newCoeff = coeff / newPower;
+        return formatPowerResult(newCoeff, newPower, v);
+      }
+    }
+  } catch (e) { }
+
+  return { success: false, result: `\\int ${term}\\, d${v}` };
+}
+
+function formatPowerResult(coeff: number, power: number, v: string): IntegrationResult {
+  const isNeg = coeff < 0;
+  const absCoeff = Math.abs(coeff);
+
+  let numerator: number = 1;
+  let denominator: number = 1;
+
+  try {
+    const f = math.fraction(absCoeff);
+    numerator = Number((f as any).n);
+    denominator = Number((f as any).d);
+  } catch (e) {
+    numerator = absCoeff;
+  }
+
+  const sign = isNeg ? '-' : '';
+
+  if (Math.abs(power - 1) < 1e-10) {
+    if (Math.abs(absCoeff - 1) < 1e-10) {
+      return { success: true, result: `${sign}${v}` };
+    }
+    if (denominator === 1) {
+      return { success: true, result: `${sign}${Math.round(numerator)}${v}` };
+    }
+    return { success: true, result: `${sign}\\frac{${Math.round(numerator)}}{${denominator}}${v}` };
+  }
+
+  if (power > 0) {
+    const powerStr = Number.isInteger(power) ? power.toString() : formatNumberLatex(power);
+    if (Math.abs(absCoeff - 1) < 1e-10) {
+      return { success: true, result: `${sign}${v}^{${powerStr}}` };
+    }
+    if (denominator === 1) {
+      return { success: true, result: `${sign}${Math.round(numerator)}${v}^{${powerStr}}` };
+    }
+    return { success: true, result: `${sign}\\frac{${Math.round(numerator)}}{${denominator}}${v}^{${powerStr}}` };
+  }
+
+  const absPower = Math.abs(power);
+
+  if (Math.abs(absPower - 1) < 1e-10) {
+    if (denominator === 1 && Math.abs(numerator - 1) < 1e-10) {
+      return { success: true, result: `${sign}\\frac{1}{${v}}` };
+    }
+    if (denominator === 1) {
+      return { success: true, result: `${sign}\\frac{${Math.round(numerator)}}{${v}}` };
+    }
+    return { success: true, result: `${sign}\\frac{${Math.round(numerator)}}{${denominator}${v}}` };
+  }
+
+  const powerInt = Math.round(absPower);
+  const powerStr = Number.isInteger(absPower) ? powerInt.toString() : formatNumberLatex(absPower);
+
+  if (denominator === 1 && Math.abs(numerator - 1) < 1e-10) {
+    return { success: true, result: `${sign}\\frac{1}{${v}^{${powerStr}}}` };
+  }
+  if (denominator === 1) {
+    return { success: true, result: `${sign}\\frac{${Math.round(numerator)}}{${v}^{${powerStr}}}` };
+  }
+  return { success: true, result: `${sign}\\frac{${Math.round(numerator)}}{${denominator}${v}^{${powerStr}}}` };
+}
+
+function integrateKnownFunction(term: string, v: string): IntegrationResult {
+  const normalized = term.replace(/\s+/g, '').toLowerCase();
+
+  const knownIntegrals: { [pattern: string]: string } = {
+    [`sin(${v})`]: `-\\cos(${v})`,
+    [`cos(${v})`]: `\\sin(${v})`,
+    [`tan(${v})`]: `-\\ln|\\cos(${v})|`,
+    [`cot(${v})`]: `\\ln|\\sin(${v})|`,
+    [`sec(${v})^2`]: `\\tan(${v})`,
+    [`csc(${v})^2`]: `-\\cot(${v})`,
+    [`sec(${v})*tan(${v})`]: `\\sec(${v})`,
+    [`csc(${v})*cot(${v})`]: `-\\csc(${v})`,
+    [`sec(${v})`]: `\\ln|\\sec(${v})+\\tan(${v})|`,
+    [`csc(${v})`]: `-\\ln|\\csc(${v})+\\cot(${v})|`,
+    [`e^${v}`]: `e^{${v}}`,
+    [`exp(${v})`]: `e^{${v}}`,
+    [`sinh(${v})`]: `\\cosh(${v})`,
+    [`cosh(${v})`]: `\\sinh(${v})`,
+    [`tanh(${v})`]: `\\ln(\\cosh(${v}))`,
+    [`log(${v})`]: `${v}\\ln(${v})-${v}`,
+    [`ln(${v})`]: `${v}\\ln(${v})-${v}`,
+  };
+
+  for (const [pattern, result] of Object.entries(knownIntegrals)) {
+    if (normalized === pattern.toLowerCase()) {
+      return { success: true, result };
+    }
+  }
+
+  return { success: false, result: '' };
 }
 
 function definiteIntegral(exprStr: string, variable: string, start: number, end: number): string {
   try {
     const expr = math.compile(exprStr);
-    const n = 100;
+    const n = 1000;
     const h = (end - start) / n;
-    let sum = expr.evaluate({ [variable]: start }) + expr.evaluate({ [variable]: end });
 
-    for (let i = 1; i < n; i++) {
+    let sum = 0;
+    let validPoints = 0;
+
+    for (let i = 0; i <= n; i++) {
       const x = start + i * h;
-      const val = expr.evaluate({ [variable]: x });
-      sum += (i % 2 === 0 ? 2 : 4) * val;
+      const val = safeEvaluate(expr, { [variable]: x });
+
+      if (val === null) continue;
+
+      validPoints++;
+
+      if (i === 0 || i === n) {
+        sum += val;
+      } else if (i % 2 === 0) {
+        sum += 2 * val;
+      } else {
+        sum += 4 * val;
+      }
+    }
+
+    if (validPoints < n / 2) {
+      return "Integral may not converge";
     }
 
     const result = (h / 3) * sum;
+
+    if (!isFinite(result)) {
+      return "Divergent";
+    }
+
     return formatNumberLatex(result);
   } catch (e) {
+    console.error('Definite integral error:', e);
     return "Error";
   }
 }
 
-function approximateLimit(exprStr: string, variable: string, targetVal: number | string): string {
+function evaluateLimit(exprStr: string, variable: string, targetStr: string): string {
   try {
     const expr = math.compile(exprStr);
-    let val = 0;
-    const isInf = targetVal === 'Infinity' || targetVal === Infinity;
-    const isNegInf = targetVal === '-Infinity' || targetVal === -Infinity;
 
-    if (isInf) val = 10000;
-    else if (isNegInf) val = -10000;
-    else val = Number(targetVal);
+    const targetLower = targetStr.toLowerCase().trim();
 
-    if (isNaN(val)) return "Error";
-
-    if (!isInf && !isNegInf) {
-      const h = 0.0001;
-      const right = expr.evaluate({ [variable]: val + h });
-      const left = expr.evaluate({ [variable]: val - h });
-      if (Math.abs(right - left) > 0.1 && Math.abs(right) < 1000) return "Undefined";
-      if (!isFinite(right)) return "Undefined";
-      return formatNumberLatex(right);
-    } else {
-      const res = expr.evaluate({ [variable]: val });
-      return formatNumberLatex(res);
+    if (targetLower === 'infinity' || targetLower === 'inf' || targetLower === '∞') {
+      return evaluateLimitAtInfinity(expr, variable, 1);
     }
+    if (targetLower === '-infinity' || targetLower === '-inf' || targetLower === '-∞') {
+      return evaluateLimitAtInfinity(expr, variable, -1);
+    }
+
+    const target = math.evaluate(targetStr);
+    if (!isFinite(target)) {
+      return evaluateLimitAtInfinity(expr, variable, target > 0 ? 1 : -1);
+    }
+
+    return evaluateLimitAtPoint(expr, variable, target);
   } catch (e) {
+    console.error('Limit error:', e);
     return "Error";
   }
 }
 
-function factorQuadratic(exprStr: string): string {
-  try {
-    const variable = 'x';
-    const roots = solveEquation(exprStr + "=0", variable);
-
-    if (roots.includes("Error") || roots.includes("No") || roots.includes("\\pm") || roots.includes("sqrt")) return math.simplify(exprStr).toString();
-
-    const parts = roots.split(",");
-
-    return math.simplify(exprStr).toString();
-  } catch (e) {
-    return "Error";
+function evaluateLimitAtPoint(expr: any, variable: string, target: number): string {
+  const direct = safeEvaluate(expr, { [variable]: target });
+  if (direct !== null && isFinite(direct)) {
+    return formatNumberLatex(direct);
   }
+
+  const deltas = [0.1, 0.01, 0.001, 0.0001, 0.00001];
+  const leftValues: number[] = [];
+  const rightValues: number[] = [];
+
+  for (const delta of deltas) {
+    const left = safeEvaluate(expr, { [variable]: target - delta });
+    const right = safeEvaluate(expr, { [variable]: target + delta });
+
+    if (left !== null && isFinite(left)) leftValues.push(left);
+    if (right !== null && isFinite(right)) rightValues.push(right);
+  }
+
+  if (leftValues.length >= 3 && rightValues.length >= 3) {
+    const leftLimit = leftValues[leftValues.length - 1];
+    const rightLimit = rightValues[rightValues.length - 1];
+
+    if (Math.abs(leftLimit - rightLimit) < 0.001) {
+      return formatNumberLatex((leftLimit + rightLimit) / 2);
+    }
+    return "Does not exist";
+  }
+
+  return "Undefined";
+}
+
+function evaluateLimitAtInfinity(expr: any, variable: string, sign: number): string {
+  const testValues = sign > 0
+    ? [10, 100, 1000, 10000, 100000]
+    : [-10, -100, -1000, -10000, -100000];
+
+  const values: number[] = [];
+
+  for (const x of testValues) {
+    const val = safeEvaluate(expr, { [variable]: x });
+    if (val !== null) {
+      values.push(val);
+    }
+  }
+
+  if (values.length < 3) {
+    return "Cannot evaluate";
+  }
+
+  const last = values[values.length - 1];
+  const secondLast = values[values.length - 2];
+
+  if (Math.abs(last - secondLast) < 0.001) {
+    if (Math.abs(last) < 1e-8) return "0";
+    return formatNumberLatex(last);
+  }
+
+  if (Math.abs(last) > 1e10) {
+    return last > 0 ? "\\infty" : "-\\infty";
+  }
+
+  return "Does not exist";
 }
 
 export const evaluateMath = (
@@ -369,8 +846,9 @@ export const evaluateMath = (
     const trimmed = sanitized.trim();
 
     if (trimmed.startsWith("solve(")) {
-      const match = trimmed.match(/^solve\((.+),([a-zA-Z0-9_]+)\)$/);
+      const match = trimmed.match(/^solve\((.+),\s*([a-zA-Z0-9_]+)\)$/);
       if (match) return solveEquation(match[1], match[2]);
+      return "Error: Invalid solve syntax";
     }
 
     if (trimmed.includes("derivative") || trimmed.includes("d/d")) {
@@ -382,20 +860,30 @@ export const evaluateMath = (
     }
 
     if (trimmed.startsWith("integrate(")) {
-      const defMatch = trimmed.match(/^integrate\(([^,]+),([a-zA-Z]+),([^,]+),([^,]+)\)$/);
-      if (defMatch) return definiteIntegral(defMatch[1], defMatch[2], math.evaluate(defMatch[3]), math.evaluate(defMatch[4]));
-      const indefMatch = trimmed.match(/^integrate\(([^,]+),([a-zA-Z]+)\)$/);
-      if (indefMatch) return integrateExpression(indefMatch[1], indefMatch[2]);
+      const defMatch = trimmed.match(/^integrate\((.+),\s*([a-zA-Z]+),\s*([^,]+),\s*([^)]+)\)$/);
+      if (defMatch) {
+        return definiteIntegral(defMatch[1], defMatch[2], math.evaluate(defMatch[3]), math.evaluate(defMatch[4]));
+      }
+
+      const indefMatch = trimmed.match(/^integrate\((.+),\s*([a-zA-Z]+)\)$/);
+      if (indefMatch) {
+        return integrateExpression(indefMatch[1], indefMatch[2]);
+      }
+
+      const singleMatch = trimmed.match(/^integrate\((.+)\)$/);
+      if (singleMatch) {
+        return integrateExpression(singleMatch[1], 'x');
+      }
     }
 
     if (trimmed.startsWith("limit(")) {
       const cleanLimit = trimmed.replace("->", ",");
-      const match = cleanLimit.match(/^limit\(([^,]+),([a-zA-Z]+),([^)]+)\)$/);
-      if (match) return approximateLimit(match[1], match[2], match[3]);
+      const match = cleanLimit.match(/^limit\(([^,]+),\s*([a-zA-Z]+),\s*([^)]+)\)$/);
+      if (match) return evaluateLimit(match[1], match[2], match[3]);
     }
 
     if (trimmed.match(/^(sum|product)\(/)) {
-      const match = trimmed.match(/^(sum|product)\(([^,]+),([a-zA-Z]+),([^,]+),([^)]+)\)$/);
+      const match = trimmed.match(/^(sum|product)\(([^,]+),\s*([a-zA-Z]+),\s*([^,]+),\s*([^)]+)\)$/);
       if (match) {
         const type = match[1];
         const exprStr = match[2];
@@ -418,13 +906,15 @@ export const evaluateMath = (
       const inner = trimmed.match(/^simplify\((.+)\)$/);
       if (inner) return math.simplify(inner[1]).toString().replace(/\s\*\s/g, "");
     }
+
     if (trimmed.startsWith("expand(")) {
       const inner = trimmed.match(/^expand\((.+)\)$/);
       if (inner) return math.rationalize(inner[1]).toString().replace(/\s\*\s/g, "");
     }
+
     if (trimmed.startsWith("factor(")) {
       const inner = trimmed.match(/^factor\((.+)\)$/);
-      if (inner) return factorQuadratic(inner[1]);
+      if (inner) return math.simplify(inner[1]).toString().replace(/\s\*\s/g, "");
     }
 
     const result = math.evaluate(sanitized);
@@ -438,6 +928,7 @@ export const evaluateMath = (
     return result.toString().replace(/\s\*\s/g, "");
 
   } catch (error: any) {
+    console.error('CAS Error:', error);
     return "Error";
   }
 };
