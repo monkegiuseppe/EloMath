@@ -255,13 +255,32 @@ body::-webkit-scrollbar-thumb:hover {
   pointer-events: none;
 }
 
-/* Styles for dynamic background image */
-.light .dynamic-background {
+/* Styles for dynamic background images - 4 theme options */
+/* Dark themes */
+.dark-gd .dynamic-background {
+  background-image: url(/images/gd.png);
+}
+
+.dark-gd1 .dynamic-background {
+  background-image: url(/images/gd1.png);
+}
+
+/* Light themes */
+.light-g2 .dynamic-background {
   background-image: url(/images/g2.jpg);
 }
 
+.light-g21 .dynamic-background {
+  background-image: url(/images/g21.jpg);
+}
+
+/* Fallback for old theme classes (backwards compatibility) */
 .dark .dynamic-background {
   background-image: url(/images/gd.png);
+}
+
+.light .dynamic-background {
+  background-image: url(/images/g2.jpg);
 }
 
 .answer-math-field .mq-editable-field {
