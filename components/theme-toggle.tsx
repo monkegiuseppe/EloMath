@@ -10,7 +10,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuSeparator,
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu"
 
@@ -74,7 +73,6 @@ export function ThemeToggle() {
             </DropdownMenuItem>
           )
         })}
-        <DropdownMenuSeparator />
         <DropdownMenuLabel className="text-xs text-muted-foreground">Light Themes</DropdownMenuLabel>
         {themes.filter(t => !t.isDark).map((t) => {
           const Icon = t.icon
