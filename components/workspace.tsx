@@ -294,17 +294,16 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
         <motion.header
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col gap-4 mb-4 sm:flex-row sm:items-center sm:justify-between sm:mb-8 flex-shrink-0 relative z-20 pr-0 sm:pr-40 lg:pr-44"
-        >
-          <button onClick={onBack} className="self-start group flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors glass px-3 py-2 rounded-lg">
+          className="flex flex-col gap-4 mb-4 lg:flex-row lg:items-center lg:justify-between lg:mb-8 flex-shrink-0 relative z-20 pr-0 lg:pr-64">
+          <button onClick={onBack} className="self-start group flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors glass px-3 py-2 rounded-lg whitespace-nowrap">
             <ArrowLeft size={20} className="transition-transform group-hover:-translate-x-1" /> Back to Home
           </button>
 
           {sessionType !== 'default' && (
-            <div className="relative w-full sm:w-auto">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 glass px-3 sm:px-4 py-3 rounded-lg text-sm sm:text-base w-full sm:w-auto">
-                <div className="flex items-center justify-between w-full sm:w-auto gap-4">
-                  <div className="flex items-center gap-2 text-lg font-semibold text-foreground">
+            <div className="relative w-full lg:w-auto">
+              <div className="flex flex-row items-center gap-4 glass px-4 py-3 rounded-lg text-sm lg:text-base w-full lg:w-auto flex-wrap">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2 text-lg font-semibold text-foreground whitespace-nowrap">
                     <BrainCircuit size={24} />
                     <span>
                       {sessionType === 'math' ? 'Math' : 'Physics'} ELO:
@@ -315,15 +314,9 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
                       )}
                     </span>
                   </div>
-
-                  <button onClick={() => setIsCategorySelectorOpen(p => !p)} className="sm:hidden p-2 rounded-md hover:bg-muted/50 transition-colors">
-                    <SlidersHorizontal size={20} />
-                  </button>
                 </div>
 
-                <div className="w-full h-px bg-border/30 sm:hidden" />
-
-                <div className="flex items-center justify-between w-full sm:w-auto gap-2">
+                <div className="flex items-center gap-2">
                   <div className="text-xs sm:text-sm text-muted-foreground flex items-center gap-3 sm:gap-4">
                     <span className="flex items-center gap-1 sm:gap-3">
                       <span className="text-green-500 flex items-center gap-1">
@@ -343,7 +336,7 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
                     </button>
                   </div>
 
-                  <button onClick={() => setIsCategorySelectorOpen(p => !p)} className="hidden sm:flex items-center gap-2 text-sm px-3 py-1.5 rounded-md hover:bg-muted/50 transition-colors ml-auto sm:ml-0">
+                  <button onClick={() => setIsCategorySelectorOpen(p => !p)} className="flex items-center gap-2 text-sm px-3 py-1.5 rounded-md hover:bg-muted/50 transition-colors">
                     <SlidersHorizontal size={16} />
                     Categories
                   </button>
