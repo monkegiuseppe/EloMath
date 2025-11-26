@@ -1,13 +1,30 @@
-A learning platform that adapts to your skill-level by assigning a difficulty value to each question.
+# 🧮 EloMath
 
-<img width="1920" height="929" alt="image" src="https://github.com/user-attachments/assets/b11aee01-95ff-4139-a09a-c192a44afd90" />
+An adaptive learning platform that matches problems to your skill level using an ELO rating system.
 
+![Hero demo](./public/assets/answerdemo.gif)
 
-Math and physics practice available
-<img width="1921" height="929" alt="image" src="https://github.com/user-attachments/assets/4d94eec4-5f4d-4f7d-85a5-cfdfdac6cf64" />
+## Features
 
-Notepad tab with light CAS features build in (press info button to see details)
-<img width="1920" height="928" alt="image" src="https://github.com/user-attachments/assets/068ef5a9-59f1-41d6-9aab-37ac36d463b5" />
+- **Adaptive Difficulty** - Problems adjust to your skill level
+- **Math & Physics** - Calculus, Linear Algebra, Quantum Mechanics, and more
+- **CAS Notepad** - Built-in symbolic math (derivatives, integrals, solving equations)
+- **Graphing Tool** - Interactive function visualization with roots & extrema detection
 
-Graphing tool 
-<img width="1917" height="928" alt="image" src="https://github.com/user-attachments/assets/ada0d9fc-ab3a-4423-b8ee-96178a0447da" />
+## How It Works
+
+![ELO demo](./public/assets/answerdemo2.gif)
+
+Answer correctly → gain ELO → harder problems  
+Answer incorrectly → lose ELO → easier problems
+
+## Workspace
+
+![Workspace](./public/assets/demopic.png)
+![Workspace](./public/assets/demopic2.png)
+
+Use the CAS notepad and graphing tool while practicing.
+
+Change between light and dark themes with the toggle in the top right.
+
+![Theme toggle](./public/assets/demopic3.png)
