@@ -294,3 +294,11 @@ body::-webkit-scrollbar-thumb:hover {
   box-shadow: none;
   border-color: hsl(var(--border));
 }
+
+.mq-root-block .mq-nthroot,
+.mq-editable-field .mq-nthroot {
+  font-size: 0.75em;
+  padding: 2px 1px;
+  min-width: 0.5em;
+  display: inline-block;
+}
