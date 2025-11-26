@@ -20,8 +20,11 @@ Answer incorrectly → lose ELO → easier problems
 
 ## Workspace
 
-![Workspace](./public/assets/demopic.png)
-![Workspace](./public/assets/demopic2.png)
+<p>
+  <img src="./public/assets/demopic.png" height="350" />
+  <img src="./public/assets/demopic2.png" height="350" />
+</p>
+
 
 Use the CAS notepad and graphing tool while practicing.
 
