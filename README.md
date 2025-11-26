@@ -18,6 +18,11 @@ An adaptive learning platform that matches problems to your skill level using an
 Answer correctly → gain ELO → harder problems  
 Answer incorrectly → lose ELO → easier problems
 
+New users get to choose their starting skill level.
+<p>
+  <img src="./public/assets/demopic4.png" height="350" />
+</p>
+
 ## Workspace
 
 <p>
