@@ -97,6 +97,21 @@ export const PhysicsPracticeCore: FC<PhysicsPracticeCoreProps> = ({
     getNewProblem();
   }, [selectedCategories]);
 
+  // Listen for Enter key when feedback is shown to proceed to next question
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (feedback && e.key === 'Enter') {
+        e.preventDefault();
+        getNewProblem();
+      }
+    };
+
+    if (feedback) {
+      window.addEventListener('keydown', handleKeyDown);
+      return () => window.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [feedback, getNewProblem]);
+
   const handleSubmit = (e?: React.FormEvent<HTMLFormElement>) => {
     if (e) e.preventDefault();
     if (!userAnswer.trim() || !currentProblem) return;
@@ -245,6 +260,7 @@ export const PhysicsPracticeCore: FC<PhysicsPracticeCoreProps> = ({
                               Next Problem <ArrowRight className="ml-2 w-4 h-4" />
                             </Button>
                           </div>
+                          <p className="text-xs text-muted-foreground mt-4 text-center">Press Enter to continue</p>
                         </motion.div>
                       )}
                     </AnimatePresence>

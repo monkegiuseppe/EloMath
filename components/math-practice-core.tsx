@@ -96,6 +96,21 @@ export const MathPracticeCore: FC<MathPracticeCoreProps> = ({
     getNewProblem();
   }, [selectedCategories]);
 
+  // Listen for Enter key when feedback is shown to proceed to next question
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (feedback && e.key === 'Enter') {
+        e.preventDefault();
+        getNewProblem();
+      }
+    };
+
+    if (feedback) {
+      window.addEventListener('keydown', handleKeyDown);
+      return () => window.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [feedback, getNewProblem]);
+
   const handleSubmit = (e?: React.FormEvent<HTMLFormElement>) => {
     if (e) e.preventDefault();
     if (!userAnswer.trim() || !currentProblem) return;
@@ -201,8 +216,8 @@ export const MathPracticeCore: FC<MathPracticeCoreProps> = ({
                           initial={{ opacity: 0, scale: 0.95, y: 10 }}
                           animate={{ opacity: 1, scale: 1, y: 0 }}
                           className={`rounded-xl border-2 p-6 ${feedback.type === "correct"
-                              ? "bg-green-500/10 border-green-500/30"
-                              : "bg-red-500/10 border-red-500/30"
+                            ? "bg-green-500/10 border-green-500/30"
+                            : "bg-red-500/10 border-red-500/30"
                             }`}
                         >
                           <div className="flex items-start gap-4">
@@ -237,6 +252,7 @@ export const MathPracticeCore: FC<MathPracticeCoreProps> = ({
                               Next Problem <ArrowRight className="ml-2 w-4 h-4" />
                             </Button>
                           </div>
+                          <p className="text-xs text-muted-foreground mt-4 text-center">Press Enter to continue</p>
                         </motion.div>
                       )}
                     </AnimatePresence>

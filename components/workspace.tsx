@@ -71,6 +71,9 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
   const [addTabButtonLeft, setAddTabButtonLeft] = useState<number>(0);
   const [isAddTabMenuOpen, setIsAddTabMenuOpen] = useState(false);
 
+  // Track the previous active tab to detect changes
+  const prevActiveTabIdRef = useRef<number>(activeTabId);
+
   // --- DATA FETCHING ---
   useEffect(() => {
     if (status === 'authenticated' && sessionType !== 'default') {
@@ -130,6 +133,11 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
       }
     }
   }, [isAddTabMenuOpen]);
+
+  // Update previous tab ref
+  useEffect(() => {
+    prevActiveTabIdRef.current = activeTabId;
+  }, [activeTabId]);
 
   const handleDifficultySelect = (selectedElo: number) => {
     setUserElo(selectedElo);
@@ -442,6 +450,7 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
                     value={tab.content || ''}
                     onChange={(newContent) => handleContentChange(tab.id, newContent)}
                     sessionType={sessionType}
+                    isActive={activeTabId === tab.id}
                   />
                 )}
                 {tab.type === 'graphing' && <FullscreenGraphingTool />}
