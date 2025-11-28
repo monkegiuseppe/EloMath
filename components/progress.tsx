@@ -4,8 +4,8 @@
 
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
-import { 
-  ArrowLeft, TrendingUp, Target, Award, Calendar, 
+import {
+  ArrowLeft, TrendingUp, Target, Award, Calendar,
   BarChart3, Brain, Zap, BookOpen, Clock, Activity,
   ChevronLeft, ChevronRight, RefreshCw
 } from "lucide-react"
@@ -73,7 +73,7 @@ export default function Progress({ onBack }: ProgressProps) {
     if (!confirm('Are you sure you want to PERMANENTLY reset ALL your stats (both Math and Physics)? This will delete ALL your history and cannot be undone.')) {
       return;
     }
-    
+
     try {
       setLoading(true);
       await fetch('/api/progress/reset', {
@@ -81,8 +81,7 @@ export default function Progress({ onBack }: ProgressProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sessionType: 'all' })
       });
-      
-      // Refresh the data
+
       await fetchProgressData();
     } catch (error) {
       console.error('Failed to reset stats:', error);
@@ -92,7 +91,6 @@ export default function Progress({ onBack }: ProgressProps) {
     }
   };
 
-  // Generate calendar grid for the selected month
   const generateCalendarGrid = () => {
     const year = selectedMonth.getFullYear();
     const month = selectedMonth.getMonth();
@@ -100,15 +98,13 @@ export default function Progress({ onBack }: ProgressProps) {
     const lastDay = new Date(year, month + 1, 0);
     const startPadding = firstDay.getDay();
     const totalDays = lastDay.getDate();
-    
+
     const grid: (DayActivity | null)[] = [];
-    
-    // Add padding for days before month starts
+
     for (let i = 0; i < startPadding; i++) {
       grid.push(null);
     }
-    
-    // Add actual days
+
     for (let day = 1; day <= totalDays; day++) {
       const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
       const activity = stats?.recentActivity?.find(a => a.date === dateStr) || {
@@ -120,7 +116,7 @@ export default function Progress({ onBack }: ProgressProps) {
       };
       grid.push(activity);
     }
-    
+
     return grid;
   };
 
@@ -166,28 +162,28 @@ export default function Progress({ onBack }: ProgressProps) {
   }
 
   const calendarGrid = generateCalendarGrid();
-  const monthNames = ["January", "February", "March", "April", "May", "June", 
-                      "July", "August", "September", "October", "November", "December"];
+  const monthNames = ["January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"];
   const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
   return (
     <div className="min-h-screen relative">
       <div className="absolute inset-0 bg-cover bg-center bg-no-repeat dynamic-background" />
       <div className="relative z-10 w-full max-w-7xl mx-auto p-4">
-        <motion.header 
-          initial={{ opacity: 0, y: -20 }} 
-          animate={{ opacity: 1, y: 0 }} 
+        <motion.header
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
           className="flex items-center justify-between mb-6"
         >
-          <button 
-            onClick={onBack} 
+          <button
+            onClick={onBack}
             className="group flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors glass px-3 py-2 rounded-lg"
           >
             <ArrowLeft size={20} className="transition-transform group-hover:-translate-x-1" />
             Back to Home
           </button>
           <div className="flex items-center gap-3">
-            <button 
+            <button
               onClick={handleResetAll}
               className="flex items-center gap-2 glass px-4 py-2 rounded-lg text-destructive hover:bg-destructive/10 transition-colors"
               title="Reset all stats (Math & Physics)"
@@ -206,7 +202,7 @@ export default function Progress({ onBack }: ProgressProps) {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
           {/* ELO Cards */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
@@ -222,7 +218,7 @@ export default function Progress({ onBack }: ProgressProps) {
             </p>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
@@ -238,7 +234,7 @@ export default function Progress({ onBack }: ProgressProps) {
             </p>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
@@ -258,7 +254,7 @@ export default function Progress({ onBack }: ProgressProps) {
         </div>
 
         {/* Activity Calendar */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
@@ -270,7 +266,7 @@ export default function Progress({ onBack }: ProgressProps) {
               Activity Calendar
             </h3>
             <div className="flex items-center gap-4">
-              <button 
+              <button
                 onClick={() => setSelectedMonth(new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() - 1))}
                 className="text-muted-foreground hover:text-foreground p-1 rounded hover:bg-muted/50 transition-colors"
               >
@@ -279,7 +275,7 @@ export default function Progress({ onBack }: ProgressProps) {
               <span className="text-foreground font-medium">
                 {monthNames[selectedMonth.getMonth()]} {selectedMonth.getFullYear()}
               </span>
-              <button 
+              <button
                 onClick={() => setSelectedMonth(new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() + 1))}
                 className="text-muted-foreground hover:text-foreground p-1 rounded hover:bg-muted/50 transition-colors"
                 disabled={selectedMonth.getMonth() === new Date().getMonth() && selectedMonth.getFullYear() === new Date().getFullYear()}
@@ -306,7 +302,7 @@ export default function Progress({ onBack }: ProgressProps) {
                 onMouseLeave={() => setHoveredDay(null)}
               >
                 {day ? (
-                  <div 
+                  <div
                     className={`w-full h-full rounded-md flex flex-col items-center justify-center cursor-pointer transition-all hover:ring-2 hover:ring-foreground/50 ${getActivityColor(day.count)} p-1 relative group`}
                   >
                     <span className="text-xs font-medium text-foreground/80">
@@ -355,7 +351,7 @@ export default function Progress({ onBack }: ProgressProps) {
 
         {/* Statistics Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
@@ -368,7 +364,7 @@ export default function Progress({ onBack }: ProgressProps) {
             <p className="text-2xl font-bold text-foreground">{stats?.totalQuestions || 0}</p>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
@@ -381,7 +377,7 @@ export default function Progress({ onBack }: ProgressProps) {
             <p className="text-2xl font-bold text-foreground">{stats?.currentStreak || 0} days</p>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7 }}
@@ -394,7 +390,7 @@ export default function Progress({ onBack }: ProgressProps) {
             <p className="text-2xl font-bold text-foreground">{stats?.longestStreak || 0} days</p>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8 }}

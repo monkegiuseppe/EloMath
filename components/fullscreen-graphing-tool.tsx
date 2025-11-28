@@ -10,15 +10,14 @@ import { create, all, type EvalFunction } from "mathjs"
 
 const math = create(all)
 
-// A vibrant, fun color palette
 const GRAPH_COLORS = [
-  "#22d3ee", // Cyan (Electric)
-  "#e879f9", // Fuchsia (Neon)
-  "#4ade80", // Green (Lime)
-  "#fb7185", // Rose (Soft)
-  "#facc15", // Yellow (Bright)
-  "#818cf8", // Indigo (Cool)
-  "#fb923c", // Orange (Warm)
+  "#22d3ee",
+  "#e879f9",
+  "#4ade80",
+  "#fb7185",
+  "#facc15",
+  "#818cf8",
+  "#fb923c",
 ]
 
 interface Equation {
@@ -39,7 +38,6 @@ interface AnalysisPoint {
 }
 
 export default function FullscreenGraphingTool() {
-  // --- State ---
   const [equations, setEquations] = useState<Equation[]>([
     { id: 1, expr: "sin(x)", compiled: math.compile("sin(x)"), color: GRAPH_COLORS[0], visible: true },
     { id: 2, expr: "x^2 / 10", compiled: math.compile("x^2 / 10"), color: GRAPH_COLORS[1], visible: true },
@@ -49,25 +47,21 @@ export default function FullscreenGraphingTool() {
   const [isPanning, setIsPanning] = useState(false)
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
 
-  // Analysis Toggles
   const [showRoots, setShowRoots] = useState(false)
   const [showExtrema, setShowExtrema] = useState(false)
   const [showIntersections, setShowIntersections] = useState(false)
   const [showMouseTracking, setShowMouseTracking] = useState(false)
 
-  // Interaction State
   const [trackingPoint, setTrackingPoint] = useState<{ x: number; y: number; color: string } | null>(null)
   const [analysisPoints, setAnalysisPoints] = useState<AnalysisPoint[]>([])
   const [hoveredPoint, setHoveredPoint] = useState<AnalysisPoint | null>(null)
 
-  // Refs
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const lastMousePos = useRef({ x: 0, y: 0 })
   const analysisTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const lastAnalysisViewRef = useRef<string>("")
 
-  // --- Canvas Resizing ---
   useEffect(() => {
     const canvas = canvasRef.current
     const container = containerRef.current
@@ -94,7 +88,6 @@ export default function FullscreenGraphingTool() {
     return () => resizeObserver.disconnect()
   }, [])
 
-  // --- Analysis Calculation (Heavy Math) ---
   const calculateAnalysisPoints = useCallback(() => {
     if (!showRoots && !showExtrema && !showIntersections) {
       setAnalysisPoints([])
@@ -110,17 +103,15 @@ export default function FullscreenGraphingTool() {
 
     const points: AnalysisPoint[] = []
 
-    // 1. Analyze individual equations
     equations.forEach((eq) => {
       if (!eq.compiled || !eq.visible) return
 
-      const samples = 500 // Reduce samples slightly for performance
+      const samples = 500
       const xMin = toWorldX(0)
       const xMax = toWorldX(width)
       const step = (xMax - xMin) / samples
       const values: { x: number; y: number }[] = []
 
-      // Generate points
       for (let i = 0; i <= samples; i++) {
         const x = xMin + i * step
         try {
@@ -130,12 +121,10 @@ export default function FullscreenGraphingTool() {
         } catch (e) { continue }
       }
 
-      // Find roots and extrema
       for (let i = 1; i < values.length; i++) {
         const curr = values[i]
         const prev = values[i - 1]
 
-        // Roots
         if (showRoots && Math.sign(curr.y) !== Math.sign(prev.y)) {
           // Binary search for precision
           let x1 = prev.x, x2 = curr.x
@@ -152,7 +141,6 @@ export default function FullscreenGraphingTool() {
         }
       }
 
-      // Extrema
       if (showExtrema && values.length > 4) {
         for (let i = 2; i < values.length - 2; i++) {
           const [p2, p1, c, n1, n2] = [values[i - 2], values[i - 1], values[i], values[i + 1], values[i + 2]]
@@ -169,7 +157,6 @@ export default function FullscreenGraphingTool() {
       }
     })
 
-    // 2. Find Intersections
     if (showIntersections && equations.filter(e => e.visible).length > 1) {
       const visibleEqs = equations.filter(e => e.visible && e.compiled);
       for (let i = 0; i < visibleEqs.length; i++) {
@@ -187,7 +174,6 @@ export default function FullscreenGraphingTool() {
               const diff2 = eq1.compiled.evaluate({ x: x2 }) - eq2.compiled.evaluate({ x: x2 })
 
               if (Math.sign(diff1) !== Math.sign(diff2)) {
-                // Binary search for intersection
                 let low = x1, high = x2, intersectX = x1
                 for (let iter = 0; iter < 5; iter++) {
                   const mid = (low + high) / 2
@@ -209,7 +195,6 @@ export default function FullscreenGraphingTool() {
     setAnalysisPoints(points)
   }, [equations, view, showRoots, showExtrema, showIntersections])
 
-  // Debounce analysis calculation
   useEffect(() => {
     const viewSignature = `${view.zoom.toFixed(1)}-${view.centerX.toFixed(2)}-${view.centerY.toFixed(2)}-${equations.map(eq => eq.visible ? eq.expr : '').join(",")}-${showRoots}-${showExtrema}-${showIntersections}`
     if (viewSignature === lastAnalysisViewRef.current) return
@@ -218,12 +203,11 @@ export default function FullscreenGraphingTool() {
     analysisTimeoutRef.current = setTimeout(() => {
       calculateAnalysisPoints()
       lastAnalysisViewRef.current = viewSignature
-    }, isPanning ? 150 : 50) // Delay more while panning
+    }, isPanning ? 150 : 50)
 
     return () => { if (analysisTimeoutRef.current) clearTimeout(analysisTimeoutRef.current) }
   }, [calculateAnalysisPoints, isPanning])
 
-  // --- Event Listeners ---
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
@@ -249,15 +233,11 @@ export default function FullscreenGraphingTool() {
     const handleMouseMove = (e: MouseEvent) => {
       if (!canvas) return
       const rect = canvas.getBoundingClientRect()
-      // Use client dimensions for coordinate mapping
       const width = canvas.clientWidth
       const height = canvas.clientHeight
-
-      // Mouse pos relative to canvas
       const canvasX = e.clientX - rect.left
       const canvasY = e.clientY - rect.top
 
-      // Panning Logic
       if (isPanning) {
         const dx = e.clientX - lastMousePos.current.x
         const dy = e.clientY - lastMousePos.current.y
@@ -270,12 +250,10 @@ export default function FullscreenGraphingTool() {
         return
       }
 
-      // Tracking Logic
       const toWorldX = (screenX: number) => (screenX - width / 2) / view.zoom + view.centerX
 
       if (showMouseTracking) {
         const worldX = toWorldX(canvasX)
-        // Find closest equation value
         let closestY = Infinity
         let closestEqColor = "#fff"
         let minDist = Infinity
@@ -305,9 +283,8 @@ export default function FullscreenGraphingTool() {
         setTrackingPoint(null)
       }
 
-      // Hover Analysis Point Logic
       let foundPoint: AnalysisPoint | null = null
-      let minPointDist = 20 // Grab radius
+      let minPointDist = 20
 
       for (const point of analysisPoints) {
         const screenX = (point.x - view.centerX) * view.zoom + width / 2
@@ -331,7 +308,6 @@ export default function FullscreenGraphingTool() {
       const width = canvas.clientWidth
       const height = canvas.clientHeight
 
-      // World coordinates before zoom
       const worldX = (mouseX - width / 2) / view.zoom + view.centerX
       const worldY = -(mouseY - height / 2) / view.zoom + view.centerY
 
@@ -360,47 +336,33 @@ export default function FullscreenGraphingTool() {
     }
   }, [isPanning, view, analysisPoints, showMouseTracking, equations])
 
-  // --- Render Loop ---
   useEffect(() => {
     const canvas = canvasRef.current
     const ctx = canvas?.getContext("2d")
     if (!canvas || !ctx) return
-
-    // Use client dimensions for rendering logic
     const width = canvas.clientWidth
     const height = canvas.clientHeight
 
-    // Reset transform to identity then scale for high DPI
-    // Note: We already scaled context in ResizeObserver, but clearRect works on transformed coordinates
-    // It's safer to use the internal width/height for clearing
     const dpr = window.devicePixelRatio || 1
     ctx.clearRect(0, 0, canvas.width / dpr, canvas.height / dpr)
 
-    // Background
-    // ctx.fillStyle = "#0f172a" // Slate 950
-    // ctx.fillRect(0, 0, width, height)
-
-    // Coordinate Conversion Helpers
     const toScreenX = (worldX: number) => (worldX - view.centerX) * view.zoom + width / 2
     const toScreenY = (worldY: number) => -(worldY - view.centerY) * view.zoom + height / 2
     const toWorldX = (screenX: number) => (screenX - width / 2) / view.zoom + view.centerX
 
-    // --- Grid ---
     const gridSize = Math.pow(10, Math.floor(Math.log10(100 / view.zoom)))
 
-    ctx.lineWidth = 1 / dpr // Hairline
+    ctx.lineWidth = 1 / dpr
     ctx.font = "10px Inter, sans-serif"
     ctx.textAlign = "center"
     ctx.textBaseline = "top"
 
-    // Vertical Lines & Labels
     const startX = Math.floor(toWorldX(0) / gridSize) * gridSize
     const endX = toWorldX(width)
 
     for (let x = startX; x < endX; x += gridSize) {
       const sx = toScreenX(x)
 
-      // Axis Line vs Grid Line
       if (Math.abs(x) < gridSize / 10) {
         ctx.strokeStyle = "rgba(255, 255, 255, 0.5)"
         ctx.lineWidth = 2
@@ -411,16 +373,13 @@ export default function FullscreenGraphingTool() {
 
       ctx.beginPath(); ctx.moveTo(sx, 0); ctx.lineTo(sx, height); ctx.stroke()
 
-      // Label
       if (Math.abs(x) > gridSize / 10) {
         ctx.fillStyle = "rgba(148, 163, 184, 0.8)"
         ctx.fillText(parseFloat(x.toPrecision(4)).toString(), sx, toScreenY(0) + 6)
       }
     }
 
-    // Horizontal Lines & Labels
-    const startY = Math.floor(toWorldX(height) / gridSize) * gridSize // Approximation for Y range
-    // Actually calculate Y world range
+    const startY = Math.floor(toWorldX(height) / gridSize) * gridSize
     const worldBottom = -(height - height / 2) / view.zoom + view.centerY
     const worldTop = -(0 - height / 2) / view.zoom + view.centerY
 
@@ -445,7 +404,6 @@ export default function FullscreenGraphingTool() {
       }
     }
 
-    // --- Equations ---
     equations.forEach((eq) => {
       if (!eq.compiled || !eq.visible) return
 
@@ -456,14 +414,12 @@ export default function FullscreenGraphingTool() {
 
       let isDrawing = false
 
-      // Draw in small chunks to handle asymptotes better
       for (let px = 0; px < width; px += 2) {
         const x = toWorldX(px)
         try {
           const y = eq.compiled.evaluate({ x: x })
           const py = toScreenY(y)
 
-          // Check for discontinuity / asymptote / NaN
           if (isNaN(y) || !isFinite(y) || Math.abs(py) > height * 2) {
             isDrawing = false
             continue
@@ -473,27 +429,16 @@ export default function FullscreenGraphingTool() {
             ctx.moveTo(px, py)
             isDrawing = true
           } else {
-            // Check if jump is too large (likely asymptote)
-            // const prevX = toWorldX(px - 2)
-            // const prevY = eq.compiled.evaluate({x: prevX})
-            // const prevPY = toScreenY(prevY)
-            // if (Math.abs(py - prevPY) > height) {
-            //   ctx.moveTo(px, py)
-            // } else {
             ctx.lineTo(px, py)
-            // }
           }
         } catch (e) { isDrawing = false }
       }
       ctx.stroke()
     })
 
-    // --- Analysis Points ---
     analysisPoints.forEach((point) => {
       const screenX = toScreenX(point.x)
       const screenY = toScreenY(point.y)
-
-      // Don't draw if way off screen
       if (screenX < -20 || screenX > width + 20 || screenY < -20 || screenY > height + 20) return
 
       ctx.fillStyle = point.type === "intersection" ? "#ffffff" : equations.find(eq => eq.id === point.equationId)?.color || "#ffffff"
@@ -506,7 +451,6 @@ export default function FullscreenGraphingTool() {
       ctx.stroke()
     })
 
-    // --- Tracking Point ---
     if (trackingPoint && showMouseTracking) {
       const screenX = toScreenX(trackingPoint.x)
       const screenY = toScreenY(trackingPoint.y)
@@ -520,14 +464,11 @@ export default function FullscreenGraphingTool() {
       ctx.fill()
       ctx.stroke()
 
-      // Dotted lines to axes
       ctx.strokeStyle = "rgba(255, 255, 255, 0.3)"
       ctx.lineWidth = 1
       ctx.setLineDash([4, 4])
 
-      // Vertical
       ctx.beginPath(); ctx.moveTo(screenX, 0); ctx.lineTo(screenX, height); ctx.stroke()
-      // Horizontal
       ctx.beginPath(); ctx.moveTo(0, screenY); ctx.lineTo(width, screenY); ctx.stroke()
 
       ctx.setLineDash([])
@@ -535,13 +476,10 @@ export default function FullscreenGraphingTool() {
 
   }, [equations, view, analysisPoints, trackingPoint, showMouseTracking])
 
-  // --- Logic Handlers ---
-
   const handleEquationChange = (id: number, newExpr: string) => {
     setEquations((prev) =>
       prev.map((eq) => {
         if (eq.id === id) {
-          // Try compile
           let compiled = null
           let error = false
           if (newExpr.trim()) {

@@ -52,14 +52,12 @@ export const MathPracticeCore: FC<MathPracticeCoreProps> = ({
   const [isGuideOpen, setIsGuideOpen] = useState(false);
   const [isReportOpen, setIsReportOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  // Add a key to force re-render of the problem area
   const [problemKey, setProblemKey] = useState(0);
 
   const getNewProblem = useCallback(async () => {
     if (selectedCategories.length === 0) return;
 
     setIsLoading(true);
-    // Ensure feedback is cleared immediately
     setFeedback(null);
     setUserAnswer("");
 
@@ -78,7 +76,6 @@ export const MathPracticeCore: FC<MathPracticeCoreProps> = ({
         setCurrentProblem(null);
       } else {
         setCurrentProblem(data);
-        // Increment key to force fresh render of problem components
         setProblemKey(prev => prev + 1);
         onProblemLoad({
           category: data.category,
@@ -96,7 +93,6 @@ export const MathPracticeCore: FC<MathPracticeCoreProps> = ({
     getNewProblem();
   }, [selectedCategories]);
 
-  // Listen for Enter key when feedback is shown to proceed to next question
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (feedback && e.key === 'Enter') {
@@ -167,7 +163,7 @@ export const MathPracticeCore: FC<MathPracticeCoreProps> = ({
             <AnimatePresence mode="wait">
               {!isLoading && currentProblem ? (
                 <motion.div
-                  key={`${currentProblem.id}-${problemKey}`} // Updated key
+                  key={`${currentProblem.id}-${problemKey}`}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
@@ -192,7 +188,6 @@ export const MathPracticeCore: FC<MathPracticeCoreProps> = ({
                   </div>
 
                   <div className="flex-grow mb-8">
-                    {/* Removed font-serif, added font-medium for better readability */}
                     <div className="text-xl md:text-2xl leading-relaxed font-medium text-foreground">
                       <ProblemRenderer text={currentProblem.problem} />
                     </div>
@@ -244,7 +239,7 @@ export const MathPracticeCore: FC<MathPracticeCoreProps> = ({
                             </div>
 
                             <Button
-                              type="button" // FIX: Prevent form submission
+                              type="button"
                               size="lg"
                               onClick={getNewProblem}
                               className={feedback.type === 'correct' ? "bg-green-600 hover:bg-green-500" : ""}

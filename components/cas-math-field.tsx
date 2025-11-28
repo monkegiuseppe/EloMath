@@ -30,7 +30,6 @@ const CasMathField: FC<CasMathFieldProps> = ({ latex, onChange, onMount, onDelet
     }
   }, [sessionType]);
 
-  // Handle click on the wrapper to focus the math field
   const handleWrapperClick = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -52,18 +51,13 @@ const CasMathField: FC<CasMathFieldProps> = ({ latex, onChange, onMount, onDelet
         mathquillDidMount={(field) => {
           mathFieldRef.current = field;
           onMount(field);
-          // Auto-focus on mount
           setTimeout(() => {
             field.focus();
             onFocus?.();
           }, 10);
         }}
         config={{
-          // Auto-commands for Greek letters, SPECIAL SYMBOLS, and FUNCTIONS that should render as symbols
-          // Added 'sqrt' here so typing 'sqrt' becomes the symbol √
           autoCommands: 'pi theta alpha beta gamma delta epsilon zeta eta lambda mu nu xi rho sigma tau phi chi psi omega hbar infinity sqrt',
-          // Auto-operator names for functions that should render as text (like sin, cos)
-          // Removed 'sqrt' from here
           autoOperatorNames: 'sin cos tan sec csc cot sinh cosh tanh arcsin arccos arctan log ln exp abs derivative solve simplify expand factor limit integrate sum product',
           handlers: {
             edit: (mathField) => {
@@ -76,17 +70,14 @@ const CasMathField: FC<CasMathFieldProps> = ({ latex, onChange, onMount, onDelet
             },
             enter: handleEnter,
             deleteOutOf: (dir) => {
-              // Only delete if the field is empty and user pressed backspace
               if (mathFieldRef.current && mathFieldRef.current.latex().trim() === '') {
                 onDelete();
               }
             },
             upOutOf: () => {
-              // Keep focus in the field when pressing up
               mathFieldRef.current?.focus();
             },
             downOutOf: () => {
-              // Keep focus in the field when pressing down
               mathFieldRef.current?.focus();
             },
             moveOutOf: (dir) => {
@@ -97,7 +88,6 @@ const CasMathField: FC<CasMathFieldProps> = ({ latex, onChange, onMount, onDelet
               const parentEditor = wrapper.closest('[contenteditable="true"]') as HTMLElement | null;
               if (!parentEditor) return;
 
-              // Blur the math field before moving focus
               mathFieldRef.current?.blur();
 
               setTimeout(() => {
@@ -106,19 +96,18 @@ const CasMathField: FC<CasMathFieldProps> = ({ latex, onChange, onMount, onDelet
 
                 const range = document.createRange();
 
-                if (dir === 1) { // Right
+                if (dir === 1) {
                   const next = wrapper.nextSibling;
                   if (next && next.nodeType === Node.TEXT_NODE && next.textContent) {
                     range.setStart(next, 0);
                     range.collapse(true);
                   } else {
-                    // Create a zero-width space to place cursor
                     const newTextNode = document.createTextNode('\u200B');
                     parent.insertBefore(newTextNode, wrapper.nextSibling);
                     range.setStart(newTextNode, 1);
                     range.collapse(true);
                   }
-                } else if (dir === -1) { // Left
+                } else if (dir === -1) {
                   const prev = wrapper.previousSibling;
                   if (prev && prev.nodeType === Node.TEXT_NODE && prev.textContent) {
                     range.setStart(prev, prev.textContent.length);

@@ -10,20 +10,17 @@ import { cn } from "@/lib/utils";
 
 export function SiteHeader() {
   const [isHelpOpen, setIsHelpOpen] = useState(false);
-  // FOR TESTING: Default to true so you can see it immediately
   const [highlightHelp, setHighlightHelp] = useState(true);
 
   useEffect(() => {
-    // FOR TESTING: Commented out the check so it always shows
-    // const hasSeen = localStorage.getItem("elomath-help-seen");
-    // if (!hasSeen) {
-    //   setHighlightHelp(true);
-    // }
+    const hasSeen = localStorage.getItem("elomath-help-seen");
+    if (!hasSeen) {
+      setHighlightHelp(true);
+    }
   }, []);
 
   const handleOpenHelp = () => {
     setIsHelpOpen(true);
-    // Once clicked, remove highlight (this resets on refresh due to the change above)
     if (highlightHelp) {
       setHighlightHelp(false);
       localStorage.setItem("elomath-help-seen", "true");
@@ -39,7 +36,6 @@ export function SiteHeader() {
           title="Help & Guide"
           className={cn(
             "glass p-2 sm:p-3 rounded-full transition-all duration-300 group relative",
-            // Conditional styling for new users
             highlightHelp
               ? "bg-cyan-500/20 border-cyan-400/50 hover:bg-cyan-500/30 shadow-[0_0_15px_rgba(34,211,238,0.3)]"
               : "hover:glass-strong"

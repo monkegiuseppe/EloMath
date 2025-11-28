@@ -39,7 +39,6 @@ const HelpModal: FC<HelpModalProps> = ({ isOpen, onClose }) => {
             initial={{ scale: 0.9, y: 20 }}
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.9, y: 20 }}
-            // Added min-h-[600px] to prevent resizing on tab switch
             className="glass-strong rounded-xl w-full max-w-4xl h-[80vh] min-h-[600px] flex flex-col overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
@@ -57,9 +56,7 @@ const HelpModal: FC<HelpModalProps> = ({ isOpen, onClose }) => {
               </button>
             </div>
 
-            {/* Content Container: Flex Row on Desktop, Flex Col on Mobile */}
             <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
-              {/* Navigation - Top bar on mobile, Sidebar on desktop */}
               <div className="w-full md:w-56 border-b md:border-b-0 md:border-r border-border/30 p-2 md:p-4 flex-shrink-0 overflow-x-auto md:overflow-y-auto custom-scrollbar">
                 <nav className="flex md:block space-x-2 md:space-x-0 md:space-y-1 min-w-max">
                   {categories.map((category) => {
@@ -68,11 +65,10 @@ const HelpModal: FC<HelpModalProps> = ({ isOpen, onClose }) => {
                       <button
                         key={category.id}
                         onClick={() => setActiveCategory(category.id)}
-                        className={`flex items-center gap-2 sm:gap-3 px-3 py-2 rounded-lg text-sm transition-colors whitespace-nowrap w-full text-left ${
-                          activeCategory === category.id
+                        className={`flex items-center gap-2 sm:gap-3 px-3 py-2 rounded-lg text-sm transition-colors whitespace-nowrap w-full text-left ${activeCategory === category.id
                             ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
                             : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
-                        }`}
+                          }`}
                       >
                         <Icon size={18} />
                         <span>{category.label}</span>
@@ -82,7 +78,6 @@ const HelpModal: FC<HelpModalProps> = ({ isOpen, onClose }) => {
                 </nav>
               </div>
 
-              {/* Content Area */}
               <div className="flex-1 p-4 sm:p-6 overflow-y-auto custom-scrollbar relative">
                 <AnimatePresence mode="wait">
                   <motion.div
@@ -193,7 +188,6 @@ const PracticeContent = () => (
       </ul>
     </div>
 
-    {/* Added missing section */}
     <div>
       <h4 className="text-lg font-semibold text-foreground mb-2">Problem Types</h4>
       <p className="text-sm mb-2">
@@ -245,7 +239,7 @@ const PracticeContent = () => (
     <div>
       <h4 className="text-lg font-semibold text-foreground mb-2">Reset Progress</h4>
       <p className="text-sm">
-        Use the <strong className="text-foreground">Reset</strong> button (🔄) to restart from 1200 ELO. 
+        Use the <strong className="text-foreground">Reset</strong> button (🔄) to restart from 1200 ELO.
         <strong className="text-destructive"> This action cannot be undone!</strong>
       </p>
     </div>
@@ -291,7 +285,7 @@ const CASContent = () => (
 
     <div>
       <h4 className="text-lg font-semibold text-foreground mb-2">Available Functions</h4>
-      
+
       <div className="space-y-3">
         <div>
           <strong className="text-cyan-400">Solving Equations</strong>
@@ -516,7 +510,7 @@ const GraphingContent = () => (
     <div>
       <h4 className="text-lg font-semibold text-foreground mb-2">Multiple Graphs</h4>
       <p className="text-sm">
-        You can graph up to 5 functions simultaneously, each with a different color. 
+        You can graph up to 5 functions simultaneously, each with a different color.
         Perfect for comparing functions or analyzing intersections.
       </p>
     </div>

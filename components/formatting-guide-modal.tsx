@@ -26,7 +26,6 @@ const FormattingGuideModal: FC<FormattingGuideModalProps> = ({ isOpen, onClose }
             initial={{ scale: 0.9, y: 20 }}
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.9, y: 20 }}
-            // Apply the strong glass effect here instead of a solid background
             className="glass-strong rounded-xl w-full max-w-lg relative"
             onClick={(e) => e.stopPropagation()}
           >
@@ -55,7 +54,7 @@ const FormattingGuideModal: FC<FormattingGuideModalProps> = ({ isOpen, onClose }
                   <li>
                     <strong>Square Roots:</strong> Use the <code>sqrt()</code> function (e.g., <code>sqrt(2)</code>).
                   </li>
-                   <li>
+                  <li>
                     <strong>Exponents:</strong> Use the caret symbol <code>^</code> (e.g., <code>x^2</code>).
                   </li>
                   <li>

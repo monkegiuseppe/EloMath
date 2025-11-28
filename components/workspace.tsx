@@ -71,10 +71,8 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
   const [addTabButtonLeft, setAddTabButtonLeft] = useState<number>(0);
   const [isAddTabMenuOpen, setIsAddTabMenuOpen] = useState(false);
 
-  // Track the previous active tab to detect changes
   const prevActiveTabIdRef = useRef<number>(activeTabId);
 
-  // --- DATA FETCHING ---
   useEffect(() => {
     if (status === 'authenticated' && sessionType !== 'default') {
       setIsEloLoaded(false);
@@ -134,7 +132,6 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
     }
   }, [isAddTabMenuOpen]);
 
-  // Update previous tab ref
   useEffect(() => {
     prevActiveTabIdRef.current = activeTabId;
   }, [activeTabId]);
@@ -193,17 +190,12 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
     if (status === 'authenticated' && sessionType !== 'default' && currentProblemRef.current && userElo !== null) {
       const difficulty = currentProblemRef.current.difficulty;
 
-      // Logic: Calculate expected score (win probability). 
-      // If you skip an easy question (high expected score), you lose more points.
-      // If you skip a hard question (low expected score), you lose fewer/zero points.
       const expectedScore = 1 / (1 + Math.pow(10, (difficulty - userElo) / 400));
-
-      // Custom K-factor for skipping. Max penalty is 5 ELO.
       const SKIP_K_FACTOR = 5;
       const eloDrop = Math.round(SKIP_K_FACTOR * expectedScore);
       const newElo = userElo - eloDrop;
 
-      setUserElo(newElo); // Update UI immediately
+      setUserElo(newElo);
 
       fetch('/api/progress', {
         method: 'POST',
@@ -215,7 +207,7 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
           questionDetails: {
             category: currentProblemRef.current.category,
             difficulty: currentProblemRef.current.difficulty,
-            eloChange: -eloDrop // Send the negative change
+            eloChange: -eloDrop
           }
         }),
       }).catch(err => console.error('Failed to save progress:', err));

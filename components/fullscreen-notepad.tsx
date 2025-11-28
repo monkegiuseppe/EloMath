@@ -35,18 +35,15 @@ const FullscreenNotepad = forwardRef<NotepadRef, FullscreenNotepadProps>(
     const equationCounter = useRef(0);
     const lastFocusedEquationId = useRef<string | null>(null);
 
-    // Expose focus method to parent
     useImperativeHandle(ref, () => ({
       focus: () => {
         focusEditor();
       }
     }));
 
-    // Focus the editor, placing cursor at end or restoring last position
     const focusEditor = useCallback(() => {
       if (!contentRef.current) return;
 
-      // If there was a focused equation, try to refocus it
       if (lastFocusedEquationId.current && equations[lastFocusedEquationId.current]?.mqInstance) {
         const eq = equations[lastFocusedEquationId.current];
         if (eq.mqInstance) {
@@ -57,10 +54,8 @@ const FullscreenNotepad = forwardRef<NotepadRef, FullscreenNotepadProps>(
         }
       }
 
-      // Otherwise focus the contentEditable and place cursor at end
       contentRef.current.focus();
 
-      // Place cursor at the end
       const selection = window.getSelection();
       if (selection) {
         const range = document.createRange();
@@ -71,10 +66,8 @@ const FullscreenNotepad = forwardRef<NotepadRef, FullscreenNotepadProps>(
       }
     }, [equations]);
 
-    // Auto-focus when isActive becomes true
     useEffect(() => {
       if (isActive) {
-        // Small delay to ensure DOM is ready after tab switch
         const timer = setTimeout(() => {
           focusEditor();
         }, 50);
@@ -82,7 +75,6 @@ const FullscreenNotepad = forwardRef<NotepadRef, FullscreenNotepadProps>(
       }
     }, [isActive, focusEditor]);
 
-    // Initial content setup
     useEffect(() => {
       if (contentRef.current && contentRef.current.innerHTML !== value) {
         contentRef.current.innerHTML = value;
@@ -92,7 +84,6 @@ const FullscreenNotepad = forwardRef<NotepadRef, FullscreenNotepadProps>(
     const insertEquation = useCallback(() => {
       const selection = window.getSelection();
       if (!selection?.rangeCount || !contentRef.current?.contains(selection.anchorNode)) {
-        // If no selection in editor, focus it first and place cursor at end
         if (contentRef.current) {
           contentRef.current.focus();
           const range = document.createRange();
