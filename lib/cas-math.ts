@@ -852,11 +852,29 @@ export const evaluateMath = (
     }
 
     if (trimmed.includes("derivative") || trimmed.includes("d/d")) {
+      let exprStr: string;
+      let varStr: string;
+
       const dMatch = trimmed.match(/d\/d([a-zA-Z])\((.+)\)/);
-      let cmd = trimmed;
-      if (dMatch) cmd = `derivative(${dMatch[2]}, ${dMatch[1]})`;
-      const res = math.evaluate(cmd);
-      return res.toString().replace(/\s\*\s/g, "");
+      if (dMatch) {
+        varStr = dMatch[1];
+        exprStr = dMatch[2];
+      } else {
+        const derivMatch = trimmed.match(/^derivative\((.+),\s*([a-zA-Z])\)$/);
+        if (derivMatch) {
+          exprStr = derivMatch[1];
+          varStr = derivMatch[2];
+        } else {
+          return "Error: Invalid derivative syntax";
+        }
+      }
+
+      try {
+        const result = math.derivative(exprStr, varStr);
+        return result.toString().replace(/\s\*\s/g, "");
+      } catch (e) {
+        return "Error: Cannot differentiate expression";
+      }
     }
 
     if (trimmed.startsWith("integrate(")) {
