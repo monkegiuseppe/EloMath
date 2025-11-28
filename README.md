@@ -24,7 +24,7 @@ New users get to choose their starting skill level.
 </p>
 
 ## Workspace
-
+ 
 <p>
   <img src="./public/assets/demopic.png" height="350" />
   &nbsp;&nbsp;&nbsp;

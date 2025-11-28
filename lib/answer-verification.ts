@@ -10,6 +10,10 @@ function cleanInput(input: string): string {
         .replace(/\{/g, "(")
         .replace(/\}/g, ")")
         .replace(/\s/g, "")
+        .replace(/π/g, "pi")
+        .replace(/²/g, "^2")
+        .replace(/³/g, "^3")
+        .replace(/√/g, "sqrt")
         .replace(/pi/gi, "pi")
         .replace(/ln/gi, "log")
         .toLowerCase();
