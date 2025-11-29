@@ -13,7 +13,7 @@ export function calculateNewElo(
 }
 
 export function getPlayerElo(subject = "math"): number {
-  if (typeof window === "undefined") return 1200; // Default for Server-Side Rendering
+  if (typeof window === "undefined") return 1200;
   const key = `playerElo_${subject}`;
   const stored = localStorage.getItem(key);
   return stored ? parseInt(stored, 10) : 1200;

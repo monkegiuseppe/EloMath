@@ -17,6 +17,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import DifficultySelector from "./difficulty-selector";
+import MergeProgressModal from "./merge-progress-modal";
+import {
+  getAnonymousProgress,
+  saveAnonymousProgress,
+  clearAnonymousProgress,
+  hasAnonymousProgress,
+  type AnonymousProgress
+} from "@/lib/anonymous-progress";
 
 const FullscreenNotepad = dynamic(() => import('./fullscreen-notepad'), { ssr: false });
 const FullscreenGraphingTool = dynamic(() => import('./fullscreen-graphing-tool'), { ssr: false });
@@ -73,7 +81,39 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
 
   const prevActiveTabIdRef = useRef<number>(activeTabId);
 
+  const [showMergeModal, setShowMergeModal] = useState(false);
+  const [anonymousProgressData, setAnonymousProgressData] = useState<AnonymousProgress | null>(null);
+  const [existingAccountProgress, setExistingAccountProgress] = useState<any>(null);
+  const mergeCheckDone = useRef(false);
+  const mergeCompleted = useRef(false);
+
   useEffect(() => {
+    if (status === 'authenticated' && sessionType !== 'default' && !mergeCheckDone.current) {
+      mergeCheckDone.current = true;
+
+      const anonProgress = getAnonymousProgress();
+      if (anonProgress && hasAnonymousProgress()) {
+        setAnonymousProgressData(anonProgress);
+
+        fetch('/api/progress')
+          .then(res => res.json())
+          .then(data => {
+            if (data && !data.error) {
+              setExistingAccountProgress(data);
+            }
+            setShowMergeModal(true);
+          })
+          .catch(() => {
+            setShowMergeModal(true);
+          });
+      }
+    }
+  }, [status, sessionType]);
+
+  useEffect(() => {
+    if (showMergeModal) return;
+    if (mergeCompleted.current) return;
+
     if (status === 'authenticated' && sessionType !== 'default') {
       setIsEloLoaded(false);
       fetch('/api/progress')
@@ -92,7 +132,7 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
               skipped: sessionType === 'math' ? data.mathSkipped : data.physicsSkipped,
             });
 
-            if (totalAttempts === 0) {
+            if (totalAttempts === 0 && currentElo === 1200) {
               setShowDifficultySelector(true);
             }
           } else {
@@ -108,13 +148,41 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
           setIsEloLoaded(true);
         });
     } else if (status === 'unauthenticated' && sessionType !== 'default') {
+      const anonProgress = getAnonymousProgress();
+
+      if (anonProgress) {
+        const hasProgress = sessionType === 'math'
+          ? (anonProgress.mathCorrect + anonProgress.mathIncorrect + anonProgress.mathSkipped) > 0 || anonProgress.mathElo !== 1200
+          : (anonProgress.physicsCorrect + anonProgress.physicsIncorrect + anonProgress.physicsSkipped) > 0 || anonProgress.physicsElo !== 1200;
+
+        if (hasProgress) {
+          if (sessionType === 'math') {
+            setUserElo(anonProgress.mathElo);
+            setSessionStats({
+              correct: anonProgress.mathCorrect,
+              incorrect: anonProgress.mathIncorrect,
+              skipped: anonProgress.mathSkipped,
+            });
+          } else {
+            setUserElo(anonProgress.physicsElo);
+            setSessionStats({
+              correct: anonProgress.physicsCorrect,
+              incorrect: anonProgress.physicsIncorrect,
+              skipped: anonProgress.physicsSkipped,
+            });
+          }
+          setIsEloLoaded(true);
+          return;
+        }
+      }
+
       setShowDifficultySelector(true);
       setUserElo(STARTING_ELO);
       setIsEloLoaded(true);
     } else {
       setIsEloLoaded(true);
     }
-  }, [status, sessionType]);
+  }, [status, sessionType, showMergeModal]);
 
   useEffect(() => {
     if (sessionType !== 'default') {
@@ -136,6 +204,57 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
     prevActiveTabIdRef.current = activeTabId;
   }, [activeTabId]);
 
+  const handleMergeProgress = async (strategy: 'replace' | 'combine' | 'keep_best' | 'discard') => {
+    if (strategy === 'discard') {
+      clearAnonymousProgress();
+      setShowMergeModal(false);
+      setAnonymousProgressData(null);
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/progress/merge', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          anonymousProgress: anonymousProgressData,
+          mergeStrategy: strategy,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+
+        mergeCompleted.current = true;
+
+        if (sessionType === 'math') {
+          setUserElo(data.progress.mathElo);
+          setSessionStats({
+            correct: data.progress.mathCorrect,
+            incorrect: data.progress.mathIncorrect,
+            skipped: data.progress.mathSkipped,
+          });
+        } else if (sessionType === 'physics') {
+          setUserElo(data.progress.physicsElo);
+          setSessionStats({
+            correct: data.progress.physicsCorrect,
+            incorrect: data.progress.physicsIncorrect,
+            skipped: data.progress.physicsSkipped,
+          });
+        }
+
+        clearAnonymousProgress();
+        setIsEloLoaded(true);
+        setShowDifficultySelector(false);
+      }
+    } catch (error) {
+      console.error('Failed to merge progress:', error);
+    }
+
+    setShowMergeModal(false);
+    setAnonymousProgressData(null);
+  };
+
   const handleDifficultySelect = (selectedElo: number) => {
     setUserElo(selectedElo);
     setShowDifficultySelector(false);
@@ -150,6 +269,22 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
           newElo: selectedElo,
         }),
       }).catch(err => console.error('Failed to save starting ELO:', err));
+    } else if (status === 'unauthenticated' && sessionType !== 'default') {
+      if (sessionType === 'math') {
+        saveAnonymousProgress({
+          mathElo: selectedElo,
+          mathCorrect: 0,
+          mathIncorrect: 0,
+          mathSkipped: 0,
+        });
+      } else {
+        saveAnonymousProgress({
+          physicsElo: selectedElo,
+          physicsCorrect: 0,
+          physicsIncorrect: 0,
+          physicsSkipped: 0,
+        });
+      }
     }
   };
 
@@ -181,6 +316,24 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
           }
         }),
       }).catch(err => console.error('Failed to save progress:', err));
+    } else if (status === 'unauthenticated' && sessionType !== 'default') {
+      const newStats = { ...sessionStats, [type]: sessionStats[type] + 1 };
+
+      if (sessionType === 'math') {
+        saveAnonymousProgress({
+          mathElo: newElo,
+          mathCorrect: newStats.correct,
+          mathIncorrect: newStats.incorrect,
+          mathSkipped: newStats.skipped,
+        });
+      } else {
+        saveAnonymousProgress({
+          physicsElo: newElo,
+          physicsCorrect: newStats.correct,
+          physicsIncorrect: newStats.incorrect,
+          physicsSkipped: newStats.skipped,
+        });
+      }
     }
   };
 
@@ -211,6 +364,35 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
           }
         }),
       }).catch(err => console.error('Failed to save progress:', err));
+    } else if (status === 'unauthenticated' && sessionType !== 'default' && userElo !== null) {
+      let newElo = userElo;
+
+      if (currentProblemRef.current) {
+        const difficulty = currentProblemRef.current.difficulty;
+        const expectedScore = 1 / (1 + Math.pow(10, (difficulty - userElo) / 400));
+        const SKIP_K_FACTOR = 5;
+        const eloDrop = Math.round(SKIP_K_FACTOR * expectedScore);
+        newElo = userElo - eloDrop;
+        setUserElo(newElo);
+      }
+
+      const newStats = { ...sessionStats, skipped: sessionStats.skipped + 1 };
+
+      if (sessionType === 'math') {
+        saveAnonymousProgress({
+          mathElo: newElo,
+          mathCorrect: newStats.correct,
+          mathIncorrect: newStats.incorrect,
+          mathSkipped: newStats.skipped,
+        });
+      } else {
+        saveAnonymousProgress({
+          physicsElo: newElo,
+          physicsCorrect: newStats.correct,
+          physicsIncorrect: newStats.incorrect,
+          physicsSkipped: newStats.skipped,
+        });
+      }
     }
 
     currentProblemRef.current = null;
@@ -234,7 +416,7 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
 
     const confirmMessage = status === 'authenticated'
       ? `Are you sure you want to PERMANENTLY reset your ${sessionType} ELO and ALL stats? This will delete all your ${sessionType} history and cannot be undone.`
-      : `Are you sure you want to reset your ${sessionType} ELO and session stats? (This session only - not saved to database)`;
+      : `Are you sure you want to reset your ${sessionType} ELO and session stats?`;
 
     if (!confirm(confirmMessage)) return;
 
@@ -242,6 +424,7 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
     setUserElo(1200);
     setSessionStats({ correct: 0, incorrect: 0, skipped: 0 });
     setPracticeKey(prev => prev + 1);
+    mergeCompleted.current = false;
 
     if (status === 'authenticated') {
       try {
@@ -253,6 +436,22 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
       } catch (error) {
         console.error('Failed to reset stats in database:', error);
         alert('Failed to reset stats. Please try again.');
+      }
+    } else {
+      if (sessionType === 'math') {
+        saveAnonymousProgress({
+          mathElo: 1200,
+          mathCorrect: 0,
+          mathIncorrect: 0,
+          mathSkipped: 0,
+        });
+      } else {
+        saveAnonymousProgress({
+          physicsElo: 1200,
+          physicsCorrect: 0,
+          physicsIncorrect: 0,
+          physicsSkipped: 0,
+        });
       }
     }
   };
@@ -284,8 +483,22 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
 
   return (
     <div className="min-h-screen relative flex flex-col">
+      {anonymousProgressData && (
+        <MergeProgressModal
+          isOpen={showMergeModal}
+          onClose={() => {
+            setShowMergeModal(false);
+            clearAnonymousProgress();
+            setAnonymousProgressData(null);
+          }}
+          anonymousProgress={anonymousProgressData}
+          existingProgress={existingAccountProgress}
+          onMerge={handleMergeProgress}
+        />
+      )}
+
       <DifficultySelector
-        isOpen={showDifficultySelector}
+        isOpen={showDifficultySelector && !showMergeModal}
         onSelect={handleDifficultySelect}
       />
 
@@ -447,9 +660,8 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
                 )}
                 {tab.type === 'graphing' && <FullscreenGraphingTool />}
 
-                {/* Conditional Rendering for Practice Cores */}
                 {tab.type === 'math-practice' && (
-                  isEloLoaded && userElo !== null ? (
+                  isEloLoaded && userElo !== null && !showMergeModal ? (
                     <MathPracticeCore
                       key={practiceKey}
                       userElo={userElo}
@@ -465,7 +677,7 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
                   )
                 )}
                 {tab.type === 'physics-practice' && (
-                  isEloLoaded && userElo !== null ? (
+                  isEloLoaded && userElo !== null && !showMergeModal ? (
                     <PhysicsPracticeCore
                       key={practiceKey}
                       userElo={userElo}

@@ -975,7 +975,7 @@ export const mathProblems: Problem[] = [
     topic: "Calculus (Basic Derivative)",
     difficulty: 1100,
     problem: "Let $f(x) = -3x^4 + 2x^3 - 5x + 1$. Find the value of $f'(1)$.",
-    answer: "-1",
+    answer: "-11",
   },
   {
     category: "Calculus I",

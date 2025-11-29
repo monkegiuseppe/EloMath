@@ -2,7 +2,7 @@
 
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import type { FC } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { CheckCircle, XCircle, SkipForward, Loader2, Flag, ArrowRight } from "lucide-react"
@@ -55,6 +55,8 @@ export const PhysicsPracticeCore: FC<PhysicsPracticeCoreProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [problemKey, setProblemKey] = useState(0);
 
+  const feedbackTimestampRef = useRef<number>(0);
+
   const getNewProblem = useCallback(async () => {
     if (selectedCategories.length === 0) return;
 
@@ -97,6 +99,11 @@ export const PhysicsPracticeCore: FC<PhysicsPracticeCoreProps> = ({
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (feedback && e.key === 'Enter') {
+        const timeSinceFeedback = Date.now() - feedbackTimestampRef.current;
+        if (timeSinceFeedback < 300) {
+          return;
+        }
+
         e.preventDefault();
         getNewProblem();
       }
@@ -110,7 +117,7 @@ export const PhysicsPracticeCore: FC<PhysicsPracticeCoreProps> = ({
 
   const handleSubmit = (e?: React.FormEvent<HTMLFormElement>) => {
     if (e) e.preventDefault();
-    if (!userAnswer.trim() || !currentProblem) return;
+    if (!userAnswer.trim() || !currentProblem || feedback) return;
 
     const wasCorrect = checkAnswer(userAnswer, currentProblem.answer);
 
@@ -124,6 +131,8 @@ export const PhysicsPracticeCore: FC<PhysicsPracticeCoreProps> = ({
       category: currentProblem.category,
       difficulty: currentProblem.difficulty
     });
+
+    feedbackTimestampRef.current = Date.now();
 
     setFeedback({
       type: wasCorrect ? "correct" : "incorrect",
