@@ -2,7 +2,7 @@
 
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useCallback } from "react"
 import { useSession } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion"
 import { ArrowLeft, Plus, X, Notebook, TrendingUp, BrainCircuit, RefreshCw, SlidersHorizontal, CheckCircle, XCircle, SkipForward, Loader2 } from "lucide-react"
@@ -73,6 +73,8 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
   const [isCategorySelectorOpen, setIsCategorySelectorOpen] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
+  const [seenQuestionIds, setSeenQuestionIds] = useState<string[]>([]);
+
   const currentProblemRef = useRef<{ category: string; difficulty: number } | null>(null);
 
   const addTabButtonRef = useRef<HTMLDivElement>(null);
@@ -86,6 +88,17 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
   const [existingAccountProgress, setExistingAccountProgress] = useState<any>(null);
   const mergeCheckDone = useRef(false);
   const mergeCompleted = useRef(false);
+
+  const handleQuestionSeen = useCallback((questionId: string) => {
+    setSeenQuestionIds(prev => {
+      if (prev.includes(questionId)) return prev;
+      return [...prev, questionId];
+    });
+  }, []);
+
+  const handleCycleReset = useCallback(() => {
+    setSeenQuestionIds([]);
+  }, []);
 
   useEffect(() => {
     if (status === 'authenticated' && sessionType !== 'default' && !mergeCheckDone.current) {
@@ -259,6 +272,7 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
     setUserElo(selectedElo);
     setShowDifficultySelector(false);
     setPracticeKey(prev => prev + 1);
+    setSeenQuestionIds([]);
 
     if (status === 'authenticated' && sessionType !== 'default') {
       fetch('/api/progress', {
@@ -408,6 +422,7 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
       : [...selectedCategories, category];
     if (newSelection.length > 0) {
       setSelectedCategories(newSelection);
+      setSeenQuestionIds([]);
     }
   };
 
@@ -424,6 +439,7 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
     setUserElo(1200);
     setSessionStats({ correct: 0, incorrect: 0, skipped: 0 });
     setPracticeKey(prev => prev + 1);
+    setSeenQuestionIds([]);
     mergeCompleted.current = false;
 
     if (status === 'authenticated') {
@@ -669,6 +685,9 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
                       onSkip={handleSkip}
                       onProblemLoad={handleProblemLoad}
                       selectedCategories={selectedCategories}
+                      seenQuestionIds={seenQuestionIds}
+                      onQuestionSeen={handleQuestionSeen}
+                      onCycleReset={handleCycleReset}
                     />
                   ) : (
                     <div className="flex h-full items-center justify-center">
@@ -685,6 +704,9 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
                       onSkip={handleSkip}
                       onProblemLoad={handleProblemLoad}
                       selectedCategories={selectedCategories}
+                      seenQuestionIds={seenQuestionIds}
+                      onQuestionSeen={handleQuestionSeen}
+                      onCycleReset={handleCycleReset}
                     />
                   ) : (
                     <div className="flex h-full items-center justify-center">

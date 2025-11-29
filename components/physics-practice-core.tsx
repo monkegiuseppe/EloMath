@@ -5,7 +5,7 @@
 import { useState, useEffect, useCallback, useRef } from "react"
 import type { FC } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { CheckCircle, XCircle, SkipForward, Loader2, Flag, ArrowRight } from "lucide-react"
+import { CheckCircle, XCircle, SkipForward, Loader2, Flag, ArrowRight, RefreshCcw } from "lucide-react"
 import { checkAnswer } from "../lib/answer-verification"
 import ProblemRenderer from "./problem-renderer"
 import FormattingGuideModal from "./formatting-guide-modal"
@@ -21,16 +21,21 @@ interface PhysicsPracticeCoreProps {
   onSkip: () => void;
   onProblemLoad: (problemDetails: { category: string; difficulty: number }) => void;
   selectedCategories: string[];
+  seenQuestionIds: string[];
+  onQuestionSeen: (id: string) => void;
+  onCycleReset: () => void;
 }
 
 interface ProblemData {
   id: string;
+  customId?: string;
   topic: string;
   category: string;
   difficulty: number;
   problem: string;
   answer: string;
   unit?: string;
+  _cycleReset?: boolean;
 }
 
 interface Feedback {
@@ -45,7 +50,10 @@ export const PhysicsPracticeCore: FC<PhysicsPracticeCoreProps> = ({
   onAnswerSubmit,
   onSkip,
   onProblemLoad,
-  selectedCategories
+  selectedCategories,
+  seenQuestionIds,
+  onQuestionSeen,
+  onCycleReset
 }) => {
   const [currentProblem, setCurrentProblem] = useState<ProblemData | null>(null);
   const [userAnswer, setUserAnswer] = useState<string>("");
@@ -54,6 +62,7 @@ export const PhysicsPracticeCore: FC<PhysicsPracticeCoreProps> = ({
   const [isReportOpen, setIsReportOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [problemKey, setProblemKey] = useState(0);
+  const [cycleComplete, setCycleComplete] = useState(false);
 
   const feedbackTimestampRef = useRef<number>(0);
 
@@ -63,12 +72,14 @@ export const PhysicsPracticeCore: FC<PhysicsPracticeCoreProps> = ({
     setIsLoading(true);
     setFeedback(null);
     setUserAnswer("");
+    setCycleComplete(false);
 
     try {
       const params = new URLSearchParams({
         subject: 'physics',
         elo: userElo.toString(),
-        categories: selectedCategories.join(',')
+        categories: selectedCategories.join(','),
+        excludeIds: seenQuestionIds.join(',')
       });
 
       const res = await fetch(`/api/problems?${params.toString()}`);
@@ -78,8 +89,18 @@ export const PhysicsPracticeCore: FC<PhysicsPracticeCoreProps> = ({
         console.warn(data.error);
         setCurrentProblem(null);
       } else {
+        if (data._cycleReset) {
+          setCycleComplete(true);
+        }
+
         setCurrentProblem(data);
         setProblemKey(prev => prev + 1);
+
+        const questionId = data.customId || data.id;
+        if (questionId) {
+          onQuestionSeen(questionId);
+        }
+
         onProblemLoad({
           category: data.category,
           difficulty: data.difficulty
@@ -90,7 +111,7 @@ export const PhysicsPracticeCore: FC<PhysicsPracticeCoreProps> = ({
     } finally {
       setIsLoading(false);
     }
-  }, [userElo, selectedCategories, onProblemLoad]);
+  }, [userElo, selectedCategories, seenQuestionIds, onProblemLoad, onQuestionSeen]);
 
   useEffect(() => {
     getNewProblem();
@@ -147,6 +168,12 @@ export const PhysicsPracticeCore: FC<PhysicsPracticeCoreProps> = ({
     getNewProblem();
   };
 
+  const handleStartNewCycle = () => {
+    onCycleReset();
+    setCycleComplete(false);
+    setTimeout(() => getNewProblem(), 100);
+  };
+
   return (
     <>
       <FormattingGuideModal isOpen={isGuideOpen} onClose={() => setIsGuideOpen(false)} />
@@ -170,6 +197,27 @@ export const PhysicsPracticeCore: FC<PhysicsPracticeCoreProps> = ({
             )}
 
             <AnimatePresence mode="wait">
+              {cycleComplete && !feedback && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="absolute top-4 left-4 right-4 z-10"
+                >
+                  <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg px-4 py-2 flex items-center justify-between">
+                    <span className="text-sm text-amber-400">
+                      You've seen all available questions! Starting a new cycle.
+                    </span>
+                    <button
+                      onClick={handleStartNewCycle}
+                      className="text-amber-400 hover:text-amber-300 flex items-center gap-1 text-sm"
+                    >
+                      <RefreshCcw size={14} />
+                      Reset
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+
               {!isLoading && currentProblem ? (
                 <motion.div
                   key={`${currentProblem.id}-${problemKey}`}
