@@ -2076,4 +2076,47 @@ export const physicsProblems: Problem[] = [
     answer: "0.05",
     unit: "1/cm"
   },
+
+  // --- PHYSICS: MECHANICS & E&M (Tier 3-5: ELO 900-1800) ---
+  {
+    category: "Physics", id: "PHY_MECH_01", topic: "Newton's Second Law", difficulty: 900,
+    problem: "A 10kg object accelerates at $2 m/s^2$. What is the net force?", answer: "20", unit: "N"
+  },
+  {
+    category: "Physics", id: "PHY_MECH_02", topic: "Kinematics", difficulty: 1050,
+    problem: "An object falls from rest for 3 seconds ($g \\approx 10 m/s^2$). How far does it fall?", answer: "45", unit: "m"
+  },
+  {
+    category: "Physics", id: "PHY_MECH_03", topic: "Kinetic Energy", difficulty: 1100,
+    problem: "Calculate the kinetic energy of a 2kg mass moving at 4 m/s.", answer: "16", unit: "J"
+  },
+  {
+    category: "Physics", id: "PHY_MECH_04", topic: "Gravitational PE", difficulty: 1000,
+    problem: "A 5kg rock is raised 10m ($g=10 m/s^2$). What is its Potential Energy?", answer: "500", unit: "J"
+  },
+  {
+    category: "Physics", id: "PHY_MECH_05", topic: "Momentum", difficulty: 1000,
+    problem: "A 1000kg car moves at 20 m/s. What is its momentum?", answer: "20000", unit: "kg*m/s"
+  },
+  {
+    category: "Physics", id: "PHY_ELEC_01", topic: "Ohm's Law", difficulty: 950,
+    problem: "A circuit has 12V and 4 Ohms resistance. Calculate Current.", answer: "3", unit: "A"
+  },
+  {
+    category: "Physics", id: "PHY_ELEC_02", topic: "Power in Circuits", difficulty: 1150,
+    problem: "A resistor dissipates 100W at 20V. What is the current?", answer: "5", unit: "A"
+  },
+  {
+    category: "Physics", id: "PHY_ELEC_03", topic: "Capacitance", difficulty: 1400,
+    problem: "A 2uF capacitor is connected to 10V. Calculate charge stored.", answer: "20", unit: "uC"
+  },
+  {
+    category: "Physics", id: "PHY_WAVE_01", topic: "Wave Speed", difficulty: 1200,
+    problem: "A wave has frequency 50Hz and wavelength 2m. Find speed.", answer: "100", unit: "m/s"
+  },
+  {
+    category: "Physics", id: "PHY_WAVE_02", topic: "Period/Freq", difficulty: 950,
+    problem: "A pendulum swings with a period of 0.5s. What is its frequency?", answer: "2", unit: "Hz"
+  },
+
 ];

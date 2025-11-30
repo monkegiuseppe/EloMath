@@ -201,5 +201,34 @@ export const statisticsProblems: Problem[] = [
         difficulty: 1450,
         problem: "A random variable X takes value 1 with probability 0.4 and value 2 with probability 0.6. What is $E[X]$?",
         answer: "1.6"
-    }
+    },
+    // --- STATISTICS (Tier 3-4: ELO 800-1200) ---
+    {
+        category: "Statistics", id: "STAT_DESC_01", topic: "Mean", difficulty: 800,
+        problem: "Find the mean of the set {2, 4, 6, 8, 10}.", answer: "6"
+    },
+    {
+        category: "Statistics", id: "STAT_DESC_02", topic: "Median", difficulty: 850,
+        problem: "Find the median of {1, 3, 10, 2, 5}.", answer: "3"
+    },
+    {
+        category: "Statistics", id: "STAT_PROB_01", topic: "Simple Probability", difficulty: 850,
+        problem: "A fair die is rolled. P(rolling > 4)? (Answer as decimal)", answer: "0.333"
+    },
+    {
+        category: "Statistics", id: "STAT_PROB_02", topic: "Independent Events", difficulty: 1000,
+        problem: "Two coins are flipped. P(both heads)? (Answer as decimal)", answer: "0.25"
+    },
+    {
+        category: "Statistics", id: "STAT_COMB_01", topic: "Factorials", difficulty: 900,
+        problem: "Evaluate 5!", answer: "120"
+    },
+    {
+        category: "Statistics", id: "STAT_COMB_02", topic: "Permutations", difficulty: 1100,
+        problem: "Calculate 5P2 (Permutation 5 pick 2).", answer: "20"
+    },
+    {
+        category: "Statistics", id: "STAT_COMB_03", topic: "Combinations", difficulty: 1150,
+        problem: "Calculate 5C2 (Combination 5 choose 2).", answer: "10"
+    },
 ];

@@ -611,6 +611,46 @@ export const mathProblems: Problem[] = [
 
 
   {
+    category: "Calculus I", id: "CALC_DERIV_01", topic: "Power Rule", difficulty: 1150,
+    problem: "Find $\\frac{d}{dx}(x^4)$.", answer: "4x^3"
+  },
+  {
+    category: "Calculus I", id: "CALC_DERIV_02", topic: "Trigonometric Derivatives", difficulty: 1200,
+    problem: "Find $\\frac{d}{dx}(\\sin(x))$.", answer: "cos(x)"
+  },
+  {
+    category: "Calculus I", id: "CALC_DERIV_03", topic: "Exponential Derivatives", difficulty: 1220,
+    problem: "Find $\\frac{d}{dx}(e^x)$.", answer: "e^x"
+  },
+  {
+    category: "Calculus I", id: "CALC_DERIV_04", topic: "Logarithmic Derivatives", difficulty: 1250,
+    problem: "Find $\\frac{d}{dx}(\\ln(x))$.", answer: "1/x"
+  },
+  {
+    category: "Calculus I", id: "CALC_DERIV_05", topic: "Chain Rule", difficulty: 1350,
+    problem: "Find the derivative of $y = (2x+1)^3$.", answer: "6(2x+1)^2"
+  },
+  {
+    category: "Calculus I", id: "CALC_DERIV_06", topic: "Chain Rule", difficulty: 1380,
+    problem: "Find $\\frac{d}{dx}(\\cos(x^2))$.", answer: "-2xsin(x^2)"
+  },
+  {
+    category: "Calculus I", id: "CALC_DERIV_07", topic: "Product Rule", difficulty: 1320,
+    problem: "Find $\\frac{d}{dx}(x e^x)$.", answer: "e^x(x+1)"
+  },
+  {
+    category: "Calculus I", id: "CALC_DERIV_08", topic: "Quotient Rule", difficulty: 1360,
+    problem: "Find $\\frac{d}{dx}(\\frac{1}{x})$.", answer: "-1/x^2"
+  },
+  {
+    category: "Calculus I", id: "CALC_DERIV_09", topic: "Implicit Differentiation", difficulty: 1450,
+    problem: "If $x^2 + y^2 = 25$, find $\\frac{dy}{dx}$ in terms of x and y.", answer: "-x/y"
+  },
+  {
+    category: "Calculus I", id: "CALC_LIMIT_01", topic: "Limits to Infinity", difficulty: 1150,
+    problem: "Evaluate $\\lim_{x \\to \\infty} \\frac{3x^2+1}{2x^2-x}$.", answer: "3/2"
+  },
+  {
     category: "Calculus I",
     id: "C_NEW_01",
     topic: "Limit at Infinity",
@@ -1850,6 +1890,39 @@ export const mathProblems: Problem[] = [
   // --- Calculus II: Integrals ---
 
 
+
+  {
+    category: "Calculus II", id: "CALC_INT_01", topic: "Basic Integration", difficulty: 1420,
+    problem: "Evaluate $\\int 3x^2 dx$. (omit +C)", answer: "x^3"
+  },
+  {
+    category: "Calculus II", id: "CALC_INT_02", topic: "Definite Integrals", difficulty: 1480,
+    problem: "Evaluate $\\int_{0}^{2} x^3 dx$.", answer: "4"
+  },
+  {
+    category: "Calculus II", id: "CALC_INT_03", topic: "Trig Integration", difficulty: 1450,
+    problem: "Evaluate $\\int_{-\\pi/2}^{\\pi/2} \\cos(x) dx$.", answer: "2"
+  },
+  {
+    category: "Calculus II", id: "CALC_INT_04", topic: "U-Substitution", difficulty: 1550,
+    problem: "Evaluate $\\int 2x e^{x^2} dx$. (omit +C)", answer: "e^{x^2}"
+  },
+  {
+    category: "Calculus II", id: "CALC_INT_05", topic: "U-Substitution", difficulty: 1600,
+    problem: "Evaluate $\\int \\frac{1}{2x+1} dx$. (omit +C)", answer: "0.5ln|2x+1|"
+  },
+  {
+    category: "Calculus II", id: "CALC_INT_06", topic: "Integration by Parts", difficulty: 1750,
+    problem: "Evaluate $\\int x \\cos(x) dx$. (omit +C)", answer: "xsin(x)+cos(x)"
+  },
+  {
+    category: "Calculus II", id: "CALC_INT_07", topic: "Improper Integrals", difficulty: 1700,
+    problem: "Evaluate $\\int_{1}^{\\infty} \\frac{1}{x^2} dx$.", answer: "1"
+  },
+  {
+    category: "Calculus II", id: "CALC_SEQ_01", topic: "Geometric Series", difficulty: 1650,
+    problem: "Find the sum of the infinite series $1 + 1/2 + 1/4 + 1/8 + ...$", answer: "2"
+  },
   {
     category: "Calculus II",
     id: "C2_NEW_01",
@@ -4527,8 +4600,18 @@ export const mathProblems: Problem[] = [
 
 
 
-
-
+  {
+    category: "Diff Eq", id: "DIFF_EQ_01", topic: "Separable Equations", difficulty: 1850,
+    problem: "Solve y' = y for y(0)=1. Find y(1).", answer: "e"
+  },
+  {
+    category: "Diff Eq", id: "DIFF_EQ_02", topic: "Order of Equation", difficulty: 1600,
+    problem: "What is the order of $y'' + 3y' + y = 0$?", answer: "2"
+  },
+  {
+    category: "Complex Analysis", id: "COMPLEX_01", topic: "Complex Arithmetic", difficulty: 950,
+    problem: "Evaluate $(2+i) + (3-4i)$. Format: a+bi", answer: "5-3i"
+  },
   {
     category: "Differential Equations",
     id: "DE01",
@@ -5859,7 +5942,30 @@ export const mathProblems: Problem[] = [
 
 
 
-
+  {
+    category: "Linear Algebra", id: "LIN_ALG_01", topic: "Determinants", difficulty: 1250,
+    problem: "Find the determinant of matrix $A = [[1, 2], [3, 4]]$.", answer: "-2"
+  },
+  {
+    category: "Linear Algebra", id: "LIN_ALG_02", topic: "Determinants", difficulty: 1300,
+    problem: "Find the determinant of matrix $A = [[5, 0], [2, 3]]$.", answer: "15"
+  },
+  {
+    category: "Linear Algebra", id: "LIN_ALG_03", topic: "Dot Product", difficulty: 1200,
+    problem: "Calculate the dot product of vectors $u=[1, 3]$ and $v=[4, -2]$.", answer: "-2"
+  },
+  {
+    category: "Linear Algebra", id: "LIN_ALG_04", topic: "Matrix Trace", difficulty: 1150,
+    problem: "Find the trace of the identity matrix $I_3$ (3x3).", answer: "3"
+  },
+  {
+    category: "Linear Algebra", id: "LIN_ALG_05", topic: "Eigenvalues", difficulty: 2100,
+    problem: "Find the largest eigenvalue of $A = [[2, 0], [0, 5]]$.", answer: "5"
+  },
+  {
+    category: "Linear Algebra", id: "LIN_ALG_06", topic: "Vector Magnitude", difficulty: 1100,
+    problem: "Find the magnitude of vector $v = [3, 4]$.", answer: "5"
+  },
   {
     category: "Linear Algebra1",
     id: "LA_NEW_01",
