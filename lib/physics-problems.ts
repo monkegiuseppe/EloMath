@@ -6,6 +6,42 @@ export const physicsProblems: Problem[] = [
   // --- Kinematic Equations (8 Problems) ---
 
   {
+    category: "Kinematics",
+    id: "PHY_K_01",
+    topic: "Displacement",
+    difficulty: 1000,
+    problem: "A car travels at 20 m/s for 10 seconds. Find distance.",
+    answer: "200",
+    unit: "m"
+  },
+  {
+    category: "Kinematics",
+    id: "PHY_K_02",
+    topic: "Acceleration Def",
+    difficulty: 1050,
+    problem: "Velocity changes from 0 to 10 m/s in 2 seconds. Find acceleration.",
+    answer: "5",
+    unit: "m/s²"
+  },
+  {
+    category: "Kinematics",
+    id: "PHY_K_03",
+    topic: "Free Fall Distance",
+    difficulty: 1150,
+    problem: "An object falls for 3 seconds ($g \\approx 10$). Approx distance? ($d = 0.5gt^2$)",
+    answer: "45",
+    unit: "m"
+  },
+  {
+    category: "Kinematics",
+    id: "PHY_K_04",
+    topic: "Circular Speed",
+    difficulty: 1200,
+    problem: "A ball moves in a circle of radius 2m. It completes one rev in 3.14s. Approx speed?",
+    answer: "4",
+    unit: "m/s"
+  },
+  {
     category: "Kinematic Equations",
     id: "KE_NEW_01",
     topic: "Displacement",
@@ -209,7 +245,42 @@ export const physicsProblems: Problem[] = [
   // --- Forces & Newton's Laws (8 Problems) ---
 
 
-
+  {
+    category: "Forces",
+    id: "PHY_F_01",
+    topic: "Net Force",
+    difficulty: 1200,
+    problem: "Two forces of 3N and 4N pull at right angles. Net force magnitude?",
+    answer: "5",
+    unit: "N"
+  },
+  {
+    category: "Forces",
+    id: "PHY_F_02",
+    topic: "Weight",
+    difficulty: 1250,
+    problem: "Mass is 10kg. What is weight on Earth? ($g=9.8$)",
+    answer: "98",
+    unit: "N"
+  },
+  {
+    category: "Forces",
+    id: "PHY_F_03",
+    topic: "Friction",
+    difficulty: 1350,
+    problem: "Normal force is 100N, coeff of friction is 0.5. Max friction force?",
+    answer: "50",
+    unit: "N"
+  },
+  {
+    category: "Forces",
+    id: "PHY_F_04",
+    topic: "Spring Force",
+    difficulty: 1300,
+    problem: "Spring constant k=100 N/m. Stretched 0.5m. Force?",
+    answer: "50",
+    unit: "N"
+  },
   {
     category: "Forces & Newton's Laws",
     id: "FNL101",
@@ -386,7 +457,42 @@ export const physicsProblems: Problem[] = [
 
   // --- Work & Energy (8 Problems) ---
 
-
+  {
+    category: "Energy",
+    id: "PHY_E_01",
+    topic: "Kinetic Energy",
+    difficulty: 1300,
+    problem: "Mass 2kg moving at 3 m/s. Calculate KE.",
+    answer: "9",
+    unit: "J"
+  },
+  {
+    category: "Energy",
+    id: "PHY_E_02",
+    topic: "Potential Energy",
+    difficulty: 1350,
+    problem: "Mass 5kg lifted 2m. ($g=10$). Calculate PE.",
+    answer: "100",
+    unit: "J"
+  },
+  {
+    category: "Energy",
+    id: "PHY_E_03",
+    topic: "Work",
+    difficulty: 1400,
+    problem: "Force of 10N pushes box 5m. Work done?",
+    answer: "50",
+    unit: "J"
+  },
+  {
+    category: "Energy",
+    id: "PHY_E_04",
+    topic: "Power",
+    difficulty: 1450,
+    problem: "100J of work done in 5 seconds. Power?",
+    answer: "20",
+    unit: "W"
+  },
   {
     category: "Work & Energy",
     id: "WE101",
@@ -1217,6 +1323,42 @@ export const physicsProblems: Problem[] = [
 
   // --- Circuits & Capacitance (8 Problems) ---
 
+  {
+    category: "Circuits",
+    id: "PHY_C_01",
+    topic: "Current Definition",
+    difficulty: 1400,
+    problem: "10 Coulombs pass in 2 seconds. Current?",
+    answer: "5",
+    unit: "A"
+  },
+  {
+    category: "Circuits",
+    id: "PHY_C_02",
+    topic: "Equivalent Resistance",
+    difficulty: 1500,
+    problem: "Three 10 Ohm resistors in series. Total R?",
+    answer: "30",
+    unit: "Ω"
+  },
+  {
+    category: "Circuits",
+    id: "PHY_C_03",
+    topic: "Capacitor Charge",
+    difficulty: 1600,
+    problem: "Capacitance 2F, Voltage 5V. Charge Q?",
+    answer: "10",
+    unit: "C"
+  },
+  {
+    category: "Circuits",
+    id: "PHY_C_04",
+    topic: "Power Law",
+    difficulty: 1550,
+    problem: "Current 2A, Resistance 5Ω. Power dissipated ($I^2R$)?",
+    answer: "20",
+    unit: "W"
+  },
   {
     category: "Circuits & Capacitance",
     id: "CC_NEW_01",
