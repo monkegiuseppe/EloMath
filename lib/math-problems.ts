@@ -287,7 +287,63 @@ export const mathProblems: Problem[] = [
     answer: "4",
   },
 
-  // --- Level 3: Algebra II & Pre-Calculus (700 - 900) ---
+  // --- Level 3: Algebra II & Pre-Calculus ---
+  {
+    category: "Algebra I",
+    id: "BATCH_v2_ALG_01",
+    topic: "Linear Equations",
+    difficulty: 500,
+    problem: "Find the x-intercept of the line $2x - 4y = 8$.",
+    answer: "4"
+  },
+  {
+    category: "Algebra I",
+    id: "BATCH_v2_ALG_02",
+    topic: "Slope",
+    difficulty: 550,
+    problem: "Find the slope of the line perpendicular to $y = 2x + 5$.",
+    answer: "-0.5"
+  },
+  {
+    category: "Algebra I",
+    id: "BATCH_v2_ALG_03",
+    topic: "Systems of Equations",
+    difficulty: 600,
+    problem: "Solve for y: $\\begin{cases} x + y = 10 \\\\ x - y = 2 \\end{cases}$",
+    answer: "4"
+  },
+  {
+    category: "Geometry",
+    id: "BATCH_v2_GEO_01",
+    topic: "Circle Area",
+    difficulty: 550,
+    problem: "A circle has a diameter of 10. What is its area? (Enter the coefficient of $\\pi$)",
+    answer: "25"
+  },
+  {
+    category: "Algebra II",
+    id: "BATCH_v2_ALG2_01",
+    topic: "Logarithms",
+    difficulty: 750,
+    problem: "Evaluate $\\log_3(27) + \\log_3(3)$.",
+    answer: "4"
+  },
+  {
+    category: "Algebra II",
+    id: "BATCH_v2_ALG2_02",
+    topic: "Quadratic Roots",
+    difficulty: 800,
+    problem: "Find the sum of the roots of the equation $x^2 - 8x + 15 = 0$.",
+    answer: "8"
+  },
+  {
+    category: "Algebra II",
+    id: "BATCH_v2_ALG2_03",
+    topic: "Function Composition",
+    difficulty: 850,
+    problem: "If $f(x) = x^2$ and $g(x) = x - 1$, find $f(g(3))$.",
+    answer: "4"
+  },
   {
     category: "Algebra II",
     id: "B2_ALG2_01",
@@ -718,14 +774,6 @@ export const mathProblems: Problem[] = [
   },
   {
     category: "Linear Algebra",
-    id: "LA_NEW_01",
-    topic: "Matrix Trace",
-    difficulty: 1400,
-    problem: "Find the trace of the identity matrix $I_2$.",
-    answer: "2",
-  },
-  {
-    category: "Linear Algebra",
     id: "LA_NEW_02",
     topic: "Determinant of Diagonal",
     difficulty: 1450,
@@ -770,11 +818,67 @@ export const mathProblems: Problem[] = [
   // --- Calculus I ---
   {
     category: "Calculus I",
-    id: "CALC1_DERIV_01",
-    topic: "Chain Rule",
-    difficulty: 1200,
-    problem: "Find the derivative of $f(x) = \\sin(x^2)$ at $x$.",
-    answer: "2xcos(x^2)",
+    id: "BATCH_v2_CALC1_01",
+    topic: "Limits (Rational)",
+    difficulty: 950,
+    problem: "Evaluate $\\lim_{x \\to 3} \\frac{x^2 - 9}{x - 3}$.",
+    answer: "6"
+  },
+  {
+    category: "Calculus I",
+    id: "BATCH_v2_CALC1_02",
+    topic: "Limits (Infinity)",
+    difficulty: 1000,
+    problem: "Evaluate $\\lim_{x \\to \\infty} \\frac{4x^2 + x}{2x^2 - 5}$.",
+    answer: "2"
+  },
+  {
+    category: "Calculus I",
+    id: "BATCH_v2_CALC1_03",
+    topic: "Derivative Power Rule",
+    difficulty: 1100,
+    problem: "If $f(x) = 3x^4 - 2x$, find $f'(1)$.",
+    answer: "10"
+  },
+  {
+    category: "Calculus I",
+    id: "BATCH_v2_CALC1_04",
+    topic: "Derivative Chain Rule",
+    difficulty: 1300,
+    problem: "If $y = (2x + 1)^3$, find the value of $y'$ at $x=0$.",
+    answer: "6"
+  },
+  {
+    category: "Calculus I",
+    id: "BATCH_v2_CALC1_05",
+    topic: "Derivative Trig",
+    difficulty: 1350,
+    problem: "Evaluate $\\frac{d}{dx}(\\sin(x))$ at $x = \\pi$.",
+    answer: "-1"
+  },
+  {
+    category: "Calculus I",
+    id: "BATCH_v2_CALC1_06",
+    topic: "Derivative Exponential",
+    difficulty: 1400,
+    problem: "If $f(x) = e^{2x}$, find $f'(0)$.",
+    answer: "2"
+  },
+  {
+    category: "Calculus I",
+    id: "BATCH_v2_CALC1_07",
+    topic: "Product Rule",
+    difficulty: 1450,
+    problem: "If $h(x) = x \\ln(x)$, find $h'(e)$.",
+    answer: "2"
+  },
+  {
+    category: "Calculus I",
+    id: "BATCH_v2_CALC1_08",
+    topic: "Tangent Line",
+    difficulty: 1500,
+    problem: "Find the slope of the tangent line to $y = x^3$ at $x=2$.",
+    answer: "12"
   },
   {
     category: "Calculus I",
@@ -1426,14 +1530,6 @@ export const mathProblems: Problem[] = [
   },
   {
     category: "Calculus I",
-    id: "C324",
-    topic: "Calculus (Second Derivative Implicit)",
-    difficulty: 2350,
-    problem: "For the line $x+y=1$, find the value of the second derivative, $\\frac{d^2y}{dx^2}$.",
-    answer: "0",
-  },
-  {
-    category: "Calculus I",
     id: "C325",
     topic: "Calculus (Optimization - Cylinder)",
     difficulty: 2200,
@@ -1954,14 +2050,6 @@ export const mathProblems: Problem[] = [
   },
   {
     category: "Calculus I",
-    id: "C541",
-    topic: "Calculus (Basic Derivative)",
-    difficulty: 1200,
-    problem: "Let $f(x) = 2^x + x^2$. Find $f'(x)$.",
-    answer: "2^x * ln(2) + 2x",
-  },
-  {
-    category: "Calculus I",
     id: "C542",
     topic: "Calculus (Critical Points)",
     difficulty: 1550,
@@ -2238,7 +2326,63 @@ export const mathProblems: Problem[] = [
 
 
   // --- Calculus II: Integrals ---
-
+  {
+    category: "Calculus II",
+    id: "BATCH_v2_CALC2_01",
+    topic: "Definite Integral (Polynomial)",
+    difficulty: 1600,
+    problem: "Evaluate $\\int_0^2 (3x^2 + 1) dx$.",
+    answer: "10"
+  },
+  {
+    category: "Calculus II",
+    id: "BATCH_v2_CALC2_02",
+    topic: "Definite Integral (Exponentials)",
+    difficulty: 1650,
+    problem: "Evaluate $\\int_0^1 e^x dx$. (Enter 'e-1' or decimal approx 1.718)",
+    answer: "e-1",
+    format_hint: "Use 'e' for Euler's number"
+  },
+  {
+    category: "Calculus II",
+    id: "BATCH_v2_CALC2_03",
+    topic: "Integration by Substitution",
+    difficulty: 1700,
+    problem: "Evaluate $\\int_0^1 2x(x^2 + 1)^3 dx$.",
+    answer: "3.75"
+  },
+  {
+    category: "Calculus II",
+    id: "BATCH_v2_CALC2_04",
+    topic: "Integration by Parts",
+    difficulty: 1800,
+    problem: "Evaluate $\\int_1^e \\ln(x) dx$.",
+    answer: "1"
+  },
+  {
+    category: "Calculus II",
+    id: "BATCH_v2_CALC2_05",
+    topic: "Geometric Series",
+    difficulty: 1750,
+    problem: "Find the sum of $\\sum_{n=0}^{\\infty} (\\frac{1}{3})^n$.",
+    answer: "1.5"
+  },
+  {
+    category: "Calculus II",
+    id: "BATCH_v2_CALC2_06",
+    topic: "Improper Integral",
+    difficulty: 1850,
+    problem: "Evaluate $\\int_1^{\\infty} \\frac{1}{x^3} dx$.",
+    answer: "0.5"
+  },
+  {
+    category: "Calculus II",
+    id: "BATCH_v2_CALC2_07",
+    topic: "Average Value",
+    difficulty: 1650,
+    problem: "Find the average value of $f(x) = 2x$ on the interval $[0, 4]$.",
+    answer: "4"
+  },
   {
     category: "Calculus I",
     id: "CALC1_INT_01",
@@ -2273,84 +2417,11 @@ export const mathProblems: Problem[] = [
   },
   {
     category: "Calculus II",
-    id: "CALC_INT_01",
-    topic: "Indefinite Integrals",
-    difficulty: 1500,
-    problem: "Find $\\int 3x^2 dx$. (Enter the function without +C, use x^3 format)",
-    answer: "x^3",
-  },
-  {
-    category: "Calculus II",
-    id: "CALC_INT_02",
-    topic: "Definite Integrals",
-    difficulty: 1550,
-    problem: "Evaluate $\\int_0^2 2x dx$.",
-    answer: "4",
-  },
-  {
-    category: "Calculus II",
-    id: "CALC_INT_03",
-    topic: "Definite Integrals",
-    difficulty: 1600,
-    problem: "Evaluate $\\int_0^{\\pi} \\sin(x) dx$.",
-    answer: "2",
-  },
-  {
-    category: "Calculus II",
-    id: "CALC_INT_04",
-    topic: "Integration by Substitution",
-    difficulty: 1650,
-    problem: "Evaluate $\\int_0^1 2x(x^2+1)^3 dx$.",
-    answer: "3.75",
-  },
-  {
-    category: "Calculus II",
-    id: "CALC_INT_05",
-    topic: "Logarithmic Integration",
-    difficulty: 1580,
-    problem: "Evaluate $\\int_1^e \\frac{1}{x} dx$.",
-    answer: "1",
-  },
-  {
-    category: "Calculus II",
-    id: "CALC_INT_06",
-    topic: "Exponential Integration",
-    difficulty: 1620,
-    problem: "Evaluate $\\int_0^{\\ln(2)} e^x dx$.",
-    answer: "1",
-  },
-  {
-    category: "Calculus II",
-    id: "CALC_VOL_01",
-    topic: "Volume of Revolution",
-    difficulty: 1750,
-    problem: "Find the volume generated by rotating $y=x$ from $x=0$ to $1$ around the x-axis. (Answer in terms of pi, e.g., 0.5pi)",
-    answer: "0.333pi",
-    format_hint: "Use fractions or decimals. 1/3pi or 0.33pi"
-  },
-  {
-    category: "Calculus II",
-    id: "CALC_INT_07",
-    topic: "Integration by Parts",
-    difficulty: 1800,
-    problem: "Evaluate $\\int_0^1 x e^x dx$.",
-    answer: "1",
-  },
-  {
-    category: "Calculus II",
     id: "CALC_AVG_01",
     topic: "Average Value",
     difficulty: 1700,
     problem: "Find the average value of $f(x) = x^2$ on $[0, 3]$.",
     answer: "3",
-  },
-  {
-    category: "Calculus II",
-    id: "CALC_INT_08",
-    topic: "Trig Integrals",
-    difficulty: 1780,
-    problem: "Evaluate $\\int_0^{\\pi/4} \\sec^2(x) dx$.",
-    answer: "1",
   },
   {
     category: "Calculus II", id: "CALC_INT_01", topic: "Basic Integration", difficulty: 1420,
@@ -2379,98 +2450,6 @@ export const mathProblems: Problem[] = [
   {
     category: "Calculus II", id: "CALC_INT_07", topic: "Improper Integrals", difficulty: 1700,
     problem: "Evaluate $\\int_{1}^{\\infty} \\frac{1}{x^2} dx$.", answer: "1"
-  },
-  {
-    category: "Calculus II", id: "CALC_SEQ_01", topic: "Geometric Series", difficulty: 1650,
-    problem: "Find the sum of the infinite series $1 + 1/2 + 1/4 + 1/8 + ...$", answer: "2"
-  },
-  {
-    category: "Calculus II",
-    id: "C2_NEW_01",
-    topic: "Integration by Parts (Setup)",
-    difficulty: 1550,
-    problem: "For $\\int x e^x dx$, if $u=x$, what is $du/dx$?",
-    answer: "1",
-  },
-  {
-    category: "Calculus II",
-    id: "C2_NEW_02",
-    topic: "Improper Integral",
-    difficulty: 1600,
-    problem: "Evaluate $\\int_1^{\\infty} x^{-2} dx$.",
-    answer: "1",
-  },
-  {
-    category: "Calculus II",
-    id: "C2_NEW_03",
-    topic: "Series Convergence",
-    difficulty: 1650,
-    problem: "What is the sum of the series $1 + 0.5 + 0.25 + ...$?",
-    answer: "2",
-  },
-  {
-    category: "Linear Algebra",
-    id: "LA_NEW_01",
-    topic: "Matrix Trace",
-    difficulty: 1400,
-    problem: "Find the trace of the identity matrix $I_2$.",
-    answer: "2",
-  },
-  {
-    category: "Linear Algebra",
-    id: "LA_NEW_02",
-    topic: "Determinant of Diagonal",
-    difficulty: 1450,
-    problem: "Find the determinant of $\\begin{pmatrix} 2 & 0 \\\\ 0 & 3 \\end{pmatrix}$.",
-    answer: "6",
-  },
-  {
-    category: "Linear Algebra",
-    id: "LA_NEW_03",
-    topic: "Matrix Subtraction",
-    difficulty: 1500,
-    problem: "If $A = \\begin{pmatrix} 5 \\\\ 5 \\end{pmatrix}$ and $B = \\begin{pmatrix} 2 \\\\ 2 \\end{pmatrix}$, find the sum of elements in $A-B$.",
-    answer: "6",
-  },
-  {
-    category: "Linear Algebra",
-    id: "LA_NEW_04",
-    topic: "Eigenvalues (Identity)",
-    difficulty: 1700,
-    problem: "What is the only eigenvalue of the identity matrix?",
-    answer: "1",
-  },
-  {
-    category: "Linear Algebra",
-    id: "LA_NEW_05",
-    topic: "Vector Magnitude",
-    difficulty: 1600,
-    problem: "Find the magnitude of vector $\\vec{v} = <3, 4>$.",
-    answer: "5",
-  },
-  {
-    category: "Linear Algebra",
-    id: "LA_NEW_06",
-    topic: "Orthogonality",
-    difficulty: 1750,
-    problem: "What is the dot product of orthogonal vectors?",
-    answer: "0",
-  },
-  {
-    category: "Diff Eq",
-    id: "DE_NEW_01",
-    topic: "Separable Eq",
-    difficulty: 1800,
-    problem: "Solve $y' = y$. If $y(0)=1$, what is $y(1)$?",
-    answer: "e",
-  },
-  {
-    category: "Diff Eq",
-    id: "DE_NEW_02",
-    topic: "Second Derivative",
-    difficulty: 1850,
-    problem: "If $y'' = 0$, what is the degree of the polynomial solution for y?",
-    answer: "1",
   },
   {
     category: "Calculus II",
@@ -2511,46 +2490,6 @@ export const mathProblems: Problem[] = [
     difficulty: 1600,
     problem: "Evaluate $\\int \\cos(2x) dx$. (No +C)",
     answer: "0.5sin(2x)",
-  },
-  {
-    category: "Calculus I",
-    id: "C_NEW_01",
-    topic: "Power Rule",
-    difficulty: 1000,
-    problem: "Differentiate $f(x) = 4x^5$. Find $f'(x)$.",
-    answer: "20x^4",
-  },
-  {
-    category: "Calculus I",
-    id: "C_NEW_02",
-    topic: "Trig Derivative",
-    difficulty: 1100,
-    problem: "Differentiate $f(x) = 3\\cos(x)$. Find $f'(x)$.",
-    answer: "-3sin(x)",
-  },
-  {
-    category: "Calculus I",
-    id: "C_NEW_03",
-    topic: "Chain Rule",
-    difficulty: 1400,
-    problem: "Differentiate $y = (2x+1)^3$. Find $y'$.",
-    answer: "6(2x+1)^2",
-  },
-  {
-    category: "Calculus I",
-    id: "C_NEW_04",
-    topic: "Product Rule",
-    difficulty: 1450,
-    problem: "Differentiate $y = x^2 e^x$. Find $y'(1)$.",
-    answer: "3e",
-  },
-  {
-    category: "Calculus I",
-    id: "C_NEW_05",
-    topic: "Quotient Rule",
-    difficulty: 1500,
-    problem: "Let $f(x) = \\frac{1}{x}$. Find $f''(2)$.",
-    answer: "0.25",
   },
   {
     category: "Calculus II",
@@ -3784,20 +3723,83 @@ export const mathProblems: Problem[] = [
     problem: "Solve $y' = y$. If $y(0)=1$, what is $y(1)$?",
     answer: "e",
   },
-  {
-    category: "Diff Eq",
-    id: "DE_NEW_02",
-    topic: "Second Derivative",
-    difficulty: 1850,
-    problem: "If $y'' = 0$, what is the degree of the polynomial solution for y?",
-    answer: "1",
-  },
 
 
 
 
   // --- Calculus III & Advanced Topics ---
-
+  {
+    category: "Calculus III & Advanced Topics",
+    id: "BATCH_v2_CALC3_01",
+    topic: "Partial Derivatives",
+    difficulty: 1900,
+    problem: "If $f(x,y) = x^2 y + 3$, find the value of $\\frac{\\partial f}{\\partial x}$ at $(2, 1)$.",
+    answer: "4"
+  },
+  {
+    category: "Calculus III & Advanced Topics",
+    id: "BATCH_v2_CALC3_02",
+    topic: "Gradient",
+    difficulty: 2000,
+    problem: "If $f(x,y) = 2x + 3y$, what is the magnitude of the gradient $\\nabla f$?",
+    answer: "sqrt(13)"
+  },
+  {
+    category: "Calculus III & Advanced Topics",
+    id: "BATCH_v2_CALC3_03",
+    topic: "Double Integrals",
+    difficulty: 2100,
+    problem: "Evaluate $\\int_0^1 \\int_0^1 4xy \\, dx dy$.",
+    answer: "1"
+  },
+  {
+    category: "Calculus III & Advanced Topics",
+    id: "BATCH_v2_CALC3_04",
+    topic: "Vector Cross Product",
+    difficulty: 2050,
+    problem: "Find the magnitude of $\\mathbf{i} \\times \\mathbf{j}$.",
+    answer: "1"
+  },
+  {
+    category: "Differential Equations",
+    id: "BATCH_v2_DE_01",
+    topic: "First Order Linear IVP",
+    difficulty: 1800,
+    problem: "Solve $y' = y$ with $y(0) = 4$. Find $y(1)$. (Enter coefficient of e)",
+    answer: "4"
+  },
+  {
+    category: "Differential Equations",
+    id: "BATCH_v2_DE_02",
+    topic: "Separable IVP",
+    difficulty: 1900,
+    problem: "Solve $y' = 2x$ with $y(0) = 1$. Find $y(2)$.",
+    answer: "5"
+  },
+  {
+    category: "Differential Equations",
+    id: "BATCH_v2_DE_03",
+    topic: "Second Order Homogeneous",
+    difficulty: 2000,
+    problem: "For $y'' - 9y = 0$, one solution is $e^{kt}$ where $k>0$. What is $k$?",
+    answer: "3"
+  },
+  {
+    category: "Differential Equations",
+    id: "BATCH_v2_DE_04",
+    topic: "Second Order IVP",
+    difficulty: 2100,
+    problem: "Solve $y'' = 2$ with $y(0)=0, y'(0)=0$. Find $y(3)$.",
+    answer: "9"
+  },
+  {
+    category: "Differential Equations",
+    id: "BATCH_v2_DE_05",
+    topic: "Characteristic Equation",
+    difficulty: 1950,
+    problem: "Find the discriminant ($b^2 - 4ac$) of the characteristic equation for $y'' + 4y' + 5y = 0$.",
+    answer: "-4"
+  },
   {
     category: "Calculus III & Advanced Topics",
     id: "CALC3_PART_01",
@@ -3870,14 +3872,6 @@ export const mathProblems: Problem[] = [
     difficulty: 2050,
     problem: "Find $\\frac{\\partial f}{\\partial x}$ for $f(x,y) = x^3y + e^y$ at $(2, 1)$.",
     answer: "12"
-  },
-  {
-    category: "Calculus II",
-    id: "B2_CALC2_01",
-    topic: "Integration by Parts",
-    difficulty: 1650,
-    problem: "Evaluate $\\int \\ln x dx$. (Omit C)",
-    answer: "x*ln(x)-x"
   },
   {
     category: "Calculus II",
@@ -4430,14 +4424,6 @@ export const mathProblems: Problem[] = [
     difficulty: 1200,
     problem: "Find the dot product of $u = \\langle 1, -1, 5 \\rangle$ and $v = \\langle 6, 2, -1 \\rangle$.",
     answer: "-1",
-  },
-  {
-    category: "Calculus III",
-    id: "C424",
-    topic: "Calculus (Cross Product)",
-    difficulty: 1550,
-    problem: "Find the cross product $j \\times k$.",
-    answer: "<i>",
   },
   {
     category: "Calculus III",
@@ -5207,15 +5193,6 @@ export const mathProblems: Problem[] = [
   // --- Differential Equations ---
 
 
-
-  {
-    category: "Differential Equations",
-    id: "DE_SEP_01",
-    topic: "Separable Equations",
-    difficulty: 1800,
-    problem: "Solve the differential equation $\\frac{dy}{dx} = y$. Find the general solution $y(x)$.",
-    answer: "Ce^x",
-  },
   {
     category: "Differential Equations",
     id: "DE_LIN_02",
@@ -5267,14 +5244,6 @@ export const mathProblems: Problem[] = [
     difficulty: 1400,
     problem: "For what value of $r$ is $y = e^{rx}$ a solution to the equation $y'' - 5y' + 6y = 0$?",
     answer: "2 or 3",
-  },
-  {
-    category: "Differential Equations",
-    id: "DE04",
-    topic: "Differential Equations (Separable)",
-    difficulty: 1550,
-    problem: "Find the general solution to $\\frac{dy}{dx} = \\frac{x}{y}$. The solution is $y^2 = x^2 + C$. What is the form of y?",
-    answer: "sqrt(x²+C)",
   },
   {
     category: "Differential Equations",
@@ -6571,7 +6540,54 @@ export const mathProblems: Problem[] = [
 
 
   // --- Linear Algebra: Basic Operations ---
-
+  {
+    category: "Linear Algebra: Basic Operations",
+    id: "BATCH_v2_LA_01",
+    topic: "Matrix Trace",
+    difficulty: 900,
+    problem: "Find the trace of $\\begin{pmatrix} 5 & 2 \\\\ 1 & 3 \\end{pmatrix}$.",
+    answer: "8"
+  },
+  {
+    category: "Linear Algebra: Basic Operations",
+    id: "BATCH_v2_LA_02",
+    topic: "Determinant (2x2)",
+    difficulty: 1000,
+    problem: "Find the determinant of $\\begin{pmatrix} 4 & 2 \\\\ 1 & 3 \\end{pmatrix}$.",
+    answer: "10"
+  },
+  {
+    category: "Linear Algebra: Basic Operations",
+    id: "BATCH_v2_LA_03",
+    topic: "Matrix Multiplication",
+    difficulty: 1100,
+    problem: "If $A = \\begin{pmatrix} 1 & 0 \\\\ 0 & 2 \\end{pmatrix}$ and $x = \\begin{pmatrix} 3 \\\\ 4 \\end{pmatrix}$, what is the second element of $Ax$?",
+    answer: "8"
+  },
+  {
+    category: "Linear Algebra: Vector Spaces & Eigenvalues",
+    id: "BATCH_v2_LA_04",
+    topic: "Eigenvalues",
+    difficulty: 1800,
+    problem: "Find the largest eigenvalue of the diagonal matrix $\\begin{pmatrix} 1 & 0 \\\\ 0 & 4 \\end{pmatrix}$.",
+    answer: "4"
+  },
+  {
+    category: "Linear Algebra: Vector Spaces & Eigenvalues",
+    id: "BATCH_v2_LA_05",
+    topic: "Vector Magnitude",
+    difficulty: 1200,
+    problem: "Find the magnitude of the vector $\\langle 3, 4 \\rangle$.",
+    answer: "5"
+  },
+  {
+    category: "Linear Algebra: Vector Spaces & Eigenvalues",
+    id: "BATCH_v2_LA_06",
+    topic: "Dot Product",
+    difficulty: 1300,
+    problem: "Calculate $\\langle 1, 2 \\rangle \\cdot \\langle 3, -1 \\rangle$.",
+    answer: "1"
+  },
   {
     category: "Linear Algebra: Basic Operations",
     id: "LA_DOT_04",
@@ -7887,7 +7903,38 @@ export const mathProblems: Problem[] = [
 
   // --- Complex Analysis ---
 
-
+  {
+    category: "Complex Analysis",
+    id: "BATCH_v2_COMP_01",
+    topic: "Complex Magnitude",
+    difficulty: 1400,
+    problem: "Find the modulus $|3 + 4i|$.",
+    answer: "5"
+  },
+  {
+    category: "Complex Analysis",
+    id: "BATCH_v2_COMP_02",
+    topic: "Complex Arithmetic",
+    difficulty: 1500,
+    problem: "Evaluate $(1+i) + (2-i)$. Give the real part.",
+    answer: "3"
+  },
+  {
+    category: "Complex Analysis",
+    id: "BATCH_v2_COMP_03",
+    topic: "Powers of i",
+    difficulty: 1450,
+    problem: "Simplify $i^4$.",
+    answer: "1"
+  },
+  {
+    category: "Complex Analysis",
+    id: "BATCH_v2_COMP_04",
+    topic: "Residues",
+    difficulty: 2400,
+    problem: "Find the residue of $f(z) = \\frac{1}{z-2}$ at the pole $z=2$.",
+    answer: "1"
+  },
   {
     category: "Complex Analysis",
     id: "COMP_ALG_01",
