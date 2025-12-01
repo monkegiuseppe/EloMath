@@ -768,7 +768,38 @@ export const mathProblems: Problem[] = [
 
 
   // --- Calculus I ---
-
+  {
+    category: "Calculus I",
+    id: "CALC1_DERIV_01",
+    topic: "Chain Rule",
+    difficulty: 1200,
+    problem: "Find the derivative of $f(x) = \\sin(x^2)$ at $x$.",
+    answer: "2xcos(x^2)",
+  },
+  {
+    category: "Calculus I",
+    id: "CALC1_DERIV_02",
+    topic: "Product Rule",
+    difficulty: 1250,
+    problem: "Find the derivative of $f(x) = x e^x$.",
+    answer: "e^x(x+1)",
+  },
+  {
+    category: "Calculus I",
+    id: "CALC1_DERIV_03",
+    topic: "Implicit Differentiation",
+    difficulty: 1400,
+    problem: "If $x^2 + y^2 = 25$, find $\\frac{dy}{dx}$ in terms of $x$ and $y$.",
+    answer: "-x/y",
+  },
+  {
+    category: "Calculus I",
+    id: "CALC1_LIM_04",
+    topic: "L'Hopital's Rule",
+    difficulty: 1350,
+    problem: "Evaluate $\\lim_{x \\to 0} \\frac{\\sin(x)}{x}$.",
+    answer: "1",
+  },
   {
     category: "Calculus I",
     id: "CALC_LHO_01",
@@ -2208,7 +2239,38 @@ export const mathProblems: Problem[] = [
 
   // --- Calculus II: Integrals ---
 
-
+  {
+    category: "Calculus I",
+    id: "CALC1_INT_01",
+    topic: "Basic Integration",
+    difficulty: 1300,
+    problem: "Evaluate $\\int_{0}^{2} 3x^2 dx$.",
+    answer: "8",
+  },
+  {
+    category: "Calculus I",
+    id: "CALC1_INT_02",
+    topic: "U-Substitution",
+    difficulty: 1450,
+    problem: "Evaluate $\\int 2x(x^2+1)^3 dx$. Let $C=0$.",
+    answer: "1/4(x^2+1)^4",
+  },
+  {
+    category: "Calculus II",
+    id: "CALC2_INT_03",
+    topic: "Integration by Parts",
+    difficulty: 1600,
+    problem: "Evaluate $\\int x \\ln(x) dx$. Let $C=0$.",
+    answer: "1/2x^2ln(x)-1/4x^2",
+  },
+  {
+    category: "Calculus II",
+    id: "CALC2_VOL_04",
+    topic: "Volume of Revolution",
+    difficulty: 1550,
+    problem: "Find the volume of the solid formed by rotating $y=x$ from $x=0$ to $x=1$ around the x-axis.",
+    answer: "pi/3",
+  },
   {
     category: "Calculus II",
     id: "CALC_INT_01",
@@ -3736,8 +3798,46 @@ export const mathProblems: Problem[] = [
 
   // --- Calculus III & Advanced Topics ---
 
-
-
+  {
+    category: "Calculus III & Advanced Topics",
+    id: "CALC3_PART_01",
+    topic: "Partial Derivatives",
+    difficulty: 2200,
+    problem: "If $f(x,y) = x^2y + \\sin(y)$, find $\\frac{\\partial f}{\\partial x}$.",
+    answer: "2xy",
+  },
+  {
+    category: "Calculus III & Advanced Topics",
+    id: "CALC3_GRAD_02",
+    topic: "Gradient Vectors",
+    difficulty: 2250,
+    problem: "Find the magnitude of the gradient $\\nabla f$ of $f(x,y) = x^2 + y^2$ at the point $(1, 2)$.",
+    answer: "sqrt(20)",
+  },
+  {
+    category: "Calculus III & Advanced Topics",
+    id: "CALC3_DBL_03",
+    topic: "Double Integrals",
+    difficulty: 2300,
+    problem: "Evaluate $\\int_{0}^{1} \\int_{0}^{2} xy \\, dy \\, dx$.",
+    answer: "1",
+  },
+  {
+    category: "Calculus II",
+    id: "CALC2_SEQ_01",
+    topic: "Geometric Series",
+    difficulty: 1650,
+    problem: "Find the sum of the infinite series $\\sum_{n=0}^{\\infty} (\\frac{1}{2})^n$.",
+    answer: "2",
+  },
+  {
+    category: "Calculus II",
+    id: "CALC2_SEQ_02",
+    topic: "Taylor Series",
+    difficulty: 1750,
+    problem: "What is the coefficient of the $x^3$ term in the Maclaurin series expansion of $\\sin(x)$?",
+    answer: "-1/6",
+  },
   {
     category: "Differential Equations",
     id: "DIFF_EQ_04",
@@ -5108,7 +5208,30 @@ export const mathProblems: Problem[] = [
 
 
 
-
+  {
+    category: "Differential Equations",
+    id: "DE_SEP_01",
+    topic: "Separable Equations",
+    difficulty: 1800,
+    problem: "Solve the differential equation $\\frac{dy}{dx} = y$. Find the general solution $y(x)$.",
+    answer: "Ce^x",
+  },
+  {
+    category: "Differential Equations",
+    id: "DE_LIN_02",
+    topic: "Second Order Homogeneous",
+    difficulty: 1950,
+    problem: "Find the general solution to $y'' - y = 0$.",
+    answer: "c1e^x+c2e^-x",
+  },
+  {
+    category: "Differential Equations",
+    id: "DE_INIT_03",
+    topic: "Initial Value Problems",
+    difficulty: 1900,
+    problem: "Solve $y' = 2x$ given $y(0) = 3$.",
+    answer: "x^2+3",
+  },
   {
     category: "Diff Eq", id: "DIFF_EQ_01", topic: "Separable Equations", difficulty: 1850,
     problem: "Solve y' = y for y(0)=1. Find y(1).", answer: "e"
@@ -6449,8 +6572,22 @@ export const mathProblems: Problem[] = [
 
   // --- Linear Algebra: Basic Operations ---
 
-
-
+  {
+    category: "Linear Algebra: Basic Operations",
+    id: "LA_DOT_04",
+    topic: "Dot Product",
+    difficulty: 1600,
+    problem: "Given vectors $\\mathbf{u} = \\langle 1, 2, 3 \\rangle$ and $\\mathbf{v} = \\langle -2, 0, 1 \\rangle$, find $\\mathbf{u} \\cdot \\mathbf{v}$.",
+    answer: "1",
+  },
+  {
+    category: "Linear Algebra: Basic Operations",
+    id: "LA_DET_01",
+    topic: "Determinants",
+    difficulty: 1700,
+    problem: "Calculate the determinant of the matrix $\\begin{pmatrix} 2 & 1 \\\\ 1 & 4 \\end{pmatrix}$.",
+    answer: "7",
+  },
   {
     category: "Linear Algebra", id: "LIN_ALG_01", topic: "Determinants", difficulty: 1250,
     problem: "Find the determinant of matrix $A = [[1, 2], [3, 4]]$.", answer: "-2"
@@ -7016,9 +7153,30 @@ export const mathProblems: Problem[] = [
 
 
   // --- Linear Algebra: Vector Spaces & Eigenvalues ---
-
-
-
+  {
+    category: "Linear Algebra: Vector Spaces & Eigenvalues",
+    id: "LA_CROSS_05",
+    topic: "Cross Product",
+    difficulty: 2150,
+    problem: "Find the magnitude of the cross product of two orthogonal unit vectors.",
+    answer: "1",
+  },
+  {
+    category: "Linear Algebra: Vector Spaces & Eigenvalues",
+    id: "LA_TRACE_03",
+    topic: "Matrix Trace",
+    difficulty: 1650,
+    problem: "Find the trace of the identity matrix $I_4$ (4x4).",
+    answer: "4",
+  },
+  {
+    category: "Linear Algebra: Vector Spaces & Eigenvalues",
+    id: "LA_EIG_02",
+    topic: "Eigenvalues",
+    difficulty: 2100,
+    problem: "Find the larger eigenvalue of the matrix $\\begin{pmatrix} 4 & 1 \\\\ 2 & 3 \\end{pmatrix}$.",
+    answer: "5",
+  },
   {
     category: "Linear Algebra2",
     id: "LA10",
@@ -7727,10 +7885,33 @@ export const mathProblems: Problem[] = [
 
 
 
-  // --- Complex Analysis Questions ---
+  // --- Complex Analysis ---
 
 
-
+  {
+    category: "Complex Analysis",
+    id: "COMP_ALG_01",
+    topic: "Complex Arithmetic",
+    difficulty: 2100,
+    problem: "Evaluate $(1+i)^2$. Write answer in $a+bi$ form.",
+    answer: "2i",
+  },
+  {
+    category: "Complex Analysis",
+    id: "COMP_EULER_02",
+    topic: "Euler's Formula",
+    difficulty: 2200,
+    problem: "Evaluate $e^{i\\pi}$.",
+    answer: "-1",
+  },
+  {
+    category: "Complex Analysis",
+    id: "COMP_RES_03",
+    topic: "Residue Theorem",
+    difficulty: 2400,
+    problem: "Find the residue of $f(z) = \\frac{1}{z-1}$ at $z=1$.",
+    answer: "1",
+  },
   {
     category: "Complex Analysis",
     id: "CA_NEW_01",

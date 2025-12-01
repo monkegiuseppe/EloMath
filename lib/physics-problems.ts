@@ -278,7 +278,23 @@ export const physicsProblems: Problem[] = [
 
 
   // --- Forces & Newton's Laws (8 Problems) ---
-
+  {
+    category: "Forces & Newton's Laws",
+    id: "PHY_DYN_01",
+    topic: "Inclined Planes",
+    difficulty: 1300,
+    problem: "A block slides down a frictionless 30-degree incline. Gravity is $g=10$. What is the acceleration?",
+    answer: "5",
+    unit: "m/s^2"
+  },
+  {
+    category: "Forces & Newton's Laws",
+    id: "PHY_DYN_02",
+    topic: "Friction",
+    difficulty: 1400,
+    problem: "A 10kg block requires 40N of force to start moving on a horizontal surface. What is the coefficient of static friction? (g=10)",
+    answer: "0.4",
+  },
   {
     category: "Forces",
     id: "PHY_F_01",
@@ -525,7 +541,25 @@ export const physicsProblems: Problem[] = [
   },
 
 
-  // --- Work & Energy (8 Problems) ---
+  // --- Work & Energy  ---
+  {
+    category: "Work & Energy",
+    id: "PHY_EN_01",
+    topic: "Spring Potential",
+    difficulty: 1250,
+    problem: "A spring with $k=200$ N/m is compressed by 0.2m. How much potential energy is stored?",
+    answer: "4",
+    unit: "J"
+  },
+  {
+    category: "Work & Energy",
+    id: "PHY_EN_02",
+    topic: "Kinetic Energy",
+    difficulty: 1200,
+    problem: "An object of mass 2kg is moving at 10m/s. What is its kinetic energy?",
+    answer: "100",
+    unit: "J"
+  },
   {
     category: "Energy",
     id: "PHY_E_01",
@@ -771,7 +805,15 @@ export const physicsProblems: Problem[] = [
 
   // --- Momentum & Collisions (8 Problems) ---
 
-
+  {
+    category: "Momentum & Collisions",
+    id: "PHY_MOM_01",
+    topic: "Inelastic Collision",
+    difficulty: 1350,
+    problem: "A 2kg mass moving at 3m/s hits a stationary 1kg mass and sticks to it. What is the final velocity?",
+    answer: "2",
+    unit: "m/s"
+  },
   {
     category: "Momentum & Collisions",
     id: "MC101",
@@ -948,7 +990,23 @@ export const physicsProblems: Problem[] = [
 
   // --- Circular Motion & Gravitation (8 Problems) ---
 
-
+  {
+    category: "Circular Motion & Gravitation",
+    id: "PHY_CIRC_01",
+    topic: "Centripetal Force",
+    difficulty: 1450,
+    problem: "A 2kg ball spins in a circle of radius 1m at 4m/s. Calculate the centripetal force.",
+    answer: "32",
+    unit: "N"
+  },
+  {
+    category: "Circular Motion & Gravitation",
+    id: "PHY_GRAV_02",
+    topic: "Gravitational Force",
+    difficulty: 1550,
+    problem: "If the distance between two planets doubles, by what factor does the gravitational force decrease?",
+    answer: "4",
+  },
   {
     category: "Circular Motion & Gravitation",
     id: "CG101",
@@ -1108,9 +1166,35 @@ export const physicsProblems: Problem[] = [
   },
 
 
-  // --- Rotational Motion (7 Problems) ---
+  // --- Rotational Motion ---
 
-
+  {
+    category: "Rotational Motion",
+    id: "PHY_ROT_01",
+    topic: "Torque",
+    difficulty: 1650,
+    problem: "A force of 10N is applied perpendicularly to a wrench 0.5m long. What is the torque?",
+    answer: "5",
+    unit: "Nm"
+  },
+  {
+    category: "Rotational Motion",
+    id: "PHY_ROT_02",
+    topic: "Rotational Inertia",
+    difficulty: 1750,
+    problem: "Calculate the Moment of Inertia of a solid disk ($M=2$kg, $R=1$m) rotating about its center. ($I = 1/2 MR^2$)",
+    answer: "1",
+    unit: "kg*m^2"
+  },
+  {
+    category: "Rotational Motion",
+    id: "PHY_ROT_03",
+    topic: "Angular Momentum",
+    difficulty: 1800,
+    problem: "An ice skater spins with $I=2$ and $\\omega=5$. She pulls her arms in, reducing $I$ to 1. What is her new $\\omega$?",
+    answer: "10",
+    unit: "rad/s"
+  },
   {
     category: "Rotational Motion",
     id: "RM101",
@@ -1426,8 +1510,25 @@ export const physicsProblems: Problem[] = [
   },
 
 
-  // --- Circuits & Capacitance (8 Problems) ---
-
+  // --- Circuits & Capacitance ---
+  {
+    category: "Circuits & Capacitance",
+    id: "PHY_CIRC_04",
+    topic: "RC Circuits",
+    difficulty: 2100,
+    problem: "A circuit has $R=1000$ Ohms and $C=1e-3$ Farads. What is the time constant $\\tau$?",
+    answer: "1",
+    unit: "s"
+  },
+  {
+    category: "Circuits & Capacitance",
+    id: "PHY_CIRC_05",
+    topic: "Power Dissipation",
+    difficulty: 1700,
+    problem: "A 10 Ohm resistor carries 2 Amps. How much power is dissipated?",
+    answer: "40",
+    unit: "W"
+  },
   {
     category: "Circuits",
     id: "PHY_C_01",
@@ -1831,9 +1932,25 @@ export const physicsProblems: Problem[] = [
   },
 
 
-  // --- Quantum Mechanics (8 Problems) ---
+  // --- Quantum Mechanics ---
 
-
+  {
+    category: "Quantum Mechanics",
+    id: "PHY_QUANT_01",
+    topic: "Photon Energy",
+    difficulty: 2250,
+    problem: "Calculate the energy of a photon with frequency $f$ if Planck's constant is $h$. Formula $E=hf$. If $f=2$ and $h=6.63e-34$, what is E?",
+    answer: "1.326e-33",
+    unit: "J"
+  },
+  {
+    category: "Quantum Mechanics",
+    id: "PHY_QUANT_02",
+    topic: "De Broglie Wavelength",
+    difficulty: 2350,
+    problem: "If momentum $p$ doubles, what happens to the de Broglie wavelength $\\lambda$? (Answer as a fraction, e.g., 1/2)",
+    answer: "1/2",
+  },
   {
     category: "Quantum Mechanics",
     id: "QM101",
@@ -2003,7 +2120,32 @@ export const physicsProblems: Problem[] = [
   // Thermodynamics (Ideal Gas & Heat)
 
 
-
+  {
+    category: "Thermodynamics",
+    id: "PHY_THERM_01",
+    topic: "First Law",
+    difficulty: 1850,
+    problem: "A gas does 500J of work while expanding adiabatically (no heat exchange). What is the change in internal energy?",
+    answer: "-500",
+    unit: "J"
+  },
+  {
+    category: "Thermodynamics",
+    id: "PHY_THERM_02",
+    topic: "Carnot Efficiency",
+    difficulty: 1900,
+    problem: "A heat engine operates between 600K and 300K. What is its maximum theoretical efficiency (as a decimal)?",
+    answer: "0.5",
+  },
+  {
+    category: "Thermodynamics",
+    id: "PHY_THERM_03",
+    topic: "Ideal Gas Law",
+    difficulty: 1600,
+    problem: "1 mole of an ideal gas is at 300K in a 1 cubic meter volume. If $R \\approx 8.31$, find the pressure (approx).",
+    answer: "2493",
+    unit: "Pa"
+  },
   {
     category: "Thermodynamics",
     id: "TH_NEW_01",
@@ -2041,6 +2183,23 @@ export const physicsProblems: Problem[] = [
   },
 
   // Waves & Optics
+  {
+    category: "Waves & Optics",
+    id: "PHY_OPT_01",
+    topic: "Snell's Law",
+    difficulty: 2100,
+    problem: "Light travels from a medium with $n=1$ to $n=2$. If the angle of incidence is $30^{\\circ}$ ($sin(30)=0.5$), what is $sin(\\theta_{refracted})$?",
+    answer: "0.25",
+  },
+  {
+    category: "Waves & Optics",
+    id: "PHY_WAVE_02",
+    topic: "Doppler Effect",
+    difficulty: 2150,
+    problem: "A source emits sound at 1000Hz. If it moves towards you at the speed of sound, what is the observed frequency?",
+    answer: "infinity",
+    format_hint: "If the denominator is zero, mathematically it tends to infinity."
+  },
   {
     category: "Optics and Waves",
     id: "OW_NEW_01",
@@ -2564,7 +2723,26 @@ export const physicsProblems: Problem[] = [
     answer: "444.4",
     unit: "Hz"
   },
-  // --- PHYSICS: ELECTROMAGNETISM & THERMO [ELO 1800-2200] ---
+  // --- PHYSICS: ELECTROMAGNETISM & THERMO ---
+  {
+    category: "Magnetic Fields & Forces",
+    id: "PHY_MAG_01",
+    topic: "Lorentz Force",
+    difficulty: 2200,
+    problem: "An electron ($q = 1.6 \\times 10^{-19}$) moves at $10^6$ m/s perpendicular to a 1 T field. What is the magnitude of force? (Enter in scientific notation like 1.6e-13)",
+    answer: "1.6e-13",
+    unit: "N"
+  },
+  {
+    category: "Electric Fields & Potential",
+    id: "PHY_ELEC_02",
+    topic: "Gauss's Law",
+    difficulty: 2300,
+    problem: "A point charge $q$ is at the center of a sphere of radius $R$. If the radius is doubled to $2R$, what happens to the total electric flux?",
+    answer: "1",
+    format_hint: "Enter the factor of change (e.g., 1 if unchanged)."
+  },
+
   {
     category: "Physics",
     id: "PHY_ELEC_01",
