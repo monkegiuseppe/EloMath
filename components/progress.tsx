@@ -57,7 +57,11 @@ export default function Progress({ onBack }: ProgressProps) {
 
   const fetchProgressData = async () => {
     try {
-      const response = await fetch(`/api/progress/detailed?month=${selectedMonth.toISOString()}`);
+      const year = selectedMonth.getFullYear();
+      const month = selectedMonth.getMonth();
+      const offset = new Date().getTimezoneOffset();
+
+      const response = await fetch(`/api/progress/detailed?year=${year}&month=${month}&offset=${offset}`);
       const data = await response.json();
       if (!data.error) {
         setStats(data);
@@ -201,7 +205,6 @@ export default function Progress({ onBack }: ProgressProps) {
         </motion.header>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-          {/* ELO Cards */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -253,7 +256,6 @@ export default function Progress({ onBack }: ProgressProps) {
           </motion.div>
         </div>
 
-        {/* Activity Calendar */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -349,7 +351,6 @@ export default function Progress({ onBack }: ProgressProps) {
           </div>
         </motion.div>
 
-        {/* Statistics Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
