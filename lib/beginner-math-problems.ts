@@ -5,6 +5,86 @@ export const beginnerMathProblems: Problem[] = [
     // --- Foundations (200 - 450) ---
     {
         category: "Arithmetic",
+        id: "B2_AR_01",
+        topic: "Modulo",
+        difficulty: 350,
+        problem: "Find the remainder of $25 \\div 4$.",
+        answer: "1"
+    },
+    {
+        category: "Arithmetic",
+        id: "B2_AR_02",
+        topic: "LCM",
+        difficulty: 380,
+        problem: "Find the Least Common Multiple (LCM) of 4 and 6.",
+        answer: "12"
+    },
+    {
+        category: "Arithmetic",
+        id: "B2_AR_03",
+        topic: "GCD",
+        difficulty: 390,
+        problem: "Find the Greatest Common Divisor (GCD) of 18 and 24.",
+        answer: "6"
+    },
+    {
+        category: "Arithmetic",
+        id: "B2_AR_04",
+        topic: "Fractions",
+        difficulty: 300,
+        problem: "Simplify $\\frac{3}{4} - \\frac{1}{2}$. (Enter as decimal)",
+        answer: "0.25"
+    },
+    {
+        category: "Arithmetic",
+        id: "B2_AR_05",
+        topic: "Exponents",
+        difficulty: 320,
+        problem: "Evaluate $5^0$.",
+        answer: "1"
+    },
+    {
+        category: "Arithmetic",
+        id: "B2_AR_06",
+        topic: "Percents",
+        difficulty: 360,
+        problem: "What is 15% of 200?",
+        answer: "30"
+    },
+    {
+        category: "Arithmetic",
+        id: "B2_AR_07",
+        topic: "Absolute Value",
+        difficulty: 310,
+        problem: "Evaluate $|-7| + |3|$.",
+        answer: "10"
+    },
+    {
+        category: "Arithmetic",
+        id: "B2_AR_08",
+        topic: "Factorial",
+        difficulty: 395,
+        problem: "Evaluate $4!$.",
+        answer: "24"
+    },
+    {
+        category: "Arithmetic",
+        id: "B2_AR_09",
+        topic: "Decimals",
+        difficulty: 250,
+        problem: "Calculate $0.02 \\times 100$.",
+        answer: "2"
+    },
+    {
+        category: "Arithmetic",
+        id: "B2_AR_10",
+        topic: "Order of Operations",
+        difficulty: 340,
+        problem: "Evaluate $10 - 2^3$.",
+        answer: "2"
+    },
+    {
+        category: "Arithmetic",
         id: "AR_NEW_01",
         topic: "Mental Math subtraction",
         difficulty: 250,

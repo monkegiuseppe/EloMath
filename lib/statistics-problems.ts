@@ -231,4 +231,68 @@ export const statisticsProblems: Problem[] = [
         category: "Statistics", id: "STAT_COMB_03", topic: "Combinations", difficulty: 1150,
         problem: "Calculate 5C2 (Combination 5 choose 2).", answer: "10"
     },
+    {
+        category: "Statistics",
+        id: "B2_STAT_01",
+        topic: "Probability",
+        difficulty: 1100,
+        problem: "Probability of flipping 3 heads in a row (fair coin).",
+        answer: "0.125"
+    },
+    {
+        category: "Statistics",
+        id: "B2_STAT_02",
+        topic: "Combinatorics",
+        difficulty: 1200,
+        problem: "Calculate $_5C_2$.",
+        answer: "10"
+    },
+    {
+        category: "Statistics",
+        id: "B2_STAT_03",
+        topic: "Normal Dist",
+        difficulty: 1400,
+        problem: "In a standard normal distribution, what percentage lies within 1 std dev (approx integer)?",
+        answer: "68"
+    },
+    {
+        category: "Statistics",
+        id: "B2_STAT_04",
+        topic: "Expected Value",
+        difficulty: 1350,
+        problem: "Expected value of a fair 6-sided die roll.",
+        answer: "3.5"
+    },
+    {
+        category: "Statistics",
+        id: "B2_STAT_05",
+        topic: "Variance",
+        difficulty: 1500,
+        problem: "Variance of dataset {2, 2, 2}.",
+        answer: "0"
+    },
+    {
+        category: "Statistics",
+        id: "STAT_NORM_01",
+        topic: "Z-Score",
+        difficulty: 2000,
+        problem: "Z-score of a value 2 standard deviations below the mean.",
+        answer: "-2",
+    },
+    {
+        category: "Statistics",
+        id: "STAT_COMB_01",
+        topic: "Combinations",
+        difficulty: 1900,
+        problem: "Calculate $5C2$ (5 choose 2).",
+        answer: "10",
+    },
+    {
+        category: "Statistics",
+        id: "STAT_PERM_01",
+        topic: "Permutations",
+        difficulty: 1950,
+        problem: "Calculate $5P2$.",
+        answer: "20",
+    },
 ];

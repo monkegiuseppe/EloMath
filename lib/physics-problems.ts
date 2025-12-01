@@ -2118,5 +2118,594 @@ export const physicsProblems: Problem[] = [
     category: "Physics", id: "PHY_WAVE_02", topic: "Period/Freq", difficulty: 950,
     problem: "A pendulum swings with a period of 0.5s. What is its frequency?", answer: "2", unit: "Hz"
   },
-
+  {
+    category: "Kinematic Equations",
+    id: "B2_PHY_01",
+    topic: "Velocity",
+    difficulty: 500,
+    problem: "Distance = 100m, Time = 10s. Find speed.",
+    answer: "10",
+    unit: "m/s"
+  },
+  {
+    category: "Kinematic Equations",
+    id: "B2_PHY_02",
+    topic: "Acceleration",
+    difficulty: 600,
+    problem: "Start at 0m/s, end at 20m/s in 5s. Find acceleration.",
+    answer: "4",
+    unit: "m/s²"
+  },
+  {
+    category: "Forces & Newton's Laws",
+    id: "B2_PHY_03",
+    topic: "Newton's 2nd Law",
+    difficulty: 650,
+    problem: "Mass 10kg, Acceleration 3m/s². Find Force.",
+    answer: "30",
+    unit: "N"
+  },
+  {
+    category: "Forces & Newton's Laws",
+    id: "B2_PHY_04",
+    topic: "Weight",
+    difficulty: 620,
+    problem: "Weight of 1kg mass on Earth ($g=9.8$).",
+    answer: "9.8",
+    unit: "N"
+  },
+  {
+    category: "Kinematic Equations",
+    id: "B2_PHY_05",
+    topic: "Free Fall",
+    difficulty: 700,
+    problem: "Speed after falling 1s from rest ($g=9.8$).",
+    answer: "9.8",
+    unit: "m/s"
+  },
+  {
+    category: "Work & Energy",
+    id: "B2_PHY_06",
+    topic: "Kinetic Energy",
+    difficulty: 800,
+    problem: "KE of 2kg mass at 2m/s. ($0.5mv^2$)",
+    answer: "4",
+    unit: "J"
+  },
+  {
+    category: "Work & Energy",
+    id: "B2_PHY_07",
+    topic: "Potential Energy",
+    difficulty: 820,
+    problem: "PE of 1kg mass at 10m height ($g=9.8$).",
+    answer: "98",
+    unit: "J"
+  },
+  {
+    category: "Momentum & Collisions",
+    id: "B2_PHY_08",
+    topic: "Momentum",
+    difficulty: 850,
+    problem: "Momentum of 10kg car at 5m/s.",
+    answer: "50",
+    unit: "kg·m/s"
+  },
+  {
+    category: "Work & Energy",
+    id: "B2_PHY_09",
+    topic: "Work",
+    difficulty: 750,
+    problem: "Work done pushing box 10m with 5N force.",
+    answer: "50",
+    unit: "J"
+  },
+  {
+    category: "Forces & Newton's Laws",
+    id: "B2_PHY_10",
+    topic: "Net Force",
+    difficulty: 720,
+    problem: "10N right, 4N left. Net force?",
+    answer: "6",
+    unit: "N"
+  },
+  {
+    category: "Circuits & Capacitance",
+    id: "B2_PHY_11",
+    topic: "Ohm's Law",
+    difficulty: 1050,
+    problem: "Voltage 12V, Resistance 6Ω. Current?",
+    answer: "2",
+    unit: "A"
+  },
+  {
+    category: "Circuits & Capacitance",
+    id: "B2_PHY_12",
+    topic: "Power",
+    difficulty: 1150,
+    problem: "Power of resistor with 2A and 5V.",
+    answer: "10",
+    unit: "W"
+  },
+  {
+    category: "Circular Motion & Gravitation",
+    id: "B2_PHY_13",
+    topic: "Centripetal Accel",
+    difficulty: 1200,
+    problem: "$a_c$ for $v=4$ m/s, $r=2$ m.",
+    answer: "8",
+    unit: "m/s²"
+  },
+  {
+    category: "Optics and Waves",
+    id: "B2_PHY_14",
+    topic: "Wave Speed",
+    difficulty: 1100,
+    problem: "Freq 10Hz, Wavelength 2m. Speed?",
+    answer: "20",
+    unit: "m/s"
+  },
+  {
+    category: "Optics and Waves",
+    id: "B2_PHY_15",
+    topic: "Period",
+    difficulty: 1020,
+    problem: "Period of 50Hz wave.",
+    answer: "0.02",
+    unit: "s"
+  },
+  {
+    category: "Thermodynamics",
+    id: "B2_PHY_16",
+    topic: "Ideal Gas",
+    difficulty: 1350,
+    problem: "If T doubles at constant V, P multiplies by?",
+    answer: "2"
+  },
+  {
+    category: "Electric Fields & Potential",
+    id: "B2_PHY_17",
+    topic: "Coulomb Force",
+    difficulty: 1400,
+    problem: "If distance is halved, force multiplies by?",
+    answer: "4"
+  },
+  {
+    category: "Circuits & Capacitance",
+    id: "B2_PHY_18",
+    topic: "Series Resistors",
+    difficulty: 1120,
+    problem: "Total R for 10Ω and 20Ω in series.",
+    answer: "30",
+    unit: "Ω"
+  },
+  {
+    category: "Circuits & Capacitance",
+    id: "B2_PHY_19",
+    topic: "Parallel Resistors",
+    difficulty: 1450,
+    problem: "Total R for two 10Ω resistors in parallel.",
+    answer: "5",
+    unit: "Ω"
+  },
+  {
+    category: "Rotational Motion",
+    id: "B2_PHY_20",
+    topic: "Torque",
+    difficulty: 1300,
+    problem: "Force 10N at 2m lever arm (perpendicular). Torque?",
+    answer: "20",
+    unit: "Nm"
+  },
+  {
+    category: "Quantum Mechanics",
+    id: "B2_PHY_21",
+    topic: "Photon Energy",
+    difficulty: 1600,
+    problem: "Energy of photon $E=hf$. If $f$ doubles, E multiplies by?",
+    answer: "2"
+  },
+  {
+    category: "Magnetic Fields & Forces",
+    id: "B2_PHY_22",
+    topic: "Lorentz Force",
+    difficulty: 1700,
+    problem: "Force on stationary charge in magnetic field.",
+    answer: "0",
+    unit: "N"
+  },
+  {
+    category: "Quantum Mechanics",
+    id: "B2_PHY_23",
+    topic: "De Broglie",
+    difficulty: 1800,
+    problem: "If momentum doubles, wavelength multiplies by?",
+    answer: "0.5"
+  },
+  {
+    category: "Thermodynamics",
+    id: "B2_PHY_24",
+    topic: "Carnot Efficiency",
+    difficulty: 1750,
+    problem: "Efficiency if $T_c=0$ K?",
+    answer: "1"
+  },
+  {
+    category: "Electric Fields & Potential",
+    id: "B2_PHY_25",
+    topic: "Capacitance",
+    difficulty: 1650,
+    problem: "Charge stored in 2F cap at 5V.",
+    answer: "10",
+    unit: "C"
+  },
+  {
+    category: "Forces & Newton's Laws",
+    id: "B2_PHY_26",
+    topic: "Friction",
+    difficulty: 1550,
+    problem: "Max static friction if $\\mu=0.5, N=100$.",
+    answer: "50",
+    unit: "N"
+  },
+  {
+    category: "Kinematic Equations",
+    id: "B2_PHY_27",
+    topic: "Projectile Range",
+    difficulty: 1600,
+    problem: "Angle for max range (no air resistance).",
+    answer: "45",
+    unit: "deg"
+  },
+  {
+    category: "Momentum & Collisions",
+    id: "B2_PHY_28",
+    topic: "Inelastic Collision",
+    difficulty: 1650,
+    problem: "1kg at 10m/s hits 1kg at rest, sticks. Final speed?",
+    answer: "5",
+    unit: "m/s"
+  },
+  {
+    category: "Optics and Waves",
+    id: "B2_PHY_29",
+    topic: "Snell's Law",
+    difficulty: 1700,
+    problem: "If $n_1 < n_2$, does light bend toward or away from normal?",
+    answer: "toward"
+  },
+  {
+    category: "Magnetic Fields & Forces",
+    id: "B2_PHY_30",
+    topic: "Solenoid",
+    difficulty: 1850,
+    problem: "If turns/length doubles, B-field multiplies by?",
+    answer: "2"
+  },
+  // --- PHYSICS: ADVANCED MECHANICS [ELO 1200-1600] ---
+  {
+    category: "Mechanics",
+    id: "PHY_DYN_01",
+    topic: "Newton's Laws",
+    difficulty: 1200,
+    problem: "A 10kg block is pushed with a net force of 50N. What is its acceleration?",
+    answer: "5",
+    unit: "m/s^2"
+  },
+  {
+    category: "Mechanics",
+    id: "PHY_NRG_01",
+    topic: "Kinetic Energy",
+    difficulty: 1250,
+    problem: "Calculate the kinetic energy of a 2kg mass moving at 4 m/s.",
+    answer: "16",
+    unit: "J"
+  },
+  {
+    category: "Mechanics",
+    id: "PHY_MOM_01",
+    topic: "Momentum",
+    difficulty: 1300,
+    problem: "A 4kg object moving at 3 m/s collides with a stationary 2kg object and they stick together. What is the final velocity?",
+    answer: "2",
+    unit: "m/s"
+  },
+  {
+    category: "Mechanics",
+    id: "PHY_FRIC_01",
+    topic: "Friction",
+    difficulty: 1350,
+    problem: "A 5kg block slides on a surface with $\\mu_k = 0.2$. What is the magnitude of the friction force? ($g=9.8$)",
+    answer: "9.8",
+    unit: "N"
+  },
+  {
+    category: "Mechanics",
+    id: "PHY_GRAV_01",
+    topic: "Gravitation",
+    difficulty: 1400,
+    problem: "Calculate the gravitational force between two 1000kg masses separated by 1 meter. ($G \\approx 6.67 \\times 10^{-11}$)",
+    answer: "6.67e-5",
+    unit: "N",
+    format_hint: "Scientific notation"
+  },
+  {
+    category: "Mechanics",
+    id: "PHY_CIRC_01",
+    topic: "Centripetal Force",
+    difficulty: 1450,
+    problem: "A 1kg ball spins in a circle of radius 0.5m at 2 m/s. What is the tension in the string?",
+    answer: "8",
+    unit: "N"
+  },
+  {
+    category: "Mechanics",
+    id: "PHY_INC_01",
+    topic: "Inclined Planes",
+    difficulty: 1500,
+    problem: "A block slides down a frictionless $30^\\circ$ incline. What is its acceleration? ($g=9.8$)",
+    answer: "4.9",
+    unit: "m/s^2"
+  },
+  {
+    category: "Mechanics",
+    id: "PHY_SPR_01",
+    topic: "Hooke's Law",
+    difficulty: 1300,
+    problem: "A spring with $k=100$ N/m is compressed 0.2m. What is the potential energy stored?",
+    answer: "2",
+    unit: "J"
+  },
+  {
+    category: "Mechanics",
+    id: "PHY_POW_01",
+    topic: "Power",
+    difficulty: 1350,
+    problem: "An engine does 1000J of work in 5 seconds. What is the power output?",
+    answer: "200",
+    unit: "W"
+  },
+  {
+    category: "Mechanics",
+    id: "PHY_PROJ_01",
+    topic: "Projectile Motion",
+    difficulty: 1550,
+    problem: "A projectile is fired at 20 m/s at $45^\\circ$. What is the range? ($g=10$ m/s$^2$ for simplicity)",
+    answer: "40",
+    unit: "m"
+  },
+  // --- PHYSICS: ROTATION & FLUIDS [ELO 1600-1900] ---
+  {
+    category: "Physics",
+    id: "PHY_ROT_01",
+    topic: "Torque",
+    difficulty: 1600,
+    problem: "A 10N force is applied perpendicular to a wrench 0.5m from the pivot. Calculate the torque.",
+    answer: "5",
+    unit: "Nm"
+  },
+  {
+    category: "Physics",
+    id: "PHY_ROT_02",
+    topic: "Rotational Inertia",
+    difficulty: 1650,
+    problem: "Calculate the moment of inertia of a 2kg thin hoop of radius 3m rotating about its center. ($I=MR^2$)",
+    answer: "18",
+    unit: "kg*m^2"
+  },
+  {
+    category: "Physics",
+    id: "PHY_ROT_03",
+    topic: "Angular Momentum",
+    difficulty: 1700,
+    problem: "A disk with $I=2$ kg m$^2$ spins at 5 rad/s. What is its angular momentum?",
+    answer: "10",
+    unit: "kg m^2/s"
+  },
+  {
+    category: "Physics",
+    id: "PHY_ROT_04",
+    topic: "Rotational Energy",
+    difficulty: 1750,
+    problem: "What is the rotational kinetic energy of a sphere ($I=0.4$) spinning at 10 rad/s?",
+    answer: "20",
+    unit: "J"
+  },
+  {
+    category: "Physics",
+    id: "PHY_FLUID_01",
+    topic: "Pressure",
+    difficulty: 1600,
+    problem: "What is the pressure at a depth of 10m in water? (Assume $\\rho=1000$, $g=9.8$, atmospheric pressure ignored).",
+    answer: "98000",
+    unit: "Pa"
+  },
+  {
+    category: "Physics",
+    id: "PHY_FLUID_02",
+    topic: "Buoyancy",
+    difficulty: 1650,
+    problem: "A block displaces 0.002 m$^3$ of water. What is the buoyant force? ($g=9.8$, $\\rho=1000$)",
+    answer: "19.6",
+    unit: "N"
+  },
+  {
+    category: "Physics",
+    id: "PHY_SHM_01",
+    topic: "Simple Harmonic Motion",
+    difficulty: 1700,
+    problem: "A mass-spring system has period $T=2s$. If the mass is quadrupled, what is the new period?",
+    answer: "4",
+    unit: "s"
+  },
+  {
+    category: "Physics",
+    id: "PHY_SHM_02",
+    topic: "Pendulum",
+    difficulty: 1750,
+    problem: "What is the length of a simple pendulum with a period of 2 seconds on Earth? (Use $g \\approx \\pi^2$)",
+    answer: "1",
+    unit: "m"
+  },
+  {
+    category: "Physics",
+    id: "PHY_WAVE_01",
+    topic: "Wave Speed",
+    difficulty: 1600,
+    problem: "A wave has frequency 50Hz and wavelength 2m. What is its speed?",
+    answer: "100",
+    unit: "m/s"
+  },
+  {
+    category: "Physics",
+    id: "PHY_SOUND_01",
+    topic: "Doppler Effect",
+    difficulty: 1800,
+    problem: "A source emits 400Hz moving at 34 m/s towards an observer. Speed of sound is 340 m/s. What frequency is heard?",
+    answer: "444.4",
+    unit: "Hz"
+  },
+  // --- PHYSICS: ELECTROMAGNETISM & THERMO [ELO 1800-2200] ---
+  {
+    category: "Physics",
+    id: "PHY_ELEC_01",
+    topic: "Coulomb's Law",
+    difficulty: 1800,
+    problem: "Force between two $+1\\mu C$ charges 1m apart. ($k=9\\times10^9$)",
+    answer: "0.009",
+    unit: "N"
+  },
+  {
+    category: "Physics",
+    id: "PHY_ELEC_02",
+    topic: "Electric Field",
+    difficulty: 1850,
+    problem: "Electric field strength 0.5m from a $2\\mu C$ charge. ($k=9\\times10^9$)",
+    answer: "72000",
+    unit: "N/C"
+  },
+  {
+    category: "Physics",
+    id: "PHY_CIRC_02",
+    topic: "Ohm's Law",
+    difficulty: 1800,
+    problem: "Current through a $100\\Omega$ resistor connected to 9V.",
+    answer: "0.09",
+    unit: "A"
+  },
+  {
+    category: "Physics",
+    id: "PHY_CAP_01",
+    topic: "Capacitors",
+    difficulty: 1900,
+    problem: "Energy stored in a $10\\mu F$ capacitor at 100V. ($E = 0.5CV^2$)",
+    answer: "0.05",
+    unit: "J"
+  },
+  {
+    category: "Physics",
+    id: "PHY_CIRC_03",
+    topic: "Resistors in Parallel",
+    difficulty: 1850,
+    problem: "Equivalent resistance of two $100\\Omega$ resistors in parallel.",
+    answer: "50",
+    unit: "Ohms"
+  },
+  {
+    category: "Physics",
+    id: "PHY_MAG_01",
+    topic: "Lorentz Force",
+    difficulty: 1950,
+    problem: "Force on a 2C charge moving 5 m/s perpendicular to a 0.1T magnetic field.",
+    answer: "1",
+    unit: "N"
+  },
+  {
+    category: "Physics",
+    id: "PHY_MAG_02",
+    topic: "Wire in B-Field",
+    difficulty: 2000,
+    problem: "Force on a 2m wire carrying 3A perpendicular to a 0.5T field.",
+    answer: "3",
+    unit: "N"
+  },
+  {
+    category: "Physics",
+    id: "PHY_THERMO_01",
+    topic: "Ideal Gas Law",
+    difficulty: 1900,
+    problem: "Pressure of 1 mole of gas at 300K in 0.025 m$^3$. ($R \\approx 8.31$)",
+    answer: "99720",
+    unit: "Pa"
+  },
+  {
+    category: "Physics",
+    id: "PHY_THERMO_02",
+    topic: "Heat Engine",
+    difficulty: 2050,
+    problem: "Efficiency of a Carnot engine operating between 500K and 300K.",
+    answer: "0.4",
+    format_hint: "Decimal"
+  },
+  {
+    category: "Physics",
+    id: "PHY_THERMO_03",
+    topic: "Specific Heat",
+    difficulty: 1850,
+    problem: "Energy required to heat 1kg of water ($c=4184$) by 10 degrees Celsius.",
+    answer: "41840",
+    unit: "J"
+  },
+  {
+    category: "Physics",
+    id: "PHY_OPT_01",
+    topic: "Refraction",
+    difficulty: 2000,
+    problem: "Light enters glass ($n=1.5$) from air at $30^\\circ$. Find $\\sin(\\theta_{ref})$.",
+    answer: "0.333",
+  },
+  {
+    category: "Physics",
+    id: "PHY_Q_01",
+    topic: "Photon Energy",
+    difficulty: 2150,
+    problem: "Energy of a photon with frequency $10^{15}$ Hz. ($h \\approx 6.63 \\times 10^{-34}$)",
+    answer: "6.63e-19",
+    unit: "J"
+  },
+  {
+    category: "Physics",
+    id: "PHY_REL_01",
+    topic: "Relativity",
+    difficulty: 2200,
+    problem: "Rest energy of a 1g mass. ($c=3\\times10^8$)",
+    answer: "9e13",
+    unit: "J"
+  },
+  {
+    category: "Physics",
+    id: "PHY_FLUX_01",
+    topic: "Magnetic Flux",
+    difficulty: 2100,
+    problem: "Flux through a 2m$^2$ loop perpendicular to a 3T field.",
+    answer: "6",
+    unit: "Wb"
+  },
+  {
+    category: "Physics",
+    id: "PHY_INDUCT_01",
+    topic: "Inductance",
+    difficulty: 2150,
+    problem: "EMF induced in 2H inductor when current changes at 5 A/s.",
+    answer: "10",
+    unit: "V"
+  },
+  {
+    category: "Physics",
+    id: "PHY_ALT_01",
+    topic: "AC Circuits",
+    difficulty: 2200,
+    problem: "Peak voltage is 170V. What is the RMS voltage?",
+    answer: "120",
+    unit: "V"
+  },
 ];
