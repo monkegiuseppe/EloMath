@@ -1,4 +1,4 @@
-import type { Problem } from './problems';
+import type { Problem } from '../problems';
 
 export const statisticsProblems: Problem[] = [
     // --- Basic Statistics (Mean, Median, Mode) (800-1100) ---

@@ -80,9 +80,7 @@ export default function Home() {
               </p>
             </motion.div>
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }} className="flex justify-center mb-8">
-              {/* --- DYNAMIC AUTHENTICATION SECTION --- */}
               {status === 'authenticated' ? (
-                // If the user is logged in, show their info and a sign-out button
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-2 glass px-4 py-2 rounded-xl">
                     {session.user?.image && <Image src={session.user.image} alt="User avatar" width={24} height={24} className="rounded-full" />}
@@ -93,7 +91,6 @@ export default function Home() {
                   </button>
                 </div>
               ) : (
-                // If the user is not logged in, show the sign-in button
                 <button onClick={() => signIn('google')} disabled={status === 'loading'} className="glass px-6 py-3 rounded-xl flex items-center gap-2 text-foreground hover:bg-card/90">
                   <LogIn size={20} />
                   <span>{status === 'loading' ? 'Authenticating...' : 'Sign in with Google'}</span>

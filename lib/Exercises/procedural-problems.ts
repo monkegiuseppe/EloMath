@@ -1,4 +1,4 @@
-import type { Problem } from './problems';
+import type { Problem } from '../problems';
 
 const generateAlgebraDrills = (): Problem[] => {
     const problems: Problem[] = [];

@@ -1,6 +1,6 @@
-// lib/physics-problems.ts
+// lib/Exercises/physics-problems.ts
 
-import type { Problem } from './problems';
+import type { Problem } from '../problems';
 
 export const physicsProblems: Problem[] = [
   // --- Kinematic Equations (8 Problems) ---

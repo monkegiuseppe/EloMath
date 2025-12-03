@@ -1,5 +1,5 @@
-// lib/arithmetic-problems.ts
-import type { Problem } from './problems';
+// lib/Exercises/arithmetic-problems.ts
+import type { Problem } from '../problems';
 
 // Helper to generate problems programmatically to save space
 const generateArithmeticProblems = (): Problem[] => {

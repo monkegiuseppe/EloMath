@@ -1,13 +1,12 @@
 // lib/problems.ts
 
-import { mathProblems as calculusProblems } from './math-problems';
-import { physicsProblems as allPhysicsProblems } from './physics-problems';
-import { arithmeticProblems } from './arithmetic-problems';
-import { beginnerPhysicsProblems } from './beginner-physics-problems';
-import { beginnerMathProblems } from './beginner-math-problems';
-import { statisticsProblems } from './statistics-problems';
+import { mathProblems as calculusProblems } from './Exercises/math-problems';
+import { physicsProblems as allPhysicsProblems } from './Exercises/physics-problems';
+import { arithmeticProblems } from './Exercises/arithmetic-problems';
+import { beginnerPhysicsProblems } from './Exercises/beginner-physics-problems';
+import { beginnerMathProblems } from './Exercises/beginner-math-problems';
+import { statisticsProblems } from './Exercises/statistics-problems';
 
-// The main interface for all problems in the application.
 export interface Problem {
   id: string;
   topic: string;
@@ -19,7 +18,6 @@ export interface Problem {
   format_hint?: string;
 }
 
-// Combine Calculus/Linear Algebra with Arithmetic/Algebra/Statistics
 export const mathProblems: Problem[] = [
   ...beginnerMathProblems,
   ...arithmeticProblems,
@@ -35,14 +33,12 @@ export const physicsProblems: Problem[] = [
 export const allProblems: Problem[] = [...mathProblems, ...physicsProblems];
 
 export const allCategories: string[] = [
-  // Basic Math
   "Addition",
   "Subtraction",
   "Multiplication",
   "Division",
   "Linear Equations",
   "Exponents",
-  // Advanced Math
   "Statistics",
   "Calculus I",
   "Calculus II",
@@ -51,14 +47,12 @@ export const allCategories: string[] = [
   "Linear Algebra1",
   "Linear Algebra2",
   "Complex Analysis",
-  // Algebra
   "Algebra I",
   "Algebra II",
   "Geometry",
   "Pre-Calculus",
   "Pre-Algebra",
   "Arithmetic",
-  // Physics
   "Kinematic Equations",
   "Forces & Newton's Laws",
   "Work & Energy",

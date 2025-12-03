@@ -10,11 +10,9 @@
 
 @layer base {
   :root {
-    /* Core Colors */
     --background: 15 23 42;
     --foreground: 248 250 252;
 
-    /* Components */
     --card: 30 41 59 / 0.8;
     --card-foreground: 248 250 252;
     --popover: 30 41 59 / 0.9;
@@ -27,30 +25,21 @@
     --destructive-foreground: 248 250 252;
 
 
-    /* Primary, Secondary are White, so Foreground must be Dark */
     --primary: 248 250 252;
     --primary-foreground: 15 23 42;
     --secondary: 248 250 252;
     --secondary-foreground: 15 23 42;
 
-    /* Accent: Used for hovers. Set to a lighter slate (not white) for better contrast with white text */
     --accent: 51 65 85;
     --accent-foreground: 248 250 252;
 
-    /* Ring color is now based on Foreground (White) */
     --ring: 248 250 252 / 0.5;
 
-    /* Chart colors updated to a neutral, white, and red palette */
     --chart-1: 148 163 184;
-    /* Muted Grey */
     --chart-2: 248 250 252;
-    /* White */
     --chart-3: 148 163 184;
-    /* Muted Grey */
     --chart-4: 239 68 68;
-    /* Destructive Red */
     --chart-5: 244 114 182;
-    /* Pink */
 
 
     --radius: 0.5rem;
@@ -147,7 +136,6 @@
   }
 }
 
-/* MathQuill and mathematical notation styles (All white/neutral) */
 .mq-editable-field {
   @apply bg-input border border-border rounded-md px-2 py-1;
 }
@@ -184,7 +172,6 @@
   background: rgb(var(--foreground) / 0.2) !important;
 }
 
-/* Custom scrollbar styles */
 .custom-scrollbar {
   scrollbar-width: thin;
   scrollbar-color: rgba(248, 250, 252, 0.3) transparent;
@@ -220,7 +207,6 @@
   background: rgba(248, 250, 252, 0.7);
 }
 
-/* Apply to body for main scrollbar */
 body {
   scrollbar-width: thin;
   scrollbar-color: rgba(248, 250, 252, 0.3) transparent;
@@ -255,8 +241,6 @@ body::-webkit-scrollbar-thumb:hover {
   pointer-events: none;
 }
 
-/* Styles for dynamic background images - 4 theme options */
-/* Dark themes */
 .dark-gd .dynamic-background {
   background-image: url(/images/gd.png);
 }
@@ -265,7 +249,6 @@ body::-webkit-scrollbar-thumb:hover {
   background-image: url(/images/gd1.png);
 }
 
-/* Light themes */
 .light-g2 .dynamic-background {
   background-image: url(/images/g2.jpg);
 }
@@ -274,7 +257,6 @@ body::-webkit-scrollbar-thumb:hover {
   background-image: url(/images/g21.jpg);
 }
 
-/* Fallback for old theme classes (backwards compatibility) */
 .dark .dynamic-background {
   background-image: url(/images/gd.png);
 }

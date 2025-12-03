@@ -1,4 +1,4 @@
-import type { Problem } from './problems';
+import type { Problem } from '../problems';
 
 export const beginnerMathProblems: Problem[] = [
 
