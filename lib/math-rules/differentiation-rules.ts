@@ -464,6 +464,77 @@ export const differentiationRules: MathRule[] = [
         transform: (_, v) => `e^{${v}}(\\cos(${v})-\\sin(${v}))`,
         priority: 55
     },
+    {
+        id: 'diff-x-sin',
+        name: 'd/dx[x·sin(x)]',
+        pattern: /^(VAR)\*?sin\((VAR)\)$/,
+        transform: (_, v) => `\\sin(${v}) + ${v}\\cos(${v})`,
+        priority: 50
+    },
+
+    {
+        id: 'diff-x-cos',
+        name: 'd/dx[x·cos(x)]',
+        pattern: /^(VAR)\*?cos\((VAR)\)$/,
+        transform: (_, v) => `\\cos(${v}) - ${v}\\sin(${v})`,
+        priority: 50
+    },
+
+    {
+        id: 'diff-x-exp',
+        name: 'd/dx[x·e^x]',
+        pattern: /^(VAR)\*?e\^(VAR)$/,
+        transform: (_, v) => `(1+${v})e^{${v}}`,
+        priority: 50
+    },
+
+    {
+        id: 'diff-x-ln',
+        name: 'd/dx[x·ln(x)]',
+        pattern: /^(VAR)\*?ln\((VAR)\)$/,
+        transform: (_, v) => `\\ln(${v}) + 1`,
+        priority: 50
+    },
+
+    {
+        id: 'diff-sin2',
+        name: 'd/dx[sin²(x)]',
+        pattern: /^sin\((VAR)\)\^2$/,
+        transform: (_, v) => `2\\sin(${v})\\cos(${v})`,
+        priority: 35
+    },
+
+    {
+        id: 'diff-cos2',
+        name: 'd/dx[cos²(x)]',
+        pattern: /^cos\((VAR)\)\^2$/,
+        transform: (_, v) => `-2\\sin(${v})\\cos(${v})`,
+        priority: 35
+    },
+
+    {
+        id: 'diff-tan2',
+        name: 'd/dx[tan²(x)]',
+        pattern: /^tan\((VAR)\)\^2$/,
+        transform: (_, v) => `2\\tan(${v})\\sec^2(${v})`,
+        priority: 35
+    },
+
+    {
+        id: 'diff-exp-sin',
+        name: 'd/dx[e^x·sin(x)]',
+        pattern: /^e\^(VAR)\*?sin\((VAR)\)$/,
+        transform: (_, v) => `e^{${v}}(\\sin(${v})+\\cos(${v}))`,
+        priority: 55
+    },
+
+    {
+        id: 'diff-exp-cos',
+        name: 'd/dx[e^x·cos(x)]',
+        pattern: /^e\^(VAR)\*?cos\((VAR)\)$/,
+        transform: (_, v) => `e^{${v}}(\\cos(${v})-\\sin(${v}))`,
+        priority: 55
+    },
 ];
 
 export function getDifferentiationRuleById(id: string): MathRule | undefined {

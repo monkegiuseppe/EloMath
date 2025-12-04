@@ -194,6 +194,22 @@ export const integrationRules: MathRule[] = [
     // ============================================
     // EXPONENTIAL FORMS (Schaum's 14.9 - 14.14)
     // ============================================
+
+    {
+        id: 'int-exp-sin',
+        name: 'e^x·sin(x)',
+        pattern: /^e\^(VAR)\*?sin\((VAR)\)$/,
+        transform: (_, v) => `\\frac{e^{${v}}}{2}(\\sin(${v})-\\cos(${v}))`,
+        priority: 55
+    },
+
+    {
+        id: 'int-exp-cos',
+        name: 'e^x·cos(x)',
+        pattern: /^e\^(VAR)\*?cos\((VAR)\)$/,
+        transform: (_, v) => `\\frac{e^{${v}}}{2}(\\sin(${v})+\\cos(${v}))`,
+        priority: 55
+    },
     {
         id: 'int-exp-sin',
         name: 'e^x·sin(x)',
@@ -303,6 +319,23 @@ export const integrationRules: MathRule[] = [
         transform: (_, v) => `\\ln|\\ln(${v})|`,
         priority: 40
     },
+    {
+        id: 'int-ln2',
+        name: 'ln²(x)',
+        pattern: /^ln\((VAR)\)\^2$/,
+        transform: (_, v) => `${v}\\ln^2(${v}) - 2${v}\\ln(${v}) + 2${v}`,
+        priority: 35
+    },
+
+    {
+        id: 'int-1-over-x-ln-x',
+        name: '1/(x·ln(x))',
+        pattern: /^1\/\((VAR)\*?ln\((VAR)\)\)$/,
+        transform: (_, v) => `\\ln|\\ln(${v})|`,
+        priority: 40
+    },
+
+
 
     // ============================================
     // TRIGONOMETRIC FORMS (Schaum's 14.15 - 14.24)
@@ -607,11 +640,81 @@ export const integrationRules: MathRule[] = [
         transform: (_, v) => `-\\coth(${v})`,
         priority: 35
     },
+    {
+        id: 'int-sinh2',
+        name: 'sinh²(x)',
+        pattern: /^sinh\((VAR)\)\^2$/,
+        transform: (_, v) => `\\frac{\\sinh(2${v})}{4} - \\frac{${v}}{2}`,
+        priority: 35
+    },
+
+    {
+        id: 'int-cosh2',
+        name: 'cosh²(x)',
+        pattern: /^cosh\((VAR)\)\^2$/,
+        transform: (_, v) => `\\frac{\\sinh(2${v})}{4} + \\frac{${v}}{2}`,
+        priority: 35
+    },
+
+    {
+        id: 'int-tanh2',
+        name: 'tanh²(x)',
+        pattern: /^tanh\((VAR)\)\^2$/,
+        transform: (_, v) => `${v} - \\tanh(${v})`,
+        priority: 35
+    },
+
+    {
+        id: 'int-coth',
+        name: 'coth(x)',
+        pattern: /^coth\((VAR)\)$/,
+        transform: (_, v) => `\\ln|\\sinh(${v})|`,
+        priority: 25
+    },
+
+    {
+        id: 'int-sech',
+        name: 'sech(x)',
+        pattern: /^sech\((VAR)\)$/,
+        transform: (_, v) => `2\\arctan(e^{${v}})`,
+        priority: 25
+    },
+
+    {
+        id: 'int-csch',
+        name: 'csch(x)',
+        pattern: /^csch\((VAR)\)$/,
+        transform: (_, v) => `\\ln|\\tanh(\\frac{${v}}{2})|`,
+        priority: 25
+    },
 
     // ============================================
     // INVERSE TRIG FORMS (Schaum's 14.45 - 14.59)
     // ============================================
 
+    {
+        id: 'int-arcsin',
+        name: 'arcsin(x)',
+        pattern: /^arcsin\((VAR)\)$/,
+        transform: (_, v) => `${v}\\arcsin(${v}) + \\sqrt{1-${v}^2}`,
+        priority: 30
+    },
+
+    {
+        id: 'int-arccos',
+        name: 'arccos(x)',
+        pattern: /^arccos\((VAR)\)$/,
+        transform: (_, v) => `${v}\\arccos(${v}) - \\sqrt{1-${v}^2}`,
+        priority: 30
+    },
+
+    {
+        id: 'int-arctan',
+        name: 'arctan(x)',
+        pattern: /^arctan\((VAR)\)$/,
+        transform: (_, v) => `${v}\\arctan(${v}) - \\frac{1}{2}\\ln(1+${v}^2)`,
+        priority: 30
+    },
     {
         id: 'int-1-over-sqrt-1-minus-x2',
         name: '1/√(1-x²)',
@@ -796,6 +899,69 @@ export const integrationRules: MathRule[] = [
     },
 
     {
+        id: 'int-x-exp',
+        name: 'x·e^x',
+        pattern: /^(VAR)\*?e\^(VAR)$/,
+        transform: (_, v) => `(${v}-1)e^{${v}}`,
+        priority: 50
+    },
+
+    {
+        id: 'int-x-ln',
+        name: 'x·ln(x)',
+        pattern: /^(VAR)\*?ln\((VAR)\)$/,
+        transform: (_, v) => `\\frac{${v}^2}{2}\\ln(${v}) - \\frac{${v}^2}{4}`,
+        priority: 50
+    },
+
+    {
+        id: 'int-x2-sin',
+        name: 'x²·sin(x)',
+        pattern: /^(VAR)\^2\*?sin\((VAR)\)$/,
+        transform: (_, v) => `(2-${v}^2)\\cos(${v}) + 2${v}\\sin(${v})`,
+        priority: 52
+    },
+
+    {
+        id: 'int-x2-cos',
+        name: 'x²·cos(x)',
+        pattern: /^(VAR)\^2\*?cos\((VAR)\)$/,
+        transform: (_, v) => `(${v}^2-2)\\sin(${v}) + 2${v}\\cos(${v})`,
+        priority: 52
+    },
+
+    {
+        id: 'int-x2-exp',
+        name: 'x²·e^x',
+        pattern: /^(VAR)\^2\*?e\^(VAR)$/,
+        transform: (_, v) => `(${v}^2-2${v}+2)e^{${v}}`,
+        priority: 52
+    },
+
+    {
+        id: 'int-x3-exp',
+        name: 'x³·e^x',
+        pattern: /^(VAR)\^3\*?e\^(VAR)$/,
+        transform: (_, v) => `(${v}^3-3${v}^2+6${v}-6)e^{${v}}`,
+        priority: 53
+    },
+    {
+        id: 'int-x-sin',
+        name: 'x·sin(x)',
+        pattern: /^(VAR)\*?sin\((VAR)\)$/,
+        transform: (_, v) => `\\sin(${v}) - ${v}\\cos(${v})`,
+        priority: 50
+    },
+
+    {
+        id: 'int-x-cos',
+        name: 'x·cos(x)',
+        pattern: /^(VAR)\*?cos\((VAR)\)$/,
+        transform: (_, v) => `\\cos(${v}) + ${v}\\sin(${v})`,
+        priority: 50
+    },
+
+    {
         id: 'int-x-sin-ax',
         name: 'x·sin(ax)',
         pattern: /^(VAR)\*?sin\((-?[\d.]+)\*?(VAR)\)$/,
@@ -953,6 +1119,321 @@ export const integrationRules: MathRule[] = [
             return `${v} - \\sqrt{${a2}}\\arctan\\frac{${v}}{\\sqrt{${a2}}}`;
         },
         priority: 43
+    },
+    {
+        id: 'int-x-over-x-plus-a',
+        name: 'x/(x+a)',
+        pattern: /^(VAR)\/\((VAR)\+(-?[\d.]+)\)$/,
+        transform: ({ captures }, v) => {
+            const a = parseFloat(captures['3']);
+            return `${v} - ${a}\\ln|${v}+${a}|`;
+        },
+        priority: 44
+    },
+
+    {
+        id: 'int-x-over-x-minus-a',
+        name: 'x/(x-a)',
+        pattern: /^(VAR)\/\((VAR)-(-?[\d.]+)\)$/,
+        transform: ({ captures }, v) => {
+            const a = parseFloat(captures['3']);
+            return `${v} + ${a}\\ln|${v}-${a}|`;
+        },
+        priority: 44
+    },
+
+    {
+        id: 'int-x2-over-x-plus-a',
+        name: 'x²/(x+a)',
+        pattern: /^(VAR)\^2\/\((VAR)\+(-?[\d.]+)\)$/,
+        transform: ({ captures }, v) => {
+            const a = parseFloat(captures['3']);
+            const a2 = a * a;
+            return `\\frac{${v}^2}{2} - ${a}${v} + ${a2}\\ln|${v}+${a}|`;
+        },
+        priority: 45
+    },
+
+    {
+        id: 'int-1-over-x-times-x-plus-a',
+        name: '1/(x(x+a))',
+        pattern: /^1\/\((VAR)\((VAR)\+(-?[\d.]+)\)\)$/,
+        transform: ({ captures }, v) => {
+            const a = parseFloat(captures['3']);
+            return `\\frac{1}{${a}}\\ln\\left|\\frac{${v}}{${v}+${a}}\\right|`;
+        },
+        priority: 46
+    },
+
+    // ============================================
+    // SECANT/COSECANT POWERS (Schaum's 14.35-14.44)
+    // ============================================
+
+    {
+        id: 'int-sec3',
+        name: 'sec³(x)',
+        pattern: /^sec\((VAR)\)\^3$/,
+        transform: (_, v) => `\\frac{1}{2}\\sec(${v})\\tan(${v}) + \\frac{1}{2}\\ln|\\sec(${v})+\\tan(${v})|`,
+        priority: 36
+    },
+
+    {
+        id: 'int-csc3',
+        name: 'csc³(x)',
+        pattern: /^csc\((VAR)\)\^3$/,
+        transform: (_, v) => `-\\frac{1}{2}\\csc(${v})\\cot(${v}) + \\frac{1}{2}\\ln|\\csc(${v})-\\cot(${v})|`,
+        priority: 36
+    },
+
+    {
+        id: 'int-sec4',
+        name: 'sec⁴(x)',
+        pattern: /^sec\((VAR)\)\^4$/,
+        transform: (_, v) => `\\tan(${v}) + \\frac{\\tan^3(${v})}{3}`,
+        priority: 37
+    },
+
+    {
+        id: 'int-csc4',
+        name: 'csc⁴(x)',
+        pattern: /^csc\((VAR)\)\^4$/,
+        transform: (_, v) => `-\\cot(${v}) - \\frac{\\cot^3(${v})}{3}`,
+        priority: 37
+    },
+
+    // ============================================
+    // TRIG POWERS (Schaum's 14.31-14.44)
+    // ============================================
+
+    {
+        id: 'int-sin3',
+        name: 'sin³(x)',
+        pattern: /^sin\((VAR)\)\^3$/,
+        transform: (_, v) => `-\\cos(${v}) + \\frac{\\cos^3(${v})}{3}`,
+        priority: 46
+    },
+
+    {
+        id: 'int-cos3',
+        name: 'cos³(x)',
+        pattern: /^cos\((VAR)\)\^3$/,
+        transform: (_, v) => `\\sin(${v}) - \\frac{\\sin^3(${v})}{3}`,
+        priority: 46
+    },
+
+    {
+        id: 'int-tan2',
+        name: 'tan²(x)',
+        pattern: /^tan\((VAR)\)\^2$/,
+        transform: (_, v) => `\\tan(${v}) - ${v}`,
+        priority: 35
+    },
+
+    {
+        id: 'int-cot2',
+        name: 'cot²(x)',
+        pattern: /^cot\((VAR)\)\^2$/,
+        transform: (_, v) => `-\\cot(${v}) - ${v}`,
+        priority: 35
+    },
+
+    {
+        id: 'int-sin-cos',
+        name: 'sin(x)·cos(x)',
+        pattern: /^sin\((VAR)\)\*?cos\((VAR)\)$/,
+        transform: (_, v) => `\\frac{\\sin^2(${v})}{2}`,
+        priority: 45
+    },
+
+    {
+        id: 'int-sec-tan',
+        name: 'sec(x)·tan(x)',
+        pattern: /^sec\((VAR)\)\*?tan\((VAR)\)$/,
+        transform: (_, v) => `\\sec(${v})`,
+        priority: 45
+    },
+
+    {
+        id: 'int-csc-cot',
+        name: 'csc(x)·cot(x)',
+        pattern: /^csc\((VAR)\)\*?cot\((VAR)\)$/,
+        transform: (_, v) => `-\\csc(${v})`,
+        priority: 45
+    },
+
+    // ============================================
+    // QUADRATIC DENOMINATORS (Schaum's 14.141-14.148)
+    // ============================================
+
+    {
+        id: 'int-x-over-x2-plus-a2',
+        name: 'x/(x²+a²)',
+        pattern: /^(VAR)\/\((VAR)\^2\+([\d.]+)\)$/,
+        transform: ({ captures }, v) => `\\frac{1}{2}\\ln(${v}^2+${captures['3']})`,
+        priority: 42
+    },
+
+    {
+        id: 'int-x2-over-x2-plus-a2',
+        name: 'x²/(x²+a²)',
+        pattern: /^(VAR)\^2\/\((VAR)\^2\+([\d.]+)\)$/,
+        transform: ({ captures }, v) => {
+            const a2 = parseFloat(captures['3']);
+            const a = Math.sqrt(a2);
+            if (Number.isInteger(a)) {
+                return `${v} - ${a}\\arctan\\frac{${v}}{${a}}`;
+            }
+            return `${v} - \\sqrt{${a2}}\\arctan\\frac{${v}}{\\sqrt{${a2}}}`;
+        },
+        priority: 43
+    },
+
+    {
+        id: 'int-1-over-x2-plus-a2-squared',
+        name: '1/(x²+a²)²',
+        pattern: /^1\/\((VAR)\^2\+([\d.]+)\)\^2$/,
+        transform: ({ captures }, v) => {
+            const a2 = parseFloat(captures['2']);
+            const a = Math.sqrt(a2);
+            if (Number.isInteger(a)) {
+                return `\\frac{${v}}{${2 * a2}(${v}^2+${a2})} + \\frac{1}{${2 * a2 * a}}\\arctan\\frac{${v}}{${a}}`;
+            }
+            return `\\frac{${v}}{${2 * a2}(${v}^2+${a2})} + \\frac{1}{${2 * a2}\\sqrt{${a2}}}\\arctan\\frac{${v}}{\\sqrt{${a2}}}`;
+        },
+        priority: 47
+    },
+
+    {
+        id: 'int-1-over-x2-minus-a2',
+        name: '1/(x²-a²)',
+        pattern: /^1\/\((VAR)\^2-([\d.]+)\)$/,
+        transform: ({ captures }, v) => {
+            const a2 = parseFloat(captures['2']);
+            const a = Math.sqrt(a2);
+            if (Number.isInteger(a)) {
+                return `\\frac{1}{${2 * a}}\\ln\\left|\\frac{${v}-${a}}{${v}+${a}}\\right|`;
+            }
+            return `\\frac{1}{2\\sqrt{${a2}}}\\ln\\left|\\frac{${v}-\\sqrt{${a2}}}{${v}+\\sqrt{${a2}}}\\right|`;
+        },
+        priority: 41
+    },
+
+    {
+        id: 'int-1-over-a2-minus-x2',
+        name: '1/(a²-x²)',
+        pattern: /^1\/\(([\d.]+)-(VAR)\^2\)$/,
+        transform: ({ captures }, v) => {
+            const a2 = parseFloat(captures['1']);
+            const a = Math.sqrt(a2);
+            if (Number.isInteger(a)) {
+                return `\\frac{1}{${2 * a}}\\ln\\left|\\frac{${a}+${v}}{${a}-${v}}\\right|`;
+            }
+            return `\\frac{1}{2\\sqrt{${a2}}}\\ln\\left|\\frac{\\sqrt{${a2}}+${v}}{\\sqrt{${a2}}-${v}}\\right|`;
+        },
+        priority: 41
+    },
+
+    // ============================================
+    // RADICAL FORMS (Schaum's 14.189-14.240)
+    // ============================================
+
+    {
+        id: 'int-x-over-sqrt-a2-minus-x2',
+        name: 'x/√(a²-x²)',
+        pattern: /^(VAR)\/sqrt\(([\d.]+)-(VAR)\^2\)$/,
+        transform: ({ captures }, v) => `-\\sqrt{${captures['2']}-${v}^2}`,
+        priority: 44
+    },
+
+    {
+        id: 'int-x-over-sqrt-x2-plus-a2',
+        name: 'x/√(x²+a²)',
+        pattern: /^(VAR)\/sqrt\((VAR)\^2\+([\d.]+)\)$/,
+        transform: ({ captures }, v) => `\\sqrt{${v}^2+${captures['3']}}`,
+        priority: 44
+    },
+
+    {
+        id: 'int-x-over-sqrt-x2-minus-a2',
+        name: 'x/√(x²-a²)',
+        pattern: /^(VAR)\/sqrt\((VAR)\^2-([\d.]+)\)$/,
+        transform: ({ captures }, v) => `\\sqrt{${v}^2-${captures['3']}}`,
+        priority: 44
+    },
+
+    {
+        id: 'int-sqrt-a2-minus-x2-over-x',
+        name: '√(a²-x²)/x',
+        pattern: /^sqrt\(([\d.]+)-(VAR)\^2\)\/(VAR)$/,
+        transform: ({ captures }, v) => {
+            const a2 = parseFloat(captures['1']);
+            const a = Math.sqrt(a2);
+            if (Number.isInteger(a)) {
+                return `\\sqrt{${a2}-${v}^2} - ${a}\\ln\\left|\\frac{${a}+\\sqrt{${a2}-${v}^2}}{${v}}\\right|`;
+            }
+            return `\\sqrt{${a2}-${v}^2} - \\sqrt{${a2}}\\ln\\left|\\frac{\\sqrt{${a2}}+\\sqrt{${a2}-${v}^2}}{${v}}\\right|`;
+        },
+        priority: 44
+    },
+
+    {
+        id: 'int-x2-over-sqrt-a2-minus-x2',
+        name: 'x²/√(a²-x²)',
+        pattern: /^(VAR)\^2\/sqrt\(([\d.]+)-(VAR)\^2\)$/,
+        transform: ({ captures }, v) => {
+            const a2 = parseFloat(captures['2']);
+            return `-\\frac{${v}}{2}\\sqrt{${a2}-${v}^2} + \\frac{${a2}}{2}\\arcsin\\frac{${v}}{\\sqrt{${a2}}}`;
+        },
+        priority: 45
+    },
+
+    {
+        id: 'int-1-over-x-sqrt-x2-plus-a2',
+        name: '1/(x√(x²+a²))',
+        pattern: /^1\/\((VAR)\*?sqrt\((VAR)\^2\+([\d.]+)\)\)$/,
+        transform: ({ captures }, v) => {
+            const a2 = parseFloat(captures['3']);
+            const a = Math.sqrt(a2);
+            if (Number.isInteger(a)) {
+                return `-\\frac{1}{${a}}\\ln\\left|\\frac{${a}+\\sqrt{${v}^2+${a2}}}{${v}}\\right|`;
+            }
+            return `-\\frac{1}{\\sqrt{${a2}}}\\ln\\left|\\frac{\\sqrt{${a2}}+\\sqrt{${v}^2+${a2}}}{${v}}\\right|`;
+        },
+        priority: 46
+    },
+
+    {
+        id: 'int-1-over-x-sqrt-a2-minus-x2',
+        name: '1/(x√(a²-x²))',
+        pattern: /^1\/\((VAR)\*?sqrt\(([\d.]+)-(VAR)\^2\)\)$/,
+        transform: ({ captures }, v) => {
+            const a2 = parseFloat(captures['2']);
+            const a = Math.sqrt(a2);
+            if (Number.isInteger(a)) {
+                return `-\\frac{1}{${a}}\\ln\\left|\\frac{${a}+\\sqrt{${a2}-${v}^2}}{${v}}\\right|`;
+            }
+            return `-\\frac{1}{\\sqrt{${a2}}}\\ln\\left|\\frac{\\sqrt{${a2}}+\\sqrt{${a2}-${v}^2}}{${v}}\\right|`;
+        },
+        priority: 46
+    },
+
+    {
+        id: 'int-1-over-sqrt-x2-minus-a2',
+        name: '1/√(x²-a²)',
+        pattern: /^1\/sqrt\((VAR)\^2-([\d.]+)\)$/,
+        transform: ({ captures }, v) => `\\ln|${v}+\\sqrt{${v}^2-${captures['2']}}|`,
+        priority: 42
+    },
+
+    {
+        id: 'int-sqrt-x2-minus-a2',
+        name: '√(x²-a²)',
+        pattern: /^sqrt\((VAR)\^2-([\d.]+)\)$/,
+        transform: ({ captures }, v) => {
+            const a2 = parseFloat(captures['2']);
+            return `\\frac{${v}}{2}\\sqrt{${v}^2-${a2}} - \\frac{${a2}}{2}\\ln|${v}+\\sqrt{${v}^2-${a2}}|`;
+        },
+        priority: 38
     },
 ];
 
