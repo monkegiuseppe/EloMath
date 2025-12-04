@@ -1,6 +1,13 @@
 // lib/cas-math.ts
 
 import { create, all } from 'mathjs';
+import {
+  symbolicIntegrate,
+  symbolicDifferentiate,
+  integrateSum,
+  differentiateSum,
+  normalizeExpression
+} from './math-rules';
 
 const math = create(all);
 
@@ -83,44 +90,6 @@ function formatNumberLatex(num: number): string {
   return parseFloat(num.toFixed(6)).toString();
 }
 
-function isBalanced(s: string): boolean {
-  let count = 0;
-  for (const c of s) {
-    if (c === '(') count++;
-    if (c === ')') count--;
-    if (count < 0) return false;
-  }
-  return count === 0;
-}
-
-function splitIntoTerms(expr: string): string[] {
-  const terms: string[] = [];
-  let current = '';
-  let depth = 0;
-
-  for (let i = 0; i < expr.length; i++) {
-    const c = expr[i];
-
-    if (c === '(') depth++;
-    else if (c === ')') depth--;
-
-    if (depth === 0 && (c === '+' || c === '-') && i > 0) {
-      if (current.trim()) {
-        terms.push(current.trim());
-      }
-      current = c;
-    } else {
-      current += c;
-    }
-  }
-
-  if (current.trim()) {
-    terms.push(current.trim());
-  }
-
-  return terms;
-}
-
 function safeEvaluate(expr: any, scope: Record<string, number>): number | null {
   try {
     const result = expr.evaluate(scope);
@@ -133,6 +102,9 @@ function safeEvaluate(expr: any, scope: Record<string, number>): number | null {
   }
 }
 
+// ============================================
+// EQUATION SOLVING (kept from original)
+// ============================================
 
 function solveEquation(equationStr: string, variable: string): string {
   try {
@@ -281,58 +253,6 @@ function solveQuadratic(a: number, b: number, c: number): string {
   const r1 = (-b + sqrtD) / (2 * a);
   const r2 = (-b - sqrtD) / (2 * a);
 
-  const sqrtDRounded = Math.round(sqrtD);
-  if (Math.abs(sqrtD - sqrtDRounded) < 1e-6) {
-    return `${formatNumberLatex(r1)}, ${formatNumberLatex(r2)}`;
-  }
-
-  const discRounded = Math.round(discriminant);
-  if (Math.abs(discriminant - discRounded) < 1e-6 && discRounded > 0) {
-    let outside = 1;
-    let inside = discRounded;
-    for (let i = 2; i * i <= inside; i++) {
-      while (inside % (i * i) === 0) {
-        inside /= (i * i);
-        outside *= i;
-      }
-    }
-
-    if (inside === 1) {
-      return `${formatNumberLatex(r1)}, ${formatNumberLatex(r2)}`;
-    }
-
-    let denominator = 2 * Math.abs(a);
-    const bPart = -b;
-
-    const g = gcd(outside, denominator);
-    outside = outside / g;
-    denominator = denominator / g;
-    let bPartSimplified = bPart;
-    if (bPart !== 0) {
-      const gB = gcd(Math.abs(bPart), denominator);
-      if (gB === denominator) {
-        bPartSimplified = bPart / gB;
-      }
-    }
-
-    const sqrtPart = outside === 1 ? `\\sqrt{${inside}}` : `${outside}\\sqrt{${inside}}`;
-
-    const signFromA = a < 0 ? -1 : 1;
-
-    if (denominator === 1) {
-      if (Math.abs(bPart) < 1e-10) {
-        return `\\pm ${sqrtPart}`;
-      }
-      return `${formatNumberLatex(bPart * signFromA)} \\pm ${sqrtPart}`;
-    }
-
-    if (Math.abs(bPart) < 1e-10) {
-      return `\\pm \\frac{${sqrtPart}}{${denominator}}`;
-    }
-
-    return `\\frac{${formatNumberLatex(bPart * signFromA)} \\pm ${sqrtPart}}{${denominator}}`;
-  }
-
   return `${formatNumberLatex(r1)}, ${formatNumberLatex(r2)}`;
 }
 
@@ -439,270 +359,6 @@ function solveNumerically(expr: any, variable: string, startingPoints: number[])
 
   solutions.sort((a, b) => a - b);
   return solutions.map(s => formatNumberLatex(s)).join(", ");
-}
-
-interface IntegrationResult {
-  success: boolean;
-  result: string;
-}
-
-function integrateExpression(exprStr: string, variable: string): string {
-  try {
-    let normalized = exprStr.trim();
-
-    while (normalized.startsWith('(') && normalized.endsWith(')') && isBalanced(normalized.slice(1, -1))) {
-      normalized = normalized.slice(1, -1).trim();
-    }
-    normalized = normalized.replace(/\(\((\d+)\)\/\(([^()]+)\)\)/g, '$1/($2)');
-    normalized = normalized.replace(/\(\(([^()]+)\)\/\(([^()]+)\)\)/g, '($1)/($2)');
-
-    const terms = splitIntoTerms(normalized);
-
-    if (terms.length === 0) {
-      return "0 + C";
-    }
-
-    const results: string[] = [];
-
-    for (const term of terms) {
-      const result = integrateTerm(term.trim(), variable);
-      results.push(result.result);
-    }
-
-    let combined = results[0];
-    for (let i = 1; i < results.length; i++) {
-      const r = results[i];
-      if (r.startsWith('-')) {
-        combined += ` ${r}`;
-      } else {
-        combined += ` + ${r}`;
-      }
-    }
-
-    combined = combined
-      .replace(/\+ -/g, '- ')
-      .replace(/- -/g, '+ ')
-      .replace(/\+ \+/g, '+ ')
-      .replace(/^\s*\+\s*/, '');
-
-    return combined + " + C";
-  } catch (e) {
-    console.error('Integration error:', e);
-    return `\\int (${exprStr})\\, d${variable} + C`;
-  }
-}
-
-function parsePowerTerm(term: string, variable: string): { coeff: number; power: number } | null {
-  const v = variable;
-  let s = term.trim();
-
-  while (s.startsWith('(') && s.endsWith(')') && isBalanced(s.slice(1, -1))) {
-    s = s.slice(1, -1).trim();
-  }
-
-  let sign = 1;
-  if (s.startsWith('-')) {
-    sign = -1;
-    s = s.slice(1).trim();
-  } else if (s.startsWith('+')) {
-    s = s.slice(1).trim();
-  }
-
-  const parenFracMatch = s.match(new RegExp(`^\\(?([\\d.]+)?\\)?\\s*\\/\\s*\\(?\\s*${v}(?:\\^([\\d.]+))?\\s*\\)?$`));
-  if (parenFracMatch) {
-    const numerator = parenFracMatch[1] ? parseFloat(parenFracMatch[1]) : 1;
-    const denomPower = parenFracMatch[2] ? parseFloat(parenFracMatch[2]) : 1;
-    return { coeff: sign * numerator, power: -denomPower };
-  }
-
-  const simpleFracMatch = s.match(new RegExp(`^([\\d.]*)?\\s*\\/\\s*${v}(?:\\^([\\d.]+))?$`));
-  if (simpleFracMatch) {
-    const numerator = simpleFracMatch[1] ? parseFloat(simpleFracMatch[1]) : 1;
-    const denomPower = simpleFracMatch[2] ? parseFloat(simpleFracMatch[2]) : 1;
-    return { coeff: sign * numerator, power: -denomPower };
-  }
-
-  const fracWithParenMatch = s.match(new RegExp(`^([\\d.]*)?\\s*\\/\\s*\\(\\s*${v}(?:\\^([\\d.]+))?\\s*\\)$`));
-  if (fracWithParenMatch) {
-    const numerator = fracWithParenMatch[1] ? parseFloat(fracWithParenMatch[1]) : 1;
-    const denomPower = fracWithParenMatch[2] ? parseFloat(fracWithParenMatch[2]) : 1;
-    return { coeff: sign * numerator, power: -denomPower };
-  }
-
-  const powerMatch = s.match(new RegExp(`^([\\d.]*)?\\s*\\*?\\s*${v}(?:\\^([+-]?[\\d.]+))?$`));
-  if (powerMatch) {
-    let coeff = 1;
-    if (powerMatch[1] && powerMatch[1].trim() !== '') {
-      coeff = parseFloat(powerMatch[1]);
-    }
-    const power = powerMatch[2] ? parseFloat(powerMatch[2]) : 1;
-    return { coeff: sign * coeff, power };
-  }
-
-  if (s === v) {
-    return { coeff: sign, power: 1 };
-  }
-  const numMatch = s.match(/^([\d.]+)$/);
-  if (numMatch && !s.includes(v)) {
-    return { coeff: sign * parseFloat(numMatch[1]), power: 0 };
-  }
-
-  const fullMatch = s.match(new RegExp(`^([\\d.]+)\\s*\\*\\s*${v}(?:\\^([+-]?[\\d.]+))?$`));
-  if (fullMatch) {
-    const coeff = parseFloat(fullMatch[1]);
-    const power = fullMatch[2] ? parseFloat(fullMatch[2]) : 1;
-    return { coeff: sign * coeff, power };
-  }
-
-  const negPowerMatch = s.match(new RegExp(`^${v}\\^\\((-?[\\d.]+)\\)$`));
-  if (negPowerMatch) {
-    return { coeff: sign, power: parseFloat(negPowerMatch[1]) };
-  }
-
-  return null;
-}
-
-function integrateTerm(term: string, variable: string): IntegrationResult {
-  const v = variable;
-  let s = term.trim();
-
-  if (!s || s === '0') {
-    return { success: true, result: '0' };
-  }
-
-  const powerParsed = parsePowerTerm(s, v);
-  if (powerParsed !== null) {
-    const { coeff, power } = powerParsed;
-
-    if (Math.abs(power + 1) < 1e-10) {
-      if (Math.abs(coeff - 1) < 1e-10) return { success: true, result: `\\ln|${v}|` };
-      if (Math.abs(coeff + 1) < 1e-10) return { success: true, result: `-\\ln|${v}|` };
-      return { success: true, result: `${formatNumberLatex(coeff)}\\ln|${v}|` };
-    }
-
-    const newPower = power + 1;
-    const newCoeff = coeff / newPower;
-
-    return formatPowerResult(newCoeff, newPower, v);
-  }
-
-  const funcResult = integrateKnownFunction(s, v);
-  if (funcResult.success) {
-    return funcResult;
-  }
-  try {
-    const simplified = math.simplify(s).toString();
-    if (simplified !== s) {
-      const simplifiedParsed = parsePowerTerm(simplified, v);
-      if (simplifiedParsed !== null) {
-        const { coeff, power } = simplifiedParsed;
-        if (Math.abs(power + 1) < 1e-10) {
-          if (Math.abs(coeff - 1) < 1e-10) return { success: true, result: `\\ln|${v}|` };
-          if (Math.abs(coeff + 1) < 1e-10) return { success: true, result: `-\\ln|${v}|` };
-          return { success: true, result: `${formatNumberLatex(coeff)}\\ln|${v}|` };
-        }
-        const newPower = power + 1;
-        const newCoeff = coeff / newPower;
-        return formatPowerResult(newCoeff, newPower, v);
-      }
-    }
-  } catch (e) { }
-
-  return { success: false, result: `\\int ${term}\\, d${v}` };
-}
-
-function formatPowerResult(coeff: number, power: number, v: string): IntegrationResult {
-  const isNeg = coeff < 0;
-  const absCoeff = Math.abs(coeff);
-
-  let numerator: number = 1;
-  let denominator: number = 1;
-
-  try {
-    const f = math.fraction(absCoeff);
-    numerator = Number((f as any).n);
-    denominator = Number((f as any).d);
-  } catch (e) {
-    numerator = absCoeff;
-  }
-
-  const sign = isNeg ? '-' : '';
-
-  if (Math.abs(power - 1) < 1e-10) {
-    if (Math.abs(absCoeff - 1) < 1e-10) {
-      return { success: true, result: `${sign}${v}` };
-    }
-    if (denominator === 1) {
-      return { success: true, result: `${sign}${Math.round(numerator)}${v}` };
-    }
-    return { success: true, result: `${sign}\\frac{${Math.round(numerator)}}{${denominator}}${v}` };
-  }
-
-  if (power > 0) {
-    const powerStr = Number.isInteger(power) ? power.toString() : formatNumberLatex(power);
-    if (Math.abs(absCoeff - 1) < 1e-10) {
-      return { success: true, result: `${sign}${v}^{${powerStr}}` };
-    }
-    if (denominator === 1) {
-      return { success: true, result: `${sign}${Math.round(numerator)}${v}^{${powerStr}}` };
-    }
-    return { success: true, result: `${sign}\\frac{${Math.round(numerator)}}{${denominator}}${v}^{${powerStr}}` };
-  }
-
-  const absPower = Math.abs(power);
-
-  if (Math.abs(absPower - 1) < 1e-10) {
-    if (denominator === 1 && Math.abs(numerator - 1) < 1e-10) {
-      return { success: true, result: `${sign}\\frac{1}{${v}}` };
-    }
-    if (denominator === 1) {
-      return { success: true, result: `${sign}\\frac{${Math.round(numerator)}}{${v}}` };
-    }
-    return { success: true, result: `${sign}\\frac{${Math.round(numerator)}}{${denominator}${v}}` };
-  }
-
-  const powerInt = Math.round(absPower);
-  const powerStr = Number.isInteger(absPower) ? powerInt.toString() : formatNumberLatex(absPower);
-
-  if (denominator === 1 && Math.abs(numerator - 1) < 1e-10) {
-    return { success: true, result: `${sign}\\frac{1}{${v}^{${powerStr}}}` };
-  }
-  if (denominator === 1) {
-    return { success: true, result: `${sign}\\frac{${Math.round(numerator)}}{${v}^{${powerStr}}}` };
-  }
-  return { success: true, result: `${sign}\\frac{${Math.round(numerator)}}{${denominator}${v}^{${powerStr}}}` };
-}
-
-function integrateKnownFunction(term: string, v: string): IntegrationResult {
-  const normalized = term.replace(/\s+/g, '').toLowerCase();
-
-  const knownIntegrals: { [pattern: string]: string } = {
-    [`sin(${v})`]: `-\\cos(${v})`,
-    [`cos(${v})`]: `\\sin(${v})`,
-    [`tan(${v})`]: `-\\ln|\\cos(${v})|`,
-    [`cot(${v})`]: `\\ln|\\sin(${v})|`,
-    [`sec(${v})^2`]: `\\tan(${v})`,
-    [`csc(${v})^2`]: `-\\cot(${v})`,
-    [`sec(${v})*tan(${v})`]: `\\sec(${v})`,
-    [`csc(${v})*cot(${v})`]: `-\\csc(${v})`,
-    [`sec(${v})`]: `\\ln|\\sec(${v})+\\tan(${v})|`,
-    [`csc(${v})`]: `-\\ln|\\csc(${v})+\\cot(${v})|`,
-    [`e^${v}`]: `e^{${v}}`,
-    [`exp(${v})`]: `e^{${v}}`,
-    [`sinh(${v})`]: `\\cosh(${v})`,
-    [`cosh(${v})`]: `\\sinh(${v})`,
-    [`tanh(${v})`]: `\\ln(\\cosh(${v}))`,
-    [`log(${v})`]: `${v}\\ln(${v})-${v}`,
-    [`ln(${v})`]: `${v}\\ln(${v})-${v}`,
-  };
-
-  for (const [pattern, result] of Object.entries(knownIntegrals)) {
-    if (normalized === pattern.toLowerCase()) {
-      return { success: true, result };
-    }
-  }
-
-  return { success: false, result: '' };
 }
 
 function definiteIntegral(exprStr: string, variable: string, start: number, end: number): string {
@@ -869,11 +525,16 @@ export const evaluateMath = (
         }
       }
 
+      const ruleResult = differentiateSum(exprStr, varStr);
+      if (ruleResult && !ruleResult.includes('\\frac{d}')) {
+        return ruleResult;
+      }
+
       try {
         const result = math.derivative(exprStr, varStr);
         return result.toString().replace(/\s\*\s/g, "");
       } catch (e) {
-        return "Error: Cannot differentiate expression";
+        return ruleResult || "Error: Cannot differentiate expression";
       }
     }
 
@@ -885,12 +546,12 @@ export const evaluateMath = (
 
       const indefMatch = trimmed.match(/^integrate\((.+),\s*([a-zA-Z]+)\)$/);
       if (indefMatch) {
-        return integrateExpression(indefMatch[1], indefMatch[2]);
+        return integrateSum(indefMatch[1], indefMatch[2]);
       }
 
       const singleMatch = trimmed.match(/^integrate\((.+)\)$/);
       if (singleMatch) {
-        return integrateExpression(singleMatch[1], 'x');
+        return integrateSum(singleMatch[1], 'x');
       }
     }
 
