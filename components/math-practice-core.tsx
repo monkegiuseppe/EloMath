@@ -34,6 +34,8 @@ interface ProblemData {
   difficulty: number;
   problem: string;
   answer: string;
+  verify?: 'ode';
+  ode?: string;
   _cycleReset?: boolean;
 }
 
@@ -139,7 +141,13 @@ export const MathPracticeCore: FC<MathPracticeCoreProps> = ({
     if (e) e.preventDefault();
     if (!userAnswer.trim() || !currentProblem || feedback) return;
 
-    const wasCorrect = checkAnswer(userAnswer, currentProblem.answer);
+    const wasCorrect = checkAnswer(
+      userAnswer,
+      currentProblem.answer,
+      currentProblem.verify === 'ode'
+        ? { verify: 'ode', ode: currentProblem.ode, variable: 'x' }
+        : undefined
+    );
 
     const score = wasCorrect ? 1 : 0;
     const expectedScore = 1 / (1 + Math.pow(10, (currentProblem.difficulty - userElo) / 400));

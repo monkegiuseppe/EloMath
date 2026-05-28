@@ -1,6 +1,7 @@
 // lib/answer-verification.ts
 
 import { create, all } from 'mathjs';
+import { verifyODESolution } from './cas-math';
 
 const math = create(all);
 
@@ -19,8 +20,16 @@ function cleanInput(input: string): string {
         .toLowerCase();
 }
 
-export const checkAnswer = (userAnswer: string, correctAnswer: string): boolean => {
+export const checkAnswer = (
+    userAnswer: string,
+    correctAnswer: string,
+    options?: { verify?: 'ode'; ode?: string; variable?: string }
+): boolean => {
     if (!userAnswer) return false;
+
+    if (options?.verify === 'ode' && options?.ode) {
+        return verifyODESolution(options.ode, userAnswer, options.variable ?? 'x');
+    }
 
     if (userAnswer.trim() === correctAnswer.trim()) return true;
 

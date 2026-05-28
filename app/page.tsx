@@ -25,7 +25,6 @@ export default function Home() {
 
   const menuItems: MenuItem[] = [
     { id: "practice-math", label: "Math Practice", icon: Calculator, description: "Calculus, Linear Algebra, etc." },
-    { id: "practice-physics", label: "Physics Practice", icon: Atom, description: "Quantum Mechanics, magnetic fields, etc." },
     { id: "workspace", label: "Workspace", icon: BookOpen, description: "A notepad with CAS/graphing capabilities" },
     { id: "progress", label: "Progress", icon: BarChart3, description: "Track your learning journey." },
   ]
@@ -76,7 +75,7 @@ export default function Home() {
                 <Brain className="w-8 h-8 text-foreground" />
               </div>
               <p className="text-lg text-foreground max-w-2xl mx-auto">
-                Master advanced mathematics and physics through adaptive learning.
+                Master advanced mathematics through adaptive learning.
               </p>
             </motion.div>
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }} className="flex justify-center mb-8">
@@ -99,7 +98,7 @@ export default function Home() {
             </motion.div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 max-w-3xl mx-auto w-full">
             {menuItems.map((item, index) => (
               <motion.button
                 key={item.id}

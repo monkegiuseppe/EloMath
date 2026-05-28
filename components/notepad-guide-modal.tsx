@@ -26,20 +26,20 @@ const NotepadGuideModal: FC<NotepadGuideModalProps> = ({ isOpen, onClose }) => {
             initial={{ scale: 0.9, y: 20 }}
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.9, y: 20 }}
-            className="glass-strong rounded-xl w-full max-w-2xl relative max-h-[90vh] overflow-y-auto custom-scrollbar"
+            className="glass-strong rounded-xl w-full max-w-2xl relative flex flex-col max-h-[80vh]"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-6">
-              <div className="flex justify-between items-center mb-4 sticky top-0 bg-card/95 backdrop-blur-sm pb-2 -mt-2">
-                <h2 className="text-xl font-bold text-foreground">CAS Notepad Guide</h2>
-                <button
-                  onClick={onClose}
-                  className="p-1 rounded-full text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-                >
-                  <X size={20} />
-                </button>
-              </div>
-              
+            <div className="flex justify-between items-center px-6 py-4 border-b border-border/20 flex-shrink-0">
+              <h2 className="text-xl font-bold text-foreground">CAS Notepad Guide</h2>
+              <button
+                onClick={onClose}
+                className="p-1 rounded-full text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="overflow-y-auto custom-scrollbar p-6 pt-4">
               <div className="text-muted-foreground space-y-5 text-sm">
                 <p className="text-foreground font-medium">
                   The notepad includes a powerful Computer Algebra System (CAS) for symbolic and numerical calculations.
@@ -104,6 +104,19 @@ const NotepadGuideModal: FC<NotepadGuideModalProps> = ({ isOpen, onClose }) => {
                         <code className="text-xs">solve(2x + 5 = 13, x)</code> → <span className="text-green-400">4</span>
                       </div>
                       <p className="text-xs mt-1 opacity-75">Supports linear and quadratic equations</p>
+                    </div>
+
+                    <div>
+                      <strong className="text-orange-400">ODE Verifier</strong>
+                      <div className="mt-1 p-2 bg-background/50 rounded">
+                        <code>verifyODE(ode, solution, variable)</code><br />
+                        <span className="text-xs opacity-75">Checks whether a proposed function satisfies a differential equation by substituting it back numerically. Use <code>y'</code> and <code>y''</code> for first and second derivatives in the ODE.</span><br />
+                        <span className="text-xs opacity-75">Examples:</span><br />
+                        <code className="text-xs">verifyODE(y''+y=0, cos(x), x)</code> → <span className="text-green-400">✓ Satisfies ODE</span><br />
+                        <code className="text-xs">verifyODE(y''-y, C1*e^x+C2*e^(-x), x)</code> → <span className="text-green-400">✓ Satisfies ODE</span><br />
+                        <code className="text-xs">verifyODE(y''+y=0, e^x, x)</code> → <span className="text-red-400">✗ Does not satisfy ODE</span>
+                      </div>
+                      <p className="text-xs mt-1 opacity-75">Use <code>C1</code>, <code>C2</code> for arbitrary constants (subscript form <code>C_1</code>, <code>C_2</code> also works). The ODE can be written as <code>LHS=RHS</code> or just the LHS (assumed = 0).</p>
                     </div>
 
                     <div>
@@ -237,6 +250,12 @@ const NotepadGuideModal: FC<NotepadGuideModalProps> = ({ isOpen, onClose }) => {
                       <strong>Series:</strong><br />
                       <code>sum(1/k^2, k, 1, 100)</code> → Basel problem approximation<br />
                       <code>product(2*k/(2*k-1), k, 1, 20)</code> → Wallis product
+                    </div>
+                    <div className="p-2 bg-background/30 rounded">
+                      <strong>ODE Verifier:</strong><br />
+                      <code>verifyODE(y''+y=0, C1*cos(x)+C2*sin(x), x)</code><br />
+                      <code>verifyODE(y'-2*y, C1*e^(2x), x)</code><br />
+                      <code>verifyODE(y''-5*y'+6*y, C1*e^(2x)+C2*e^(3x), x)</code>
                     </div>
                   </div>
                 </div>

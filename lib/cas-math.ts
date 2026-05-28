@@ -25,6 +25,11 @@ const MAX_ITERATIONS = 50;
 function latexToMathJS(latex: string): string {
   let s = latex;
 
+  s = s.replace(/−/g, '-');                    // Unicode minus → ASCII minus
+  s = s.replace(/′/g, "'");                    // Unicode prime → ASCII apostrophe
+  s = s.replace(/([A-Za-z]+)_\{(\d+)\}/g, '$1$2'); // C_{1} → C1
+  s = s.replace(/([A-Za-z]+)_(\d+)/g, '$1$2');     // C_1 → C1
+
   s = s.replace(/\\left/g, "").replace(/\\right/g, "");
   s = s.replace(/\\operatorname\{([^}]+)\}/g, "$1");
   s = s.replace(/\\mathrm\{([^}]+)\}/g, "$1");
@@ -101,10 +106,6 @@ function safeEvaluate(expr: any, scope: Record<string, number>): number | null {
     return null;
   }
 }
-
-// ============================================
-// EQUATION SOLVING (kept from original)
-// ============================================
 
 function solveEquation(equationStr: string, variable: string): string {
   try {
@@ -232,10 +233,34 @@ function solveLinear(a: number, b: number): string {
   return formatNumberLatex(-b / a);
 }
 
-function solveQuadratic(a: number, b: number, c: number): string {
-  if (Math.abs(a) < 1e-10) {
-    return solveLinear(b, c);
+function extractSqrtFactor(n: number): { coeff: number; rad: number } {
+  let coeff = 1;
+  let rad = n;
+  for (let p = 2; p * p <= rad; p++) {
+    while (rad % (p * p) === 0) {
+      coeff *= p;
+      rad = rad / (p * p);
+    }
   }
+  return { coeff, rad };
+}
+
+function formatRootLatex(constPart: number, sqrtCoeff: number, rad: number, denom: number): string {
+  if (denom < 0) { constPart = -constPart; sqrtCoeff = -sqrtCoeff; denom = -denom; }
+  const absCoeff = Math.abs(sqrtCoeff);
+  const sqrtExpr = absCoeff === 1 ? `\\sqrt{${rad}}` : `${absCoeff}\\sqrt{${rad}}`;
+  const sqrtStr = sqrtCoeff > 0 ? sqrtExpr : `-${sqrtExpr}`;
+  let numerStr: string;
+  if (constPart === 0) {
+    numerStr = sqrtStr;
+  } else {
+    numerStr = sqrtCoeff > 0 ? `${constPart}+${sqrtStr}` : `${constPart}${sqrtStr}`;
+  }
+  return denom === 1 ? numerStr : `\\frac{${numerStr}}{${denom}}`;
+}
+
+function solveQuadratic(a: number, b: number, c: number): string {
+  if (Math.abs(a) < 1e-10) return solveLinear(b, c);
 
   const discriminant = b * b - 4 * a * c;
 
@@ -249,11 +274,24 @@ function solveQuadratic(a: number, b: number, c: number): string {
     return formatNumberLatex(-b / (2 * a));
   }
 
-  const sqrtD = Math.sqrt(discriminant);
-  const r1 = (-b + sqrtD) / (2 * a);
-  const r2 = (-b - sqrtD) / (2 * a);
+  // Exact form when all coefficients are integers
+  const ai = Math.round(a), bi = Math.round(b), ci = Math.round(c);
+  if (Math.abs(a - ai) < 1e-6 && Math.abs(b - bi) < 1e-6 && Math.abs(c - ci) < 1e-6) {
+    const D = bi * bi - 4 * ai * ci;
+    const sqrtDInt = Math.round(Math.sqrt(D));
+    if (sqrtDInt * sqrtDInt === D) {
+      return `${formatNumberLatex((-bi + sqrtDInt) / (2 * ai))}, ${formatNumberLatex((-bi - sqrtDInt) / (2 * ai))}`;
+    }
+    const { coeff: sqrtCoeff, rad } = extractSqrtFactor(D);
+    const nc = -bi, ns = sqrtCoeff, dn = 2 * ai;
+    const g = gcd(gcd(Math.abs(nc), ns), Math.abs(dn));
+    const r1 = formatRootLatex(nc / g, ns / g, rad, dn / g);
+    const r2 = formatRootLatex(nc / g, -(ns / g), rad, dn / g);
+    return `${r1}, ${r2}`;
+  }
 
-  return `${formatNumberLatex(r1)}, ${formatNumberLatex(r2)}`;
+  const sqrtD = Math.sqrt(discriminant);
+  return `${formatNumberLatex((-b + sqrtD) / (2 * a))}, ${formatNumberLatex((-b - sqrtD) / (2 * a))}`;
 }
 
 function gcd(x: number, y: number): number {
@@ -493,6 +531,75 @@ function evaluateLimitAtInfinity(expr: any, variable: string, sign: number): str
   return "Does not exist";
 }
 
+const ODE_MATH_SYMBOLS = new Set([
+  'sin', 'cos', 'tan', 'asin', 'acos', 'atan',
+  'sinh', 'cosh', 'tanh', 'log', 'log10', 'exp',
+  'sqrt', 'cbrt', 'abs', 'pi', 'e', 'i', 'Infinity', 'theta',
+]);
+
+export function verifyODESolution(odeExpr: string, solutionLatex: string, variable: string = 'x'): boolean {
+  try {
+    const solutionStr = latexToMathJS(solutionLatex);
+
+    // Normalise to LHS = 0 form
+    let lhsStr = odeExpr.trim();
+    if (lhsStr.includes('=')) {
+      const eq = lhsStr.indexOf('=');
+      lhsStr = `(${lhsStr.slice(0, eq)})-(${lhsStr.slice(eq + 1)})`;
+    }
+
+    // Replace y'', y', y with numeric placeholders (longest match first)
+    const odeMathStr = lhsStr
+      .replace(/y''/g, '_ypp')
+      .replace(/y'/g, '_yp')
+      .replace(/\by\b/g, '_y');
+
+    const odeCompiled = math.compile(odeMathStr);
+
+    // Assign deterministic values to any free constants in the solution (C1, C2, A, B …)
+    const constants: Record<string, number> = {};
+    const constPool = [1.7, 2.3, 1.3, 2.9];
+    let poolIdx = 0;
+    const solutionNode = math.parse(solutionStr);
+    solutionNode.traverse((node: any) => {
+      if (node.isSymbolNode && node.name !== variable && !ODE_MATH_SYMBOLS.has(node.name) && !(node.name in constants)) {
+        constants[node.name] = constPool[poolIdx++ % constPool.length];
+      }
+    });
+
+    const solutionCompiled = math.compile(solutionStr);
+    const h = 1e-5;
+
+    const evalY = (x: number): number => {
+      return solutionCompiled.evaluate({ [variable]: x, ...constants }) as number;
+    };
+
+    for (const xVal of [0.3, 0.8, 1.5, -0.4, 2.2]) {
+      const y0 = evalY(xVal);
+      const yh = evalY(xVal + h);
+      const ymh = evalY(xVal - h);
+      if (!isFinite(y0) || !isFinite(yh) || !isFinite(ymh)) continue;
+
+      const scope: Record<string, number> = {
+        [variable]: xVal,
+        _y: y0,
+        _yp: (yh - ymh) / (2 * h),
+        _ypp: (yh - 2 * y0 + ymh) / (h * h),
+        ...constants,
+      };
+
+      const residual = odeCompiled.evaluate(scope);
+      if (typeof residual !== 'number' || !isFinite(residual) || Math.abs(residual) > 1e-3) {
+        return false;
+      }
+    }
+
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
 export const evaluateMath = (
   expression: string,
   sessionType: 'math' | 'physics' | 'default' = 'default'
@@ -500,6 +607,17 @@ export const evaluateMath = (
   try {
     const sanitized = latexToMathJS(expression);
     const trimmed = sanitized.trim();
+
+    if (trimmed.startsWith("verifyODE(")) {
+      const match = trimmed.match(/^verifyODE\(([^,]+),\s*([^,]+),\s*([a-zA-Z])\)$/);
+      if (match) {
+        const satisfied = verifyODESolution(match[1].trim(), match[2].trim(), match[3].trim());
+        return satisfied
+          ? "\\text{✓ Satisfies ODE}"
+          : "\\text{✗ Does not satisfy ODE}";
+      }
+      return "\\text{Error: use verifyODE(ode, solution, variable)}";
+    }
 
     if (trimmed.startsWith("solve(")) {
       const match = trimmed.match(/^solve\((.+),\s*([a-zA-Z0-9_]+)\)$/);

@@ -16,6 +16,8 @@ export interface Problem {
   answer: string;
   unit?: string;
   format_hint?: string;
+  verify?: 'ode';
+  ode?: string;
 }
 
 export const mathProblems: Problem[] = [
