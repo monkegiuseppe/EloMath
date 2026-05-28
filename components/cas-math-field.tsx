@@ -44,9 +44,9 @@ const CasMathField: FC<CasMathFieldProps> = ({ latex, onChange, onMount, onDelet
   return (
     <div
       ref={wrapperRef}
-      className={`inline-block align-middle mx-1 cursor-text transition-all ${
+      className={`inline-flex items-center gap-2 mx-1 cursor-text transition-all ${
         output
-          ? 'p-2 rounded-lg border border-border/50'
+          ? 'px-2 py-1 rounded-lg border border-border/50'
           : focused
             ? 'border-b border-primary/50 pb-px'
             : 'border-b border-transparent pb-px'
@@ -137,10 +137,12 @@ const CasMathField: FC<CasMathFieldProps> = ({ latex, onChange, onMount, onDelet
         className="min-w-12 text-lg !bg-transparent !border-0 !shadow-none !rounded-none"
       />
       {output && (
-        <div className="mt-2 pl-2 flex items-center gap-2 text-lg text-primary font-medium animate-in fade-in slide-in-from-top-1">
-          <span className="text-muted-foreground">=</span>
-          <StaticMathField>{output}</StaticMathField>
-        </div>
+        <>
+          <span className="text-muted-foreground text-lg">=</span>
+          <span className="text-primary font-medium text-lg animate-in fade-in slide-in-from-left-1">
+            <StaticMathField>{output}</StaticMathField>
+          </span>
+        </>
       )}
     </div>
   );
