@@ -5,7 +5,7 @@
 import { useState, useEffect, useCallback, useRef } from "react"
 import type { FC } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { CheckCircle, XCircle, SkipForward, Loader2, Flag, ArrowRight, RefreshCcw } from "lucide-react"
+import { CheckCircle, XCircle, SkipForward, Loader2, Flag, ArrowRight, RefreshCcw, Notebook } from "lucide-react"
 import { checkAnswer } from "../lib/answer-verification"
 import ProblemRenderer from "./problem-renderer"
 import FormattingGuideModal from "./formatting-guide-modal"
@@ -24,6 +24,7 @@ interface MathPracticeCoreProps {
   seenQuestionIds: string[];
   onQuestionSeen: (id: string) => void;
   onCycleReset: () => void;
+  onSendToNotepad?: (latex: string) => void;
 }
 
 interface ProblemData {
@@ -46,6 +47,14 @@ interface Feedback {
   eloChange: number;
 }
 
+const extractLatex = (problemText: string): string => {
+  const matches: string[] = [];
+  const re = /\$([^$]+)\$/g;
+  let m;
+  while ((m = re.exec(problemText)) !== null) matches.push(m[1]);
+  return matches.join(', ');
+};
+
 export const MathPracticeCore: FC<MathPracticeCoreProps> = ({
   userElo,
   onAnswerSubmit,
@@ -54,7 +63,8 @@ export const MathPracticeCore: FC<MathPracticeCoreProps> = ({
   selectedCategories,
   seenQuestionIds,
   onQuestionSeen,
-  onCycleReset
+  onCycleReset,
+  onSendToNotepad,
 }) => {
   const [currentProblem, setCurrentProblem] = useState<ProblemData | null>(null);
   const [userAnswer, setUserAnswer] = useState<string>("");
@@ -242,6 +252,18 @@ export const MathPracticeCore: FC<MathPracticeCoreProps> = ({
                       <span className="text-sm font-medium text-muted-foreground">
                         Difficulty: <span className="text-foreground font-bold">{currentProblem.difficulty}</span>
                       </span>
+                      {onSendToNotepad && (
+                        <button
+                          onClick={() => {
+                            const latex = extractLatex(currentProblem.problem);
+                            if (latex) onSendToNotepad(latex);
+                          }}
+                          className="text-muted-foreground hover:text-primary transition-colors p-1.5 rounded-md hover:bg-primary/10"
+                          title="Send equation to notepad"
+                        >
+                          <Notebook size={18} />
+                        </button>
+                      )}
                       <button
                         onClick={() => setIsReportOpen(true)}
                         className="text-muted-foreground hover:text-destructive transition-colors p-1.5 rounded-md hover:bg-destructive/10"

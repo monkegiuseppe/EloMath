@@ -21,6 +21,8 @@ interface FullscreenNotepadProps {
   onChange: (newValue: string) => void;
   sessionType?: 'math' | 'physics' | 'default';
   isActive?: boolean;
+  pendingEquation?: { latex: string; key: number } | null;
+  onEquationInserted?: () => void;
 }
 
 export interface NotepadRef {
@@ -28,12 +30,13 @@ export interface NotepadRef {
 }
 
 const FullscreenNotepad = forwardRef<NotepadRef, FullscreenNotepadProps>(
-  ({ value, onChange, sessionType = 'default', isActive = true }, ref) => {
+  ({ value, onChange, sessionType = 'default', isActive = true, pendingEquation, onEquationInserted }, ref) => {
     const [equations, setEquations] = useState<Record<string, EquationState>>({});
     const [isGuideOpen, setIsGuideOpen] = useState(false);
     const contentRef = useRef<HTMLDivElement>(null);
     const equationCounter = useRef(0);
     const lastFocusedEquationId = useRef<string | null>(null);
+    const lastPendingKeyRef = useRef<number | null>(null);
 
     useImperativeHandle(ref, () => ({
       focus: () => {
@@ -120,6 +123,38 @@ const FullscreenNotepad = forwardRef<NotepadRef, FullscreenNotepadProps>(
       sel.removeAllRanges();
       sel.addRange(range);
     }, []);
+
+    const insertEquationAtEnd = useCallback((latex: string) => {
+      if (!contentRef.current) return;
+
+      const equationId = `cas-eq-${equationCounter.current++}`;
+
+      const wrapper = document.createElement('span');
+      wrapper.className = 'inline-math-wrapper';
+      wrapper.setAttribute('data-equation-id', equationId);
+      wrapper.contentEditable = 'false';
+
+      if (contentRef.current.innerHTML.trim()) {
+        contentRef.current.appendChild(document.createElement('br'));
+      }
+      contentRef.current.appendChild(wrapper);
+      contentRef.current.appendChild(document.createTextNode('​'));
+
+      setEquations(prev => ({ ...prev, [equationId]: { latex, mqInstance: null } }));
+      lastFocusedEquationId.current = equationId;
+    }, []);
+
+    useEffect(() => {
+      if (!pendingEquation || pendingEquation.key === lastPendingKeyRef.current) return;
+      lastPendingKeyRef.current = pendingEquation.key;
+
+      const t = setTimeout(() => {
+        insertEquationAtEnd(pendingEquation.latex);
+        onEquationInserted?.();
+      }, 80);
+
+      return () => clearTimeout(t);
+    }, [pendingEquation, insertEquationAtEnd, onEquationInserted]);
 
     const handleEquationMount = useCallback((id: string, field: MathField) => {
       setEquations(prev => {

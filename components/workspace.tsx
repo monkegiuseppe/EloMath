@@ -74,6 +74,8 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
   const [seenQuestionIds, setSeenQuestionIds] = useState<string[]>([]);
+  const [pendingEquation, setPendingEquation] = useState<{ latex: string; key: number } | null>(null);
+  const pendingEquationKeyRef = useRef(0);
 
   const currentProblemRef = useRef<{ category: string; difficulty: number } | null>(null);
 
@@ -98,6 +100,22 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
 
   const handleCycleReset = useCallback(() => {
     setSeenQuestionIds([]);
+  }, []);
+
+  const handleSendToNotepad = useCallback((latex: string) => {
+    setTabs(prev => {
+      const existing = prev.find(t => t.type === 'notepad');
+      if (existing) {
+        setActiveTabId(existing.id);
+        return prev;
+      }
+      const newId = nextTabId.current++;
+      const count = prev.filter(t => t.type === 'notepad').length + 1;
+      const newTab: Tab = { id: newId, type: 'notepad', title: `Notepad ${count}`, content: '' };
+      setActiveTabId(newId);
+      return [...prev, newTab];
+    });
+    setPendingEquation({ latex, key: ++pendingEquationKeyRef.current });
   }, []);
 
   useEffect(() => {
@@ -672,6 +690,8 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
                     onChange={(newContent) => handleContentChange(tab.id, newContent)}
                     sessionType={sessionType}
                     isActive={activeTabId === tab.id}
+                    pendingEquation={activeTabId === tab.id ? pendingEquation : null}
+                    onEquationInserted={() => setPendingEquation(null)}
                   />
                 )}
                 {tab.type === 'graphing' && <FullscreenGraphingTool />}
@@ -688,6 +708,7 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
                       seenQuestionIds={seenQuestionIds}
                       onQuestionSeen={handleQuestionSeen}
                       onCycleReset={handleCycleReset}
+                      onSendToNotepad={handleSendToNotepad}
                     />
                   ) : (
                     <div className="flex h-full items-center justify-center">
@@ -707,6 +728,7 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
                       seenQuestionIds={seenQuestionIds}
                       onQuestionSeen={handleQuestionSeen}
                       onCycleReset={handleCycleReset}
+                      onSendToNotepad={handleSendToNotepad}
                     />
                   ) : (
                     <div className="flex h-full items-center justify-center">

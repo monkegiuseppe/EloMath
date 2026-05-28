@@ -216,49 +216,6 @@ const NotepadGuideModal: FC<NotepadGuideModalProps> = ({ isOpen, onClose }) => {
                   </div>
                 </div>
 
-                {/* Tips */}
-                <div className="bg-blue-500/10 border border-blue-500/30 rounded p-3">
-                  <h3 className="text-blue-400 font-semibold mb-2">💡 Pro Tips</h3>
-                  <ul className="space-y-1 text-xs">
-                    <li>• Use parentheses liberally for clarity: <code>(x+1)/(x-1)</code></li>
-                    <li>• Multiplication must be explicit: <code>2*x</code> not <code>2x</code></li>
-                    <li>• For exponents use ^: <code>x^2</code> or click the superscript button</li>
-                    <li>• Chain operations: <code>simplify(derivative(x^3, x))</code></li>
-                    <li>• All Greek letters auto-convert: just type their names</li>
-                    <li>• For infinity in limits, use <code>\infty</code> or type it as <code>infinity</code></li>
-                    <li>• Use backslash for built-in operators: <code>\int</code>, <code>\sum</code>, <code>\lim</code></li>
-                  </ul>
-                </div>
-
-                {/* Examples Section */}
-                <div className="bg-purple-500/10 border border-purple-500/30 rounded p-3">
-                  <h3 className="text-purple-400 font-semibold mb-2">📝 Try These Examples</h3>
-                  <div className="space-y-2 text-xs">
-                    <div className="p-2 bg-background/30 rounded">
-                      <strong>Calculus:</strong><br />
-                      <code>{'limit((1+1/n)^n, n->infinity)'}</code> → Definition of e<br />
-                      <code>derivative(ln(x^2+1), x)</code> → Chain rule<br />
-                      <code>integrate(x*cos(x), x)</code> → Integration by parts
-                    </div>
-                    <div className="p-2 bg-background/30 rounded">
-                      <strong>Algebra:</strong><br />
-                      <code>solve(x^2 + 3*x - 10 = 0, x)</code> → Quadratic<br />
-                      <code>expand((a+b)^3)</code> → Binomial expansion<br />
-                      <code>simplify(sin(x)^2 + cos(x)^2)</code> → Trig identity
-                    </div>
-                    <div className="p-2 bg-background/30 rounded">
-                      <strong>Series:</strong><br />
-                      <code>sum(1/k^2, k, 1, 100)</code> → Basel problem approximation<br />
-                      <code>product(2*k/(2*k-1), k, 1, 20)</code> → Wallis product
-                    </div>
-                    <div className="p-2 bg-background/30 rounded">
-                      <strong>ODE Verifier:</strong><br />
-                      <code>verifyODE(y''+y=0, C1*cos(x)+C2*sin(x), x)</code><br />
-                      <code>verifyODE(y'-2*y, C1*e^(2x), x)</code><br />
-                      <code>verifyODE(y''-5*y'+6*y, C1*e^(2x)+C2*e^(3x), x)</code>
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
           </motion.div>
