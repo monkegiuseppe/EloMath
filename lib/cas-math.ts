@@ -724,8 +724,7 @@ export const evaluateMath = (
 
     return result.toString().replace(/\s\*\s/g, "");
 
-  } catch (error: any) {
-    console.error('CAS Error:', error);
-    return "Error";
+  } catch {
+    return "";
   }
 };

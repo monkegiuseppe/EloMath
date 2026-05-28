@@ -17,6 +17,7 @@ interface CasMathFieldProps {
 
 const CasMathField: FC<CasMathFieldProps> = ({ latex, onChange, onMount, onDelete, onFocus, sessionType }) => {
   const [output, setOutput] = useState('');
+  const [focused, setFocused] = useState(false);
   const mathFieldRef = useRef<MathField | null>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
@@ -25,7 +26,7 @@ const CasMathField: FC<CasMathFieldProps> = ({ latex, onChange, onMount, onDelet
       const currentLatex = field.latex();
       if (currentLatex) {
         const result = evaluateMath(currentLatex, sessionType);
-        setOutput(result);
+        if (result) setOutput(result);
       }
     }
   }, [sessionType]);
@@ -43,7 +44,13 @@ const CasMathField: FC<CasMathFieldProps> = ({ latex, onChange, onMount, onDelet
   return (
     <div
       ref={wrapperRef}
-      className="inline-block align-middle mx-1 my-2 p-2 bg-muted/30 rounded-lg w-auto shadow-sm border border-border/50 cursor-text"
+      className={`inline-block align-middle mx-1 my-1 cursor-text transition-all ${
+        output
+          ? 'p-2 rounded-lg border border-border/50'
+          : focused
+            ? 'border-b border-primary/50 pb-px'
+            : 'border-b border-transparent pb-px'
+      }`}
       onClick={handleWrapperClick}
     >
       <EditableMathField
@@ -51,9 +58,15 @@ const CasMathField: FC<CasMathFieldProps> = ({ latex, onChange, onMount, onDelet
         mathquillDidMount={(field) => {
           mathFieldRef.current = field;
           onMount(field);
+
+          const el = field.el();
+          el.addEventListener('focusin', () => setFocused(true));
+          el.addEventListener('focusout', () => setFocused(false));
+
           setTimeout(() => {
             field.focus();
             onFocus?.();
+            setFocused(true);
           }, 10);
         }}
         config={{
@@ -63,23 +76,17 @@ const CasMathField: FC<CasMathFieldProps> = ({ latex, onChange, onMount, onDelet
             edit: (mathField) => {
               if (mathField) {
                 onChange(mathField.latex());
-                if (output) {
-                  setOutput('');
-                }
+                setOutput('');
               }
             },
             enter: handleEnter,
-            deleteOutOf: (dir) => {
+            deleteOutOf: (_dir) => {
               if (mathFieldRef.current && mathFieldRef.current.latex().trim() === '') {
                 onDelete();
               }
             },
-            upOutOf: () => {
-              mathFieldRef.current?.focus();
-            },
-            downOutOf: () => {
-              mathFieldRef.current?.focus();
-            },
+            upOutOf: () => { mathFieldRef.current?.focus(); },
+            downOutOf: () => { mathFieldRef.current?.focus(); },
             moveOutOf: (dir) => {
               const wrapper = mathFieldRef.current?.el().closest('.inline-math-wrapper');
               if (!wrapper || !wrapper.parentNode) return;
@@ -102,7 +109,7 @@ const CasMathField: FC<CasMathFieldProps> = ({ latex, onChange, onMount, onDelet
                     range.setStart(next, 0);
                     range.collapse(true);
                   } else {
-                    const newTextNode = document.createTextNode('\u200B');
+                    const newTextNode = document.createTextNode('​');
                     parent.insertBefore(newTextNode, wrapper.nextSibling);
                     range.setStart(newTextNode, 1);
                     range.collapse(true);
@@ -113,7 +120,7 @@ const CasMathField: FC<CasMathFieldProps> = ({ latex, onChange, onMount, onDelet
                     range.setStart(prev, prev.textContent.length);
                     range.collapse(true);
                   } else {
-                    const newTextNode = document.createTextNode('\u200B');
+                    const newTextNode = document.createTextNode('​');
                     parent.insertBefore(newTextNode, wrapper);
                     range.setStart(newTextNode, 1);
                     range.collapse(true);
@@ -127,7 +134,7 @@ const CasMathField: FC<CasMathFieldProps> = ({ latex, onChange, onMount, onDelet
             },
           },
         }}
-        className="p-2 rounded-md bg-input border border-border min-w-12 text-lg focus:ring-2 focus:ring-ring focus:border-border"
+        className="min-w-12 text-lg !bg-transparent !border-0 !shadow-none !rounded-none"
       />
       {output && (
         <div className="mt-2 pl-2 flex items-center gap-2 text-lg text-primary font-medium animate-in fade-in slide-in-from-top-1">
