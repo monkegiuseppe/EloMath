@@ -38,6 +38,13 @@ export function normalizeExpression(expr: string): string {
 
     s = s.replace(/^\((-?[\d.]+)\)\//, '$1/');
 
+    // (x^(n))/(c) or (x^(n))/c → x^n/c  (produced by latexToMathJS frac conversion)
+    s = s.replace(/^\(([a-zA-Z])\^\((-?[\d.]+)\)\)\/\((-?[\d.]+)\)$/, '$1^$2/$3');
+    s = s.replace(/^\(([a-zA-Z])\^\((-?[\d.]+)\)\)\/(-?[\d.]+)$/, '$1^$2/$3');
+    // (x^n)/(c) or (x^n)/c → x^n/c
+    s = s.replace(/^\(([a-zA-Z]\^-?[\d.]+)\)\/\((-?[\d.]+)\)$/, '$1/$2');
+    s = s.replace(/^\(([a-zA-Z]\^-?[\d.]+)\)\/(-?[\d.]+)$/, '$1/$2');
+
     s = s.replace(/\/\(\(([^()]+)\)\)$/, '/($1)');
 
     s = s.replace(/\/\(([a-z])\)$/i, '/$1');

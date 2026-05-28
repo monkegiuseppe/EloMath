@@ -38,7 +38,8 @@ function latexToMathJS(latex: string): string {
 
   let iterations = 0;
   while (s.includes("\\frac{") && iterations < 10) {
-    s = s.replace(/\\frac\{([^{}]+)\}\{([^{}]+)\}/g, "(($1)/($2))");
+    // Handles one level of nested braces (e.g. x^{2} in numerator/denominator)
+    s = s.replace(/\\frac\{((?:[^{}]|\{[^{}]*\})*)\}\{((?:[^{}]|\{[^{}]*\})*)\}/g, "(($1)/($2))");
     iterations++;
   }
   s = s.replace(/\\frac/g, "");

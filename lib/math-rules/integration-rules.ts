@@ -171,6 +171,26 @@ export const integrationRules: MathRule[] = [
     },
 
     {
+        id: 'int-power-div-const',
+        name: 'Power divided by constant: x^n/c',
+        pattern: /^(VAR)\^(-?[\d.]+)\/(-?[\d.]+)$/,
+        transform: ({ captures }, v) => {
+            const n = parseFloat(captures['2']);
+            const c = parseFloat(captures['3']);
+            const newN = n + 1;
+            // ∫ x^n/c dx = x^(n+1) / (c*(n+1))
+            if (Number.isInteger(n) && Number.isInteger(c)) {
+                const denom = Math.round(c * newN);
+                if (Math.abs(denom) === 1) return denom > 0 ? `${v}^{${newN}}` : `-${v}^{${newN}}`;
+                return `\\frac{${v}^{${newN}}}{${denom}}`;
+            }
+            return `${formatCoefficient(1 / (c * newN))}${v}^{${newN}}`;
+        },
+        conditions: ({ captures }) => Math.abs(parseFloat(captures['2']) + 1) > 1e-10,
+        priority: 16
+    },
+
+    {
         id: 'int-coeff-power',
         name: 'Coefficient times power: ax^n',
         pattern: /^(-?[\d.]+)\*?(VAR)\^(-?[\d.]+)$/,

@@ -44,7 +44,7 @@ const CasMathField: FC<CasMathFieldProps> = ({ latex, onChange, onMount, onDelet
   return (
     <div
       ref={wrapperRef}
-      className={`inline-block align-middle mx-1 my-1 cursor-text transition-all ${
+      className={`inline-block align-middle mx-1 cursor-text transition-all ${
         output
           ? 'p-2 rounded-lg border border-border/50'
           : focused

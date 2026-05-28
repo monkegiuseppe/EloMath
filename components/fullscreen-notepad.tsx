@@ -137,6 +137,7 @@ const FullscreenNotepad = forwardRef<NotepadRef, FullscreenNotepadProps>(
       if (contentRef.current.innerHTML.trim()) {
         contentRef.current.appendChild(document.createElement('br'));
       }
+      contentRef.current.appendChild(document.createTextNode('​'));
       contentRef.current.appendChild(wrapper);
       contentRef.current.appendChild(document.createTextNode('​'));
 
@@ -228,14 +229,38 @@ const FullscreenNotepad = forwardRef<NotepadRef, FullscreenNotepadProps>(
         let targetWrapper: Element | null = null;
 
         if (e.key === 'ArrowRight') {
-          if (anchorNode.nodeType === Node.TEXT_NODE && anchorOffset === anchorNode.textContent?.length) {
-            targetWrapper = anchorNode.nextSibling as Element;
+          if (anchorNode.nodeType === Node.TEXT_NODE) {
+            const isZWS = anchorNode.textContent === '​';
+            const atEnd = anchorOffset === anchorNode.textContent?.length;
+            if (isZWS) {
+              targetWrapper = anchorNode.nextSibling as Element;
+            } else if (atEnd) {
+              const next = anchorNode.nextSibling;
+              // Skip a single zero-width space to reach wrapper in one press
+              if (next?.nodeType === Node.TEXT_NODE && next.textContent === '​' && next.nextSibling) {
+                targetWrapper = next.nextSibling as Element;
+              } else {
+                targetWrapper = next as Element;
+              }
+            }
           } else if (anchorNode.nodeType === Node.ELEMENT_NODE) {
             targetWrapper = anchorNode.childNodes[anchorOffset] as Element;
           }
         } else if (e.key === 'ArrowLeft') {
-          if (anchorNode.nodeType === Node.TEXT_NODE && anchorOffset === 0) {
-            targetWrapper = anchorNode.previousSibling as Element;
+          if (anchorNode.nodeType === Node.TEXT_NODE) {
+            const isZWS = anchorNode.textContent === '​';
+            const atStart = anchorOffset === 0;
+            if (isZWS) {
+              targetWrapper = anchorNode.previousSibling as Element;
+            } else if (atStart) {
+              const prev = anchorNode.previousSibling;
+              // Skip a single zero-width space to reach wrapper in one press
+              if (prev?.nodeType === Node.TEXT_NODE && prev.textContent === '​' && prev.previousSibling) {
+                targetWrapper = prev.previousSibling as Element;
+              } else {
+                targetWrapper = prev as Element;
+              }
+            }
           } else if (anchorNode.nodeType === Node.ELEMENT_NODE) {
             targetWrapper = anchorNode.childNodes[anchorOffset - 1] as Element;
           }
