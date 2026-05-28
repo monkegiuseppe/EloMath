@@ -28,6 +28,8 @@ async function main() {
                     answer: p.answer,
                     unit: p.unit || null,
                     formatHint: p.format_hint || null,
+                    verify: (p as any).verify || null,
+                    ode: (p as any).ode || null,
                 },
                 create: {
                     customId: p.id,
@@ -39,6 +41,8 @@ async function main() {
                     answer: p.answer,
                     unit: p.unit || null,
                     formatHint: p.format_hint || null,
+                    verify: (p as any).verify || null,
+                    ode: (p as any).ode || null,
                 },
             })
         ));

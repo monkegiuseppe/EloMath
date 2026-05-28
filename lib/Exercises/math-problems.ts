@@ -1965,8 +1965,8 @@ export const mathProblems: Problem[] = [
     id: "C530",
     topic: "Calculus (Chain Rule with Roots)",
     difficulty: 1550,
-    problem: "Let $f(x) = \\sqrt[3]{x^3+1}$. Find $f'(2)$.",
-    answer: "4/3",
+    problem: "Let $f(x) = \\sqrt{x^3+1}$. Find $f'(2)$.",
+    answer: "2",
   },
   {
     category: "Calculus I",

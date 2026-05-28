@@ -5,8 +5,16 @@ import { verifyODESolution } from './cas-math';
 
 const math = create(all);
 
+function normalizeRadicals(s: string): string {
+    // √(expr) → sqrt(expr), then bare √N → sqrt(N)
+    return s
+        .replace(/√\(([^)]+)\)/g, 'sqrt($1)')
+        .replace(/√(\w+)/g, 'sqrt($1)')
+        .replace(/√/g, 'sqrt');
+}
+
 function cleanInput(input: string): string {
-    return input
+    return normalizeRadicals(input)
         .replace(/\\/g, "")
         .replace(/\{/g, "(")
         .replace(/\}/g, ")")
@@ -14,7 +22,6 @@ function cleanInput(input: string): string {
         .replace(/π/g, "pi")
         .replace(/²/g, "^2")
         .replace(/³/g, "^3")
-        .replace(/√/g, "sqrt")
         .replace(/pi/gi, "pi")
         .replace(/ln/gi, "log")
         .toLowerCase();
@@ -45,13 +52,15 @@ export const checkAnswer = (
     }
 
     try {
-        const diffExpression = `(${userAnswer}) - (${correctAnswer})`;
+        const normUser = normalizeRadicals(userAnswer);
+        const normCorrect = normalizeRadicals(correctAnswer);
+        const diffExpression = `(${normUser}) - (${normCorrect})`;
 
         const simplified = math.simplify(diffExpression);
         if (simplified.toString() === "0") return true;
 
-        const nodeUser = math.parse(userAnswer);
-        const nodeCorrect = math.parse(correctAnswer);
+        const nodeUser = math.parse(normUser);
+        const nodeCorrect = math.parse(normCorrect);
 
         const varsUser = new Set<string>();
         const varsCorrect = new Set<string>();

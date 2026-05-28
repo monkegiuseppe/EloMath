@@ -59,16 +59,18 @@ model QuestionAttempt {
 // Question Model
 model Question {
   id          String   @id @default(cuid())
-  customId    String?  @unique 
-  subject     String   
+  customId    String?  @unique
+  subject     String
   topic       String
   category    String
   difficulty  Int
-  problem     String   @db.Text 
-  answer      String   
-  unit        String?  
-  formatHint  String?  
-  
+  problem     String   @db.Text
+  answer      String
+  unit        String?
+  formatHint  String?
+  verify      String?
+  ode         String?
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
