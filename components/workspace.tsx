@@ -103,20 +103,17 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
   }, []);
 
   const handleSendToNotepad = useCallback((latex: string) => {
-    setTabs(prev => {
-      const existing = prev.find(t => t.type === 'notepad');
-      if (existing) {
-        setActiveTabId(existing.id);
-        return prev;
-      }
+    const existing = tabs.find(t => t.type === 'notepad');
+    if (existing) {
+      setActiveTabId(existing.id);
+    } else {
       const newId = nextTabId.current++;
-      const count = prev.filter(t => t.type === 'notepad').length + 1;
-      const newTab: Tab = { id: newId, type: 'notepad', title: `Notepad ${count}`, content: '' };
+      const count = tabs.filter(t => t.type === 'notepad').length + 1;
+      setTabs(prev => [...prev, { id: newId, type: 'notepad', title: `Notepad ${count}`, content: '' }]);
       setActiveTabId(newId);
-      return [...prev, newTab];
-    });
+    }
     setPendingEquation({ latex, key: ++pendingEquationKeyRef.current });
-  }, []);
+  }, [tabs]);
 
   useEffect(() => {
     if (status === 'authenticated' && sessionType !== 'default' && !mergeCheckDone.current) {

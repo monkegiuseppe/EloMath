@@ -340,7 +340,7 @@ export const PhysicsPracticeCore: FC<PhysicsPracticeCoreProps> = ({
                             <Button
                               type="button"
                               size="lg"
-                              onClick={getNewProblem}
+                              onClick={() => getNewProblem()}
                               className={feedback.type === 'correct' ? "bg-green-600 hover:bg-green-500" : ""}
                             >
                               Next Problem <ArrowRight className="ml-2 w-4 h-4" />
