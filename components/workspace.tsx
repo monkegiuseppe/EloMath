@@ -697,7 +697,7 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
                 {tab.type === 'graphing' && <FullscreenGraphingTool />}
 
                 {tab.type === 'math-practice' && (
-                  isEloLoaded && userElo !== null && !showMergeModal ? (
+                  isEloLoaded && userElo !== null && !showMergeModal && !showDifficultySelector ? (
                     <MathPracticeCore
                       key={practiceKey}
                       userElo={userElo}
@@ -717,7 +717,7 @@ export default function Workspace({ onBack, sessionType = 'default' }: Workspace
                   )
                 )}
                 {tab.type === 'physics-practice' && (
-                  isEloLoaded && userElo !== null && !showMergeModal ? (
+                  isEloLoaded && userElo !== null && !showMergeModal && !showDifficultySelector ? (
                     <PhysicsPracticeCore
                       key={practiceKey}
                       userElo={userElo}

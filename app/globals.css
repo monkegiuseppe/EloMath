@@ -284,3 +284,11 @@ body::-webkit-scrollbar-thumb:hover {
   min-width: 0.5em;
   display: inline-block;
 }
+
+.mq-math-mode .mq-int .mq-supsub .mq-empty {
+  background: transparent !important;
+}
+
+.mq-math-mode .mq-int .mq-supsub .mq-empty::after {
+  content: none !important;
+}

@@ -154,7 +154,10 @@ const FullscreenNotepad = forwardRef<NotepadRef, FullscreenNotepadProps>(
         onEquationInserted?.();
       }, 80);
 
-      return () => clearTimeout(t);
+      return () => {
+        clearTimeout(t);
+        lastPendingKeyRef.current = null;
+      };
     }, [pendingEquation, insertEquationAtEnd, onEquationInserted]);
 
     const handleEquationMount = useCallback((id: string, field: MathField) => {

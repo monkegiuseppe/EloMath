@@ -38,10 +38,7 @@ interface AnalysisPoint {
 }
 
 export default function FullscreenGraphingTool() {
-  const [equations, setEquations] = useState<Equation[]>([
-    { id: 1, expr: "sin(x)", compiled: math.compile("sin(x)"), color: GRAPH_COLORS[0], visible: true },
-    { id: 2, expr: "x^2 / 10", compiled: math.compile("x^2 / 10"), color: GRAPH_COLORS[1], visible: true },
-  ])
+  const [equations, setEquations] = useState<Equation[]>([])
 
   const [view, setView] = useState({ zoom: 40, centerX: 0, centerY: 0 })
   const [isPanning, setIsPanning] = useState(false)

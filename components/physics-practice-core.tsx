@@ -78,7 +78,7 @@ export const PhysicsPracticeCore: FC<PhysicsPracticeCoreProps> = ({
 
   const feedbackTimestampRef = useRef<number>(0);
 
-  const getNewProblem = useCallback(async () => {
+  const getNewProblem = useCallback(async (signal?: AbortSignal) => {
     if (selectedCategories.length === 0) return;
 
     setIsLoading(true);
@@ -94,7 +94,8 @@ export const PhysicsPracticeCore: FC<PhysicsPracticeCoreProps> = ({
         excludeIds: seenQuestionIds.join(',')
       });
 
-      const res = await fetch(`/api/problems?${params.toString()}`);
+      const res = await fetch(`/api/problems?${params.toString()}`, { signal });
+      if (signal?.aborted) return;
       const data = await res.json();
 
       if (data.error) {
@@ -119,14 +120,17 @@ export const PhysicsPracticeCore: FC<PhysicsPracticeCoreProps> = ({
         });
       }
     } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') return;
       console.error("Failed to load problem", error);
     } finally {
-      setIsLoading(false);
+      if (!signal?.aborted) setIsLoading(false);
     }
   }, [userElo, selectedCategories, seenQuestionIds, onProblemLoad, onQuestionSeen]);
 
   useEffect(() => {
-    getNewProblem();
+    const controller = new AbortController();
+    getNewProblem(controller.signal);
+    return () => controller.abort();
   }, [selectedCategories]);
 
   useEffect(() => {
