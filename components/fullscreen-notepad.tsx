@@ -295,6 +295,7 @@ const FullscreenNotepad = forwardRef<NotepadRef, FullscreenNotepadProps>(
             className="w-full flex-grow text-base sm:text-lg p-4 sm:p-8 overflow-y-auto custom-scrollbar notepad-content outline-none"
             contentEditable
             suppressContentEditableWarning
+            spellCheck={false}
             onInput={(e) => onChange(e.currentTarget.innerHTML)}
             onClick={handleEditorClick}
             tabIndex={0}
