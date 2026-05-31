@@ -13,6 +13,16 @@ function normalizeRadicals(s: string): string {
         .replace(/√/g, 'sqrt');
 }
 
+// Normalize Unicode math symbols into forms mathjs understands.
+// Without this, the stored answer "π/2" is parsed as an unknown free
+// variable instead of the constant pi, so "pi/2" never matches.
+function normalizeForMath(s: string): string {
+    return normalizeRadicals(s)
+        .replace(/π/g, 'pi')
+        .replace(/²/g, '^2')
+        .replace(/³/g, '^3');
+}
+
 function cleanInput(input: string): string {
     return normalizeRadicals(input)
         .replace(/\\/g, "")
@@ -52,8 +62,8 @@ export const checkAnswer = (
     }
 
     try {
-        const normUser = normalizeRadicals(userAnswer);
-        const normCorrect = normalizeRadicals(correctAnswer);
+        const normUser = normalizeForMath(userAnswer);
+        const normCorrect = normalizeForMath(correctAnswer);
         const diffExpression = `(${normUser}) - (${normCorrect})`;
 
         const simplified = math.simplify(diffExpression);
